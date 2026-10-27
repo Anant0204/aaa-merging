@@ -1,0 +1,178 @@
+import React from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { apiClient } from '../services/dbService';
+import Box from '@mui/material/Box';
+import Paper from '@mui/material/Paper';
+import Typography from '@mui/material/Typography';
+import Chip from '@mui/material/Chip';
+import CircularProgress from '@mui/material/CircularProgress';
+import DescriptionIcon from '@mui/icons-material/Description';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import CancelIcon from '@mui/icons-material/Cancel';
+import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
+import NoteAltIcon from '@mui/icons-material/NoteAlt';
+import ForumIcon from '@mui/icons-material/Forum';
+import HistoryIcon from '@mui/icons-material/History';
+import dayjs from 'dayjs';
+
+export const CaseActivityTimeline = ({ clientId, leadId, applicationId }) => {
+  const { data, isLoading } = useQuery({
+    queryKey: ['caseTimeline', clientId, leadId, applicationId],
+    queryFn: async () => {
+      try {
+        const params = new URLSearchParams();
+        if (clientId) params.append('clientId', clientId);
+        if (leadId) params.append('leadId', leadId);
+        if (applicationId) params.append('applicationId', applicationId);
+
+        const res = await apiClient.get(`/audit-logs/timeline?${params.toString()}`);
+        return res.data || { timeline: [] };
+      } catch (err) {
+        return { timeline: [] };
+      }
+    },
+    enabled: Boolean(clientId || leadId || applicationId),
+    retry: false
+  });
+
+  const getEventIcon = (type) => {
+    switch (type) {
+      case 'DOC_UPLOADED':
+        return <DescriptionIcon fontSize="small" sx={{ color: '#2563EB' }} />;
+      case 'DOC_VERIFIED':
+        return <CheckCircleIcon fontSize="small" sx={{ color: '#059669' }} />;
+      case 'DOC_REJECTED':
+        return <CancelIcon fontSize="small" sx={{ color: '#DC2626' }} />;
+      case 'STATUS_CHANGED':
+      case 'CASE_STATUS_CHANGED':
+      case 'LEAD_STATUS_CHANGED':
+        return <SwapHorizIcon fontSize="small" sx={{ color: '#7C3AED' }} />;
+      case 'NOTE_ADDED':
+        return <NoteAltIcon fontSize="small" sx={{ color: '#D97706' }} />;
+      default:
+        return <ForumIcon fontSize="small" sx={{ color: '#0284C7' }} />;
+    }
+  };
+
+  const getEventBadgeColor = (type) => {
+    if (type === 'DOC_VERIFIED') return 'success';
+    if (type === 'DOC_REJECTED') return 'error';
+    if (type === 'DOC_UPLOADED') return 'primary';
+    if (type.includes('STATUS')) return 'secondary';
+    if (type === 'NOTE_ADDED') return 'warning';
+    return 'info';
+  };
+
+  const timeline = data?.timeline || [];
+
+  if (isLoading) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
+        <CircularProgress size={28} />
+      </Box>
+    );
+  }
+
+  return (
+    <Paper elevation={0} sx={{ p: { xs: 1.5, sm: 2 }, border: '1px solid', borderColor: 'divider', borderRadius: 3, bgcolor: '#FAFBFD', width: '100%', overflow: 'hidden' }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1, mb: 2, pb: 1, borderBottom: '1px solid', borderColor: 'divider' }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, minWidth: 0 }}>
+          <HistoryIcon sx={{ color: 'primary.main', fontSize: { xs: '1.1rem', sm: '1.25rem' } }} />
+          <Typography variant="h6" sx={{ fontWeight: 700, fontSize: { xs: '0.875rem', sm: '1rem' } }}>
+            Activity Log & Case Timeline
+          </Typography>
+        </Box>
+        <Chip label={`${timeline.length} Events`} size="small" variant="outlined" sx={{ fontWeight: 600, fontSize: { xs: '0.68rem', sm: '0.75rem' }, flexShrink: 0 }} />
+      </Box>
+
+      {timeline.length === 0 ? (
+        <Box sx={{ textAlign: 'center', py: 3, color: 'text.secondary' }}>
+          <Typography variant="body2">No activity recorded yet for this profile.</Typography>
+        </Box>
+      ) : (
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, width: '100%' }}>
+          {timeline.map((item, idx) => (
+            <Box key={item.id || idx} sx={{ display: 'flex', gap: { xs: 1, sm: 2 }, position: 'relative', width: '100%', minWidth: 0 }}>
+              {/* Timeline Connector Line */}
+              {idx < timeline.length - 1 && (
+                <Box
+                  sx={{
+                    position: 'absolute',
+                    left: { xs: 13, sm: 17 },
+                    top: { xs: 30, sm: 36 },
+                    bottom: -16,
+                    width: 2,
+                    bgcolor: 'divider'
+                  }}
+                />
+              )}
+
+              {/* Icon Container */}
+              <Box
+                sx={{
+                  width: { xs: 28, sm: 36 },
+                  height: { xs: 28, sm: 36 },
+                  borderRadius: '50%',
+                  bgcolor: 'background.paper',
+                  border: '1px solid',
+                  borderColor: 'divider',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                  boxShadow: '0 2px 4px rgba(0,0,0,0.04)',
+                  zIndex: 1
+                }}
+              >
+                {getEventIcon(item.type)}
+              </Box>
+
+              {/* Content Details */}
+              <Paper
+                elevation={0}
+                sx={{
+                  flexGrow: 1,
+                  minWidth: 0,
+                  p: { xs: 1.25, sm: 1.5 },
+                  borderRadius: 2,
+                  border: '1px solid',
+                  borderColor: 'divider',
+                  bgcolor: 'background.paper',
+                  overflow: 'hidden'
+                }}
+              >
+                <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, alignItems: { xs: 'flex-start', sm: 'center' }, justifyContent: 'space-between', gap: 0.5, mb: 0.75 }}>
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 0.75, minWidth: 0, maxWidth: '100%' }}>
+                    <Chip
+                      label={item.type.replace(/_/g, ' ')}
+                      color={getEventBadgeColor(item.type)}
+                      size="small"
+                      sx={{ fontSize: { xs: '0.6rem', sm: '0.65rem' }, height: { xs: 18, sm: 20 }, fontWeight: 700, maxPx: '100%' }}
+                    />
+                    <Typography variant="subtitle2" sx={{ fontWeight: 700, fontSize: { xs: '0.78rem', sm: '0.85rem' }, wordBreak: 'break-word' }}>
+                      {item.actorName}
+                    </Typography>
+                    {item.actorRole && (
+                      <Typography variant="caption" sx={{ color: 'text.secondary', bgcolor: '#F1F5F9', px: 0.8, py: 0.2, borderRadius: 1, fontSize: '0.65rem', flexShrink: 0 }}>
+                        {item.actorRole}
+                      </Typography>
+                    )}
+                  </Box>
+                  <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600, fontSize: { xs: '0.68rem', sm: '0.75rem' }, flexShrink: 0 }}>
+                    {dayjs(item.timestamp).format('DD/MM/YYYY, hh:mm A')}
+                  </Typography>
+                </Box>
+
+                <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap', color: 'text.primary', fontSize: { xs: '0.78rem', sm: '0.85rem' }, wordBreak: 'break-word' }}>
+                  {item.description}
+                </Typography>
+              </Paper>
+            </Box>
+          ))}
+        </Box>
+      )}
+    </Paper>
+  );
+};
+
+export default CaseActivityTimeline;

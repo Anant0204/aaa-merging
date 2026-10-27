@@ -1,0 +1,304 @@
+import React, { useState, useRef, useLayoutEffect } from 'react';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import TableSortLabel from '@mui/material/TableSortLabel';
+import TablePagination from '@mui/material/TablePagination';
+import Paper from '@mui/material/Paper';
+import Box from '@mui/material/Box';
+import Chip from '@mui/material/Chip';
+import StatusBadge from './StatusBadge';
+
+import { useQuery } from '@tanstack/react-query';
+import { dbService } from '../services/dbService';
+import { useAuth } from '../hooks/useAuth';
+
+const DEFAULT_COLUMNS = {
+  leads: ['id', 'name', 'phone', 'email', 'nationality', 'countryOfResidence', 'service', 'status', 'assignedConsultant', 'source', 'createdDate'],
+  clients: ['id', 'name', 'nationality', 'countryOfResidence', 'service', 'package', 'status', 'visaStatus', 'assignedConsultant']
+};
+
+const isSwornTranslationRow = (row) => {
+  if (!row) return false;
+  const checkStr = `${row.service || ''} ${row.serviceType || ''} ${row.serviceId || ''} ${row.targetVisa || ''} ${row.packageName || ''}`.toLowerCase();
+  return checkStr.includes('translation') || checkStr.includes('sworn');
+};
+
+export const AppTable = ({
+  columns,
+  context, // 'leads' or 'clients'
+  data = [],
+  onRowClick,
+  actions,
+  page = 0,
+  rowsPerPage = 10,
+  count = 0,
+  onPageChange,
+  onRowsPerPageChange,
+  sortColumn,
+  sortDirection = 'asc',
+  onSort,
+  loading = false,
+  maxHeight = 600,
+}) => {
+  const { currentUser } = useAuth();
+  const { data: customizationSettings } = useQuery({
+    queryKey: ['customization-settings'],
+    queryFn: dbService.getCustomizationSettings,
+    enabled: !!currentUser
+  });
+
+  const topScrollRef = useRef(null);
+  const bottomScrollRef = useRef(null);
+  const tableRef = useRef(null);
+  const [scrollWidth, setScrollWidth] = useState(0);
+
+  const isSyncingTop = useRef(false);
+  const isSyncingBottom = useRef(false);
+
+  const handleTopScroll = () => {
+    if (isSyncingTop.current) {
+      isSyncingTop.current = false;
+      return;
+    }
+    if (topScrollRef.current && bottomScrollRef.current) {
+      isSyncingBottom.current = true;
+      bottomScrollRef.current.scrollLeft = topScrollRef.current.scrollLeft;
+    }
+  };
+
+  const handleBottomScroll = () => {
+    if (isSyncingBottom.current) {
+      isSyncingBottom.current = false;
+      return;
+    }
+    if (topScrollRef.current && bottomScrollRef.current) {
+      isSyncingTop.current = true;
+      topScrollRef.current.scrollLeft = bottomScrollRef.current.scrollLeft;
+    }
+  };
+
+  useLayoutEffect(() => {
+    const updateWidth = () => {
+      const sw = Math.max(
+        tableRef.current?.scrollWidth || 0,
+        bottomScrollRef.current?.scrollWidth || 0
+      );
+      setScrollWidth(sw);
+    };
+    updateWidth();
+    const timer = setTimeout(updateWidth, 150);
+    const resizeObserver = new ResizeObserver(updateWidth);
+    if (tableRef.current) resizeObserver.observe(tableRef.current);
+    if (bottomScrollRef.current) resizeObserver.observe(bottomScrollRef.current);
+    return () => {
+      clearTimeout(timer);
+      resizeObserver.disconnect();
+    };
+  }, [data, columns]);
+
+  const handleSort = (property) => {
+    if (onSort) {
+      onSort(property);
+    }
+  };
+
+  let visibleColumns = columns;
+  if (context && customizationSettings && currentUser && currentUser.role !== 'super_admin') {
+    const roleConfig = (customizationSettings[currentUser.id] || customizationSettings[currentUser.role]) || {};
+    const allowedColumns = roleConfig.columns?.[context] || DEFAULT_COLUMNS[context];
+    if (allowedColumns) {
+      visibleColumns = columns.filter(col => allowedColumns.includes(col.id));
+    }
+  }
+
+  return (
+    <Paper sx={{ width: '100%', overflow: 'hidden', borderRadius: 3, border: '1px solid', borderColor: 'divider', boxShadow: 'none' }}>
+      {/* Top Scrollbar Container */}
+      <Box
+        ref={topScrollRef}
+        onScroll={handleTopScroll}
+        sx={{
+          overflowX: 'auto',
+          overflowY: 'hidden',
+          width: '100%',
+          height: '14px',
+          bgcolor: '#F1F5F9',
+          borderBottom: '1px solid',
+          borderColor: 'divider',
+          '&::-webkit-scrollbar': {
+            height: 10,
+          },
+          '&::-webkit-scrollbar-track': {
+            backgroundColor: '#E2E8F0',
+          },
+          '&::-webkit-scrollbar-thumb': {
+            backgroundColor: '#64748B',
+            borderRadius: 4,
+            '&:hover': {
+              backgroundColor: '#475569',
+            },
+          },
+        }}
+      >
+        <Box sx={{ width: scrollWidth ? `${scrollWidth}px` : '100%', height: '1px' }} />
+      </Box>
+
+      <TableContainer ref={bottomScrollRef} onScroll={handleBottomScroll} sx={{ maxHeight, overflowX: 'auto' }}>
+        <Table ref={tableRef} stickyHeader aria-label="customized table">
+          <TableHead>
+            <TableRow>
+              {visibleColumns.map((column) => (
+                <TableCell
+                  key={column.id}
+                  align={column.align || 'left'}
+                  style={{ minWidth: column.minWidth }}
+                  sortDirection={sortColumn === column.id ? sortDirection : false}
+                  sx={{
+                    py: 1,
+                    fontWeight: 600,
+                    fontSize: '0.8rem',
+                  }}
+                >
+                  {column.sortable !== false ? (
+                    <TableSortLabel
+                      active={sortColumn === column.id}
+                      direction={sortColumn === column.id ? sortDirection : 'asc'}
+                      onClick={() => handleSort(column.id)}
+                    >
+                      {column.label}
+                    </TableSortLabel>
+                  ) : (
+                    column.label
+                  )}
+                </TableCell>
+              ))}
+              {actions && (
+                <TableCell align="right" sx={{ py: 1, fontWeight: 600, fontSize: '0.85rem' }}>
+                  Actions
+                </TableCell>
+              )}
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {loading ? (
+              <TableRow>
+                <TableCell colSpan={visibleColumns.length + (actions ? 1 : 0)} align="center" sx={{ py: 8 }}>
+                  <Box sx={{ color: 'text.secondary', fontWeight: 500 }}>Loading records...</Box>
+                </TableCell>
+              </TableRow>
+            ) : data.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={visibleColumns.length + (actions ? 1 : 0)} align="center" sx={{ py: 8 }}>
+                  <Box sx={{ color: 'text.secondary', fontWeight: 500 }}>No records found</Box>
+                </TableCell>
+              </TableRow>
+            ) : (
+              data.map((row, index) => {
+                const isSwornRow = isSwornTranslationRow(row);
+                return (
+                  <TableRow
+                    hover
+                    role="checkbox"
+                    tabIndex={-1}
+                    key={row.id || index}
+                    onClick={() => onRowClick && onRowClick(row)}
+                    sx={{
+                      cursor: onRowClick ? 'pointer' : 'default',
+                      '&:last-child td, &:last-child th': { border: 0 },
+                      ...(isSwornRow ? {
+                        bgcolor: 'rgba(197, 155, 39, 0.08)',
+                        borderLeft: '4px solid #C59B27',
+                        '&:hover': { bgcolor: 'rgba(197, 155, 39, 0.16) !important' }
+                      } : {})
+                    }}
+                  >
+                    {visibleColumns.map((column) => {
+                      const value = row[column.id];
+                      const isServiceCol = column.id === 'service' || column.id === 'serviceId';
+                      const valueIsSworn = isSwornRow && (
+                        isServiceCol ||
+                        (typeof value === 'string' && (value.toLowerCase().includes('translation') || value.toLowerCase().includes('sworn')))
+                      );
+
+                      let cellContent;
+                      if (valueIsSworn) {
+                        const rawLabel = column.render ? column.render(row) : (value || 'Spanish Sworn Translation');
+                        const labelText = typeof rawLabel === 'string' ? rawLabel : 'Spanish Sworn Translation';
+                        cellContent = (
+                          <Chip
+                            label={`📜 ${labelText.replace(/^📜\s*/, '')}`}
+                            size="small"
+                            sx={{
+                              bgcolor: '#C59B27',
+                              color: '#051A3B',
+                              fontWeight: 900,
+                              fontSize: '0.78rem',
+                              borderRadius: '8px',
+                              px: 0.75,
+                              py: 0.25,
+                              boxShadow: '0 2px 8px rgba(197, 155, 39, 0.35)',
+                              fontFamily: 'Outfit, sans-serif'
+                            }}
+                          />
+                        );
+                      } else if (column.render) {
+                        cellContent = column.render(row);
+                      } else if (column.id === 'status' || column.id === 'visaStatus') {
+                        cellContent = <StatusBadge status={value} />;
+                      } else {
+                        cellContent = value ?? '-';
+                      }
+
+                      return (
+                        <TableCell
+                          key={column.id}
+                          align={column.align || 'left'}
+                          sx={{
+                            py: 0.8,
+                            fontSize: '0.8rem',
+                            whiteSpace: column.wrap ? 'normal' : 'nowrap',
+                            minWidth: column.minWidth || '120px',
+                          }}
+                        >
+                          {cellContent}
+                        </TableCell>
+                      );
+                    })}
+                    {actions && (
+                      <TableCell
+                        align="right"
+                        sx={{ py: 0.6 }}
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
+                          {actions(row)}
+                        </Box>
+                      </TableCell>
+                    )}
+                  </TableRow>
+                );
+              })
+            )}
+          </TableBody>
+        </Table>
+      </TableContainer>
+      {onPageChange && (
+        <TablePagination
+          rowsPerPageOptions={[5, 10, 25, 50]}
+          component="div"
+          count={count || data.length}
+          rowsPerPage={rowsPerPage}
+          page={page}
+          onPageChange={(e, newPage) => onPageChange(newPage)}
+          onRowsPerPageChange={(e) => onRowsPerPageChange && onRowsPerPageChange(parseInt(e.target.value, 10))}
+        />
+      )}
+    </Paper>
+  );
+};
+
+export default AppTable;

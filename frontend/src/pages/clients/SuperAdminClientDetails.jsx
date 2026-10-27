@@ -1,0 +1,1446 @@
+import React, { useState } from 'react';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import Box from '@mui/material/Box';
+import Chip from '@mui/material/Chip';
+
+import Paper from '@mui/material/Paper';
+import Typography from '@mui/material/Typography';
+import Button from '@mui/material/Button';
+import Tabs from '@mui/material/Tabs';
+import Tab from '@mui/material/Tab';
+import Avatar from '@mui/material/Avatar';
+import TextField from '@mui/material/TextField';
+import MenuItem from '@mui/material/MenuItem';
+import Divider from '@mui/material/Divider';
+import CircularProgress from '@mui/material/CircularProgress';
+import List from '@mui/material/List';
+import Stack from '@mui/material/Stack';
+import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import PostAddIcon from '@mui/icons-material/PostAdd';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import SendIcon from '@mui/icons-material/Send';
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
+import Select from '@mui/material/Select';
+
+// Components & Services
+import { dbService } from '../../services/dbService';
+import PageHeader from '../../components/PageHeader';
+import StatusBadge from '../../components/StatusBadge';
+import AppCard from '../../components/AppCard';
+import Timeline from '../../components/Timeline';
+import AppModal from '../../components/AppModal';
+import FileUploader from '../../components/FileUploader';
+import { useAlert } from '../../contexts/AlertContext';
+import { useAuth } from '../../hooks/useAuth';
+import { SERVICES, PACKAGES } from '../../constants/mockData';
+import { getPackageDisplayName } from '../../utils/packageHelper';
+import { validateIBAN, normalizeIBAN, maskIBAN, formatIBAN } from '../../utils/ibanValidator';
+import SmartToyIcon from '@mui/icons-material/SmartToy';
+import AiSummaryModal from '../../components/AiSummaryModal';
+import CredentialsModal from '../../components/CredentialsModal';
+import { CommunicationHistoryTab } from '../../components/CommunicationHistoryTab';
+import CaseHistoryTimelineCard from '../../components/CaseHistoryTimelineCard';
+import ChecklistManagementModal from '../../components/ChecklistManagementModal';
+import UploadedDocumentsCard from '../../components/UploadedDocumentsCard';
+import ClientCommentsSection from '../../components/ClientCommentsSection';
+import SwornTranslationClientDocumentsCard from '../../components/SwornTranslationClientDocumentsCard';
+
+import dayjs from 'dayjs';
+
+const FollowUpDatePickerInput = ({ value, onChange, style = {} }) => {
+  const displayStr = value ? dayjs(value).format('DD/MM/YYYY') : 'dd/mm/yyyy';
+  const isoVal = value ? dayjs(value).format('YYYY-MM-DD') : '';
+
+  return (
+    <Box sx={{ position: 'relative', display: 'inline-flex', alignItems: 'center', cursor: 'pointer', padding: '6px 10px', borderRadius: '6px', border: '1px solid #CBD5E1', backgroundColor: '#FFFFFF', marginTop: '4px', width: '100%', boxSizing: 'border-box', ...style }}>
+      <Typography variant="caption" sx={{ fontWeight: 600, fontSize: '0.8rem', color: '#1E293B', flexGrow: 1 }}>
+        {displayStr}
+      </Typography>
+      <span style={{ fontSize: '0.85rem', opacity: 0.65 }}>📅</span>
+      <input
+        type="date"
+        value={isoVal}
+        onClick={(e) => e.stopPropagation()}
+        onChange={(evt) => {
+          evt.stopPropagation();
+          onChange(evt.target.value);
+        }}
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          opacity: 0,
+          cursor: 'pointer'
+        }}
+      />
+    </Box>
+  );
+};
+
+export const SuperAdminClientDetails = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const queryClient = useQueryClient();
+  const { showAlert } = useAlert();
+  const { isAdmin, isSuperAdmin, isOperations, currentUser, hasFeature } = useAuth();
+
+  const [credentialsModalOpen, setCredentialsModalOpen] = useState(false);
+  const [generatedPassword, setGeneratedPassword] = useState('');
+
+  const handleGenerateCredentials = async () => {
+    if (!client) return;
+    try {
+      const res = await dbService.generateClientCredentials(client.id);
+      setGeneratedPassword(res.password);
+      setCredentialsModalOpen(true);
+      queryClient.invalidateQueries({ queryKey: ['clients'] });
+    } catch (error) {
+      console.error('Error generating credentials', error);
+      showAlert('Failed to generate credentials. Ensure backend is running.', 'error');
+    }
+  };
+
+  const { data: customizationSettings } = useQuery({
+    queryKey: ['customization-settings'],
+    queryFn: dbService.getCustomizationSettings
+  });
+
+  const canViewDeps = hasFeature(customizationSettings, 'canViewDependents');
+
+  const roleConfig = (customizationSettings?.[currentUser?.id] || customizationSettings?.[currentUser?.role]) || {};
+  const clientsActions = roleConfig.actions?.clients || { canChangeVisaStatus: true, canVerifyDocs: true, canDelete: currentUser?.role === 'super_admin' };
+
+  const queryParams = new URLSearchParams(location.search);
+  const tabParam = queryParams.get('tab');
+
+  let defaultTab = 0;
+  if (tabParam === 'documents' || tabParam === '1') {
+    defaultTab = 1;
+  } else if (location.state?.initialTab !== undefined) {
+    defaultTab = location.state.initialTab;
+  }
+
+  const [activeTab, setActiveTab] = useState(defaultTab);
+  const [statusModalOpen, setStatusModalOpen] = useState(false);
+  const [selectedVisaStatus, setSelectedVisaStatus] = useState('');
+  const [selectedBillingStatus, setSelectedBillingStatus] = useState('');
+  const [selectedPackageId, setSelectedPackageId] = useState('');
+  const [aiSummaryOpen, setAiSummaryOpen] = useState(false);
+
+  // Application Cycle (Resubmission & Appeal) State
+  const [cycleModalOpen, setCycleModalOpen] = useState(false);
+  const [cycleType, setCycleType] = useState('resubmission'); // resubmission, appeal
+  const [refusalReason, setRefusalReason] = useState('');
+  const [refusalDate, setRefusalDate] = useState('');
+  const [lawyerAssigned, setLawyerAssigned] = useState('');
+  const [appealDeadline, setAppealDeadline] = useState('');
+
+  const createCycleMutation = useMutation({
+    mutationFn: dbService.createApplicationCycle,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['clients'] });
+      showAlert('Application cycle created successfully!', 'success');
+      setCycleModalOpen(false);
+      setRefusalReason('');
+      setLawyerAssigned('');
+    },
+    onError: (err) => {
+      showAlert(err.response?.data?.message || 'Error creating application cycle', 'error');
+    }
+  });
+
+  // Phase 2 Resubmission & Checklist Management State
+  const [checklistModalOpen, setChecklistModalOpen] = useState(false);
+  const [selectedCycleForChecklist, setSelectedCycleForChecklist] = useState(null);
+
+  const { data: cycleChecklistItems = [], refetch: refetchCycleChecklist } = useQuery({
+    queryKey: ['cycleChecklist', selectedCycleForChecklist?.id],
+    queryFn: () => dbService.getCycleChecklist(selectedCycleForChecklist.id),
+    enabled: Boolean(selectedCycleForChecklist?.id)
+  });
+
+  const handleOpenChecklistModal = (cycle) => {
+    setSelectedCycleForChecklist(cycle);
+    setChecklistModalOpen(true);
+  };
+
+  const addChecklistItemMutation = useMutation({
+    mutationFn: dbService.addChecklistItem,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['cycleChecklist', selectedCycleForChecklist?.id] });
+      refetchCycleChecklist();
+      showAlert('Checklist item added successfully', 'success');
+    }
+  });
+
+  const updateChecklistItemMutation = useMutation({
+    mutationFn: ({ id, data }) => dbService.updateChecklistItem(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['cycleChecklist', selectedCycleForChecklist?.id] });
+      refetchCycleChecklist();
+    }
+  });
+
+  const deleteChecklistItemMutation = useMutation({
+    mutationFn: dbService.deleteChecklistItem,
+    onSuccess: (res) => {
+      queryClient.invalidateQueries({ queryKey: ['cycleChecklist', selectedCycleForChecklist?.id] });
+      refetchCycleChecklist();
+      if (res?.deleted) {
+        showAlert('Checklist item hard-deleted (no history attached).', 'info');
+      } else {
+        showAlert('Checklist item marked as NOT_REQUIRED (document history preserved).', 'info');
+      }
+    }
+  });
+
+  const resubmitCycleMutation = useMutation({
+    mutationFn: ({ cycleId, data }) => dbService.recordResubmissionDetails(cycleId, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['clients'] });
+      showAlert('Application resubmission filed successfully!', 'success');
+    },
+    onError: (err) => {
+      showAlert(err.response?.data?.message || 'Failed to file resubmission', 'error');
+    }
+  });
+
+  const generateDefaultChecklistMutation = useMutation({
+    mutationFn: (cycleId) => dbService.generateDefaultChecklist(cycleId),
+    onSuccess: (res) => {
+      queryClient.invalidateQueries({ queryKey: ['cycleChecklist', selectedCycleForChecklist?.id] });
+      refetchCycleChecklist();
+      showAlert(`Generated ${res.count} default checklist items for resubmission cycle!`, 'success');
+    },
+    onError: (err) => {
+      showAlert(err.response?.data?.message || 'Failed to generate default checklist', 'error');
+    }
+  });
+
+  const recordGovernmentDecisionMutation = useMutation({
+    mutationFn: ({ cycleId, data }) => dbService.recordGovernmentDecision(cycleId, data),
+    onSuccess: (res) => {
+      queryClient.invalidateQueries({ queryKey: ['clients'] });
+      showAlert(`Government Decision recorded: ${res.clientVisaStatus}!`, 'success');
+    },
+    onError: (err) => {
+      showAlert(err.response?.data?.message || 'Failed to record government decision', 'error');
+    }
+  });
+
+  const reviewDocMutation = useMutation({
+    mutationFn: ({ documentId, data }) => dbService.reviewChecklistDoc(documentId, data),
+    onSuccess: (res) => {
+      queryClient.invalidateQueries({ queryKey: ['documents'] });
+      queryClient.invalidateQueries({ queryKey: ['clients'] });
+      queryClient.invalidateQueries({ queryKey: ['cycleChecklist', selectedCycleForChecklist?.id] });
+      refetchDocs();
+      if (res?.cycleAutoUpdated) {
+        showAlert('Document reviewed. All mandatory checklist items are now VERIFIED! Cycle automatically updated to "Ready for Resubmission". 🎉', 'success');
+      } else {
+        showAlert(`Document marked as ${res?.document?.status || 'reviewed'}!`, 'success');
+      }
+    },
+    onError: (err) => {
+      showAlert(err.response?.data?.message || 'Failed to review document', 'error');
+    }
+  });
+
+  const sendRebookLinkMutation = useMutation({
+    mutationFn: (clientId) => dbService.sendRebookLink(clientId),
+    onSuccess: (data) => {
+      showAlert(data?.message || 'Re-book booking link sent successfully via WhatsApp & Email!', 'success');
+    },
+    onError: (err) => {
+      showAlert(err.response?.data?.message || err.message || 'Failed to send re-book link', 'error');
+    }
+  });
+
+  // Fetch client details
+  const { data: clients = [], isLoading } = useQuery({
+    queryKey: ['clients'],
+    queryFn: dbService.getClients });
+
+  const client = clients.find((c) => c.id === id);
+  const isTranslationClient = client && (
+    (client.serviceType || '').toLowerCase().includes('translation') ||
+    (client.serviceType || '').toLowerCase().includes('sworn') ||
+    (client.serviceId || '').toLowerCase().includes('translation') ||
+    (client.serviceId || '').toLowerCase().includes('sworn')
+  );
+
+  // Fetch payments, documents, consultations
+  const { data: payments = [] } = useQuery({
+    queryKey: ['payments'],
+    queryFn: dbService.getPayments });
+
+  const { data: documents = [], refetch: refetchDocs } = useQuery({
+    queryKey: ['documents'],
+    queryFn: dbService.getDocuments });
+
+  const { data: refundRequests = [] } = useQuery({
+    queryKey: ['refund-requests'],
+    queryFn: dbService.getRefundRequests });
+
+  const { data: consultations = [] } = useQuery({
+    queryKey: ['consultations'],
+    queryFn: dbService.getConsultations });
+
+  // Fetch Consultants dynamically
+  const { data: consultants = [] } = useQuery({
+    queryKey: ['consultants'],
+    queryFn: dbService.getConsultants });
+
+  // Fetch Packages dynamically
+  const { data: dbPackages = [] } = useQuery({
+    queryKey: ['packages'],
+    queryFn: dbService.getPackages });
+
+  // Fetch Leads dynamically
+  const { data: leads = [] } = useQuery({
+    queryKey: ['leads'],
+    queryFn: dbService.getLeads });
+
+  // Fetch dynamic lifecycle stages
+  const { data: leadStages = [] } = useQuery({
+    queryKey: ['lead-stages'],
+    queryFn: dbService.getLeadStages });
+
+  // Refund Modal State
+  const [createRefundModalOpen, setCreateRefundModalOpen] = useState(false);
+  const [profileRefundCategory, setProfileRefundCategory] = useState('Visa Rejection');
+  const [profileRefundReason, setProfileRefundReason] = useState('');
+  const [profileRefundAmount, setProfileRefundAmount] = useState('');
+  const [profileRefundBankName, setProfileRefundBankName] = useState('');
+  const [profileRefundBankIban, setProfileRefundBankIban] = useState('');
+  const [profileRefundFile, setProfileRefundFile] = useState(null);
+  const [uploadingProfileProof, setUploadingProfileProof] = useState(false);
+
+  // Mutations
+  const createProfileRefundMutation = useMutation({
+    mutationFn: dbService.createRefundRequest,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['refund-requests'] });
+      queryClient.invalidateQueries({ queryKey: ['refundRequests'] });
+      showAlert('Refund request created successfully for this client profile!', 'success');
+      setCreateRefundModalOpen(false);
+      setProfileRefundReason('');
+      setProfileRefundAmount('');
+      setProfileRefundBankName('');
+      setProfileRefundBankIban('');
+      setProfileRefundFile(null);
+    }
+  });
+
+  const handleCreateProfileRefund = async () => {
+    if (!profileRefundReason) {
+      showAlert('Please provide a reason for the refund request', 'warning');
+      return;
+    }
+
+    let proofUrl = null;
+    if (profileRefundFile) {
+      try {
+        setUploadingProfileProof(true);
+        const uploadedDoc = await dbService.uploadDocument({
+          file: profileRefundFile,
+          clientId: client.id,
+          category: 'Visa Rejection Letter',
+          fileName: profileRefundFile.name
+        });
+        proofUrl = uploadedDoc?.fileUrl || null;
+      } catch (err) {
+        console.error('Proof upload failed:', err);
+        showAlert('Warning: Proof upload failed. Creating refund request without proof.', 'warning');
+      } finally {
+        setUploadingProfileProof(false);
+      }
+    }
+
+    let normalizedIban = undefined;
+    if (profileRefundBankIban && profileRefundBankIban.trim()) {
+      const ibanCheck = validateIBAN(profileRefundBankIban);
+      if (!ibanCheck.valid) {
+        showAlert(`Invalid IBAN: ${ibanCheck.error || 'Please enter a valid IBAN'}`, 'error');
+        return;
+      }
+      normalizedIban = ibanCheck.normalizedIBAN;
+    }
+
+    createProfileRefundMutation.mutate({
+      clientId: client.id,
+      category: profileRefundCategory,
+      reason: profileRefundReason,
+      amount: profileRefundCategory === 'Visa Rejection' ? undefined : Number(profileRefundAmount),
+      bankAccountName: profileRefundBankName || undefined,
+      bankIban: normalizedIban,
+      proofUrl: proofUrl || undefined
+    });
+  };
+
+  const updateStatusMutation = useMutation({
+    mutationFn: ({ clientId, visaStatus, status, nextFollowUpDate, packageId }) =>
+      dbService.updateClientVisaStatus(clientId, visaStatus, status, nextFollowUpDate, packageId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['client', id] });
+      queryClient.invalidateQueries({ queryKey: ['clients'] });
+      queryClient.invalidateQueries({ queryKey: ['activeCases'] });
+      showAlert('Client details, package & progression updated successfully!', 'success');
+      setStatusModalOpen(false);
+    } 
+  });
+
+  const uploadDocMutation = useMutation({
+    mutationFn: dbService.uploadDocument,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['documents'] });
+      refetchDocs();
+      showAlert('Document uploaded and queued for review', 'success');
+    } });
+
+  const updateCycleMutation = useMutation({
+    mutationFn: ({ id, data }) => dbService.updateApplicationCycle(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['clients'] });
+      showAlert('Application cycle status updated', 'success');
+    },
+    onError: (err) => {
+      showAlert(err.response?.data?.message || 'Failed to update cycle status', 'error');
+    }
+  });
+
+  if (isLoading) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (!client) {
+    return (
+      <Box sx={{ py: 4, textAlign: 'center' }}>
+        <Typography variant="h5" color="error">Client not found</Typography>
+        <Button startIcon={<KeyboardArrowLeftIcon />} onClick={() => navigate(-1)} sx={{ mt: 2 }}>
+          Back to List
+        </Button>
+      </Box>
+    );
+  }
+
+  // Linked details
+  const originalLead = leads.find((l) => l.clientId === client.id || l.email === client.email);
+  const clientPayments = payments.filter((p) => p.clientId === client.id);
+  const clientDocuments = documents.filter((d) => d.clientId === client.id);
+  const clientConsultations = consultations.filter((c) => c.leadId === originalLead?.id || c.clientName === `${client.firstName} ${client.lastName}`);
+  const consultationsWithRecordings = clientConsultations.filter(c => c.recordingUrl);
+
+  const serviceObj = SERVICES.find((s) => s.id === client.serviceId);
+  const packageObj = PACKAGES.find((p) => p.id === client.packageId);
+  const consultantObj = consultants.find((c) => c.id === client.assignedConsultantId);
+
+  const handleOpenStatusModal = () => {
+    setSelectedVisaStatus(client.visaStatus);
+    setSelectedBillingStatus(client.status);
+    setSelectedPackageId(client.packageId || '');
+    setStatusModalOpen(true);
+  };
+
+  const handleStatusSubmit = () => {
+    updateStatusMutation.mutate({
+      clientId: client.id,
+      visaStatus: selectedVisaStatus,
+      status: selectedBillingStatus,
+      packageId: selectedPackageId
+    });
+  };
+
+  const handleDocUploaded = (docData) => {
+    uploadDocMutation.mutate(docData);
+  };
+
+  const visaStatuses = [
+    'Not Started',
+    'Document Preparation',
+    'Document Review',
+    'Apostille & Translations',
+    'Submitted - Pending Decision',
+    'NIE / Local Registration',
+    'Visa Approved',
+    'Rejected',
+    'Closed',
+  ];
+
+  const billingStatuses = [
+    'Waiting for Payment',
+    'Partially Paid',
+    'Payment Completed',
+    'Documents Pending',
+    'Under Process',
+    'Completed',
+    'Case Closed',
+  ];
+
+  return (
+    <Box>
+      <Button
+        startIcon={<KeyboardArrowLeftIcon />}
+        onClick={() => navigate(-1)}
+        sx={{ mb: 2, color: 'text.secondary' }}
+      >
+        Back to Clients
+      </Button>
+
+      <PageHeader
+        title={`${client.firstName} ${client.lastName}`}
+        subtitle={`Client Registry: ${client.id} | Managed by: ${consultantObj ? consultantObj.name : 'Unknown'}`}
+        action={
+          <Stack direction="row" spacing={1.5}>
+            <Button 
+              variant="contained" 
+              color="info" 
+              onClick={() => setAiSummaryOpen(true)}
+              startIcon={<SmartToyIcon />}
+              sx={{ background: 'linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%)', color: 'white', '&:hover': { opacity: 0.95 } }}
+            >
+              AI Summary
+            </Button>
+            {clientsActions.canManageCredentials !== false && (
+              <Button
+                variant={client?.hasCredentials ? "outlined" : "contained"}
+                color={client?.hasCredentials ? "primary" : "error"}
+                onClick={handleGenerateCredentials}
+                sx={{ textTransform: 'none' }}
+              >
+                {client?.hasCredentials ? "View/Reset Credentials" : "Generate Credentials"}
+              </Button>
+            )}
+            {clientsActions.canChangeVisaStatus !== false && (
+              <Button variant="contained" onClick={handleOpenStatusModal} sx={{ textTransform: 'none' }}>
+                Update Progression Status
+              </Button>
+            )}
+          </Stack>
+        }
+      />
+
+      <Box className="grid grid-cols-12 gap-4" sx={{ mb: 3, alignItems: 'stretch' }}>
+        {/* Left pane */}
+        <Box className="col-span-12 md:col-span-3">
+          <Paper sx={{ p: 2.5, borderRadius: 3, border: '1px solid', borderColor: 'divider', boxShadow: 'none', height: '100%', display: 'flex', flexDirection: 'column' }}>
+            <Box sx={{ textAlign: 'center', mb: 2 }}>
+              <Avatar
+                sx={{ width: 72, height: 72, mx: 'auto', mb: 1.5, bgcolor: 'secondary.main', fontSize: '1.8rem', fontWeight: 600 }}
+              >
+                {client.firstName[0]}
+                {client.lastName[0]}
+              </Avatar>
+              <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                {client.firstName} {client.lastName}
+              </Typography>
+              <Typography variant="caption" color="text.secondary" sx={{ mb: 1.5, display: 'block', wordBreak: 'break-all' }}>
+                {client.email}
+              </Typography>
+              <Stack direction="column" spacing={1} sx={{ alignItems: 'center' }}>
+                <Box>
+                  <Typography variant="caption" color="text.secondary" display="block">Visa Process</Typography>
+                  <StatusBadge status={client.visaStatus} />
+                </Box>
+                <Box>
+                  <Typography variant="caption" color="text.secondary" display="block">Billing Status</Typography>
+                  <StatusBadge status={client.status} />
+                </Box>
+              </Stack>
+            </Box>
+
+            <Divider sx={{ my: 2 }} />
+
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.25 }}>
+              <Box>
+                <Typography variant="caption" color="text.secondary" display="block">Target Service Pathway</Typography>
+                <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>{serviceObj?.name || client.serviceId}</Typography>
+              </Box>
+              <Box>
+                <Typography variant="caption" color="text.secondary" display="block">Enrolled Package</Typography>
+                <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>{getPackageDisplayName(client.packageId, dbPackages)}</Typography>
+              </Box>
+              <Box>
+                <Typography variant="caption" color="text.secondary" display="block">Phone Contact</Typography>
+                <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>{client.phone}</Typography>
+              </Box>
+              <Box sx={{ my: 1, p: 1.5, bgcolor: '#FEF3C7', borderRadius: 2, border: '1px solid #FCD34D' }}>
+                <Typography variant="caption" sx={{ fontWeight: 700, color: '#B45309', display: 'block', mb: 0.5 }}>
+                  📅 Next Follow-Up Date
+                </Typography>
+                <FollowUpDatePickerInput
+                  value={client.nextFollowUpDate}
+                  onChange={(dateStr) => updateStatusMutation.mutate({ clientId: client.id, visaStatus: client.visaStatus, status: client.status, nextFollowUpDate: dateStr })}
+                  style={{ width: '100%' }}
+                />
+              </Box>
+              <Box>
+                <Typography variant="caption" color="text.secondary" display="block">Nationality</Typography>
+                <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>{client.nationality}</Typography>
+              </Box>
+              <Box>
+                <Typography variant="caption" color="text.secondary" display="block">Language Preference</Typography>
+                <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>{client.preferredLanguage}</Typography>
+              </Box>
+              <Box>
+                <Typography variant="caption" color="text.secondary" display="block">Country of Residence</Typography>
+                <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>{client.residence || 'Not Specified'}</Typography>
+              </Box>
+              <Box>
+                <Typography variant="caption" color="text.secondary" display="block">Number of Applicants</Typography>
+                <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>{client.applicantsCount || 1}</Typography>
+              </Box>
+              <Box>
+                <Typography variant="caption" color="text.secondary" display="block">Total Payment Paid</Typography>
+                <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
+                  €{payments.filter(p => p.clientId === client.id && p.status === 'Paid').reduce((sum, p) => sum + p.amount - p.discount, 0).toLocaleString()}
+                </Typography>
+              </Box>
+            </Box>
+          </Paper>
+        </Box>
+
+        {/* Right pane */}
+        <Box className="col-span-12 md:col-span-9" sx={{ display: 'flex', flexDirection: 'column' }}>
+          <AppCard noPadding sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+            <Tabs
+              value={activeTab}
+              onChange={(e, newTab) => setActiveTab(newTab)}
+              sx={{ px: 3, pt: 1, borderBottom: '1px solid', borderColor: 'divider' }}
+            >
+              <Tab value={0} label="Profile Summary" sx={{ fontWeight: 600 }} />
+              <Tab value={1} label="Documents Upload" sx={{ fontWeight: 600 }} />
+              <Tab value={2} label="Payments & Invoices" sx={{ fontWeight: 600 }} />
+              <Tab value={3} label="Meetings / Consultations" sx={{ fontWeight: 600 }} />
+              <Tab value={4} label="Zoom Recordings" sx={{ fontWeight: 600 }} />
+              {(canViewDeps && clientsActions.canManageDependents !== false) && (
+                <Tab value={5} label="Family & Dependents" sx={{ fontWeight: 600 }} />
+              )}
+              <Tab value={6} label="Communications & Calls" sx={{ fontWeight: 600 }} />
+            </Tabs>
+
+            <Box sx={{ p: 3 }}>
+              {activeTab === 0 && (
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                  <Box>
+                    <Typography variant="h5" sx={{ fontWeight: 600, mb: 1 }}>
+                      Case Notes & Profile Summary
+                    </Typography>
+                    <Typography variant="body2" sx={{ p: 2, borderRadius: 2, bgcolor: 'background.neutral' }}>
+                      {client.profileSummary || 'No case brief uploaded.'}
+                    </Typography>
+                  </Box>
+
+                  <ClientCommentsSection client={client} currentUser={currentUser} />
+
+                  <Box sx={{ mt: 2 }}>
+                    <CaseHistoryTimelineCard
+                      cycles={client.applicationCycles || []}
+                      client={client}
+                      onRefresh={() => queryClient.invalidateQueries({ queryKey: ['clients'] })}
+                      onCreateCycle={(cycleData) => createCycleMutation.mutateAsync(cycleData)}
+                      onUpdateCycle={(id, cycleData) => updateCycleMutation.mutateAsync({ id, data: cycleData })}
+                      onOpenChecklistModal={handleOpenChecklistModal}
+                      onResubmitCycle={(cycleId, data) => resubmitCycleMutation.mutateAsync({ cycleId, data })}
+                      onRecordGovernmentDecision={(cycleId, data) => recordGovernmentDecisionMutation.mutateAsync({ cycleId, data })}
+                    />
+                  </Box>
+
+                  {originalLead && (
+                    <Box sx={{ mt: 2 }}>
+                      <Typography variant="h5" sx={{ fontWeight: 600, mb: 1.5 }}>
+                        Original Lead History & Timeline
+                      </Typography>
+                      <Paper sx={{ p: 3, border: '1px solid', borderColor: 'divider', borderRadius: 3, boxShadow: 'none' }}>
+                        {originalLead.notes && (
+                          <Box sx={{ mb: 3 }}>
+                            <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 1 }}>
+                              Lead Intake Notes
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary" sx={{ p: 1.5, borderRadius: 2, bgcolor: 'background.neutral', borderLeft: '3px solid', borderColor: 'secondary.main', whiteSpace: 'pre-line' }}>
+                              {originalLead.notes}
+                            </Typography>
+                          </Box>
+                        )}
+                        <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 1 }}>
+                          Intake Event Timeline
+                        </Typography>
+                        <Timeline items={originalLead.timeline || []} />
+                      </Paper>
+                    </Box>
+                  )}
+
+                  <Box>
+                    <Typography variant="h5" sx={{ fontWeight: 600, mb: 2 }}>
+                      Enrolled Package Benefits Checklist
+                    </Typography>
+                    <Box className="grid grid-cols-12 gap-2">
+                      {packageObj?.includes.map((benefit, idx) => (
+                        <Box className="col-span-12 sm:col-span-6" key={idx} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          <CheckCircleIcon color="success" fontSize="small" />
+                          <Typography variant="body2">{benefit}</Typography>
+                        </Box>
+                      ))}
+                    </Box>
+                  </Box>
+                </Box>
+              )}
+
+              {activeTab === 1 && (
+                <Box>
+                  {isTranslationClient ? (
+                    <SwornTranslationClientDocumentsCard client={client} documents={clientDocuments} />
+                  ) : (
+                    <>
+                      <Typography variant="h5" sx={{ fontWeight: 600, mb: 2 }}>
+                        Upload Checklist Documents
+                      </Typography>
+                      <FileUploader
+                        onUpload={handleDocUploaded}
+                        clientId={client.id}
+                        clientName={`${client.firstName} ${client.lastName}`}
+                        isLoading={uploadDocMutation.isPending}
+                      />
+
+                      <Divider sx={{ my: 3 }} />
+
+                      <UploadedDocumentsCard
+                        documents={clientDocuments}
+                        title="Uploaded Documents & Operations Review"
+                        onReviewDoc={(docId, data) => reviewDocMutation.mutateAsync({ documentId: docId, data })}
+                        canReview={clientsActions.canVerifyDocs}
+                      />
+                    </>
+                  )}
+                </Box>
+              )}
+
+              {activeTab === 2 && (
+                <Box>
+                  <Typography variant="h5" sx={{ fontWeight: 600, mb: 2 }}>
+                    Invoices & Retainers
+                  </Typography>
+
+                    {clientPayments.length === 0 ? (
+                      <Typography variant="body2" color="text.secondary" align="center" sx={{ py: 3 }}>
+                        No invoices found.
+                      </Typography>
+                    ) : (
+                      clientPayments.map((pay) => (
+                        <Paper
+                          key={pay.id}
+                          sx={{
+                            p: 2.5,
+                            mb: 2,
+                            borderRadius: 2.5,
+                            border: '1px solid',
+                            borderColor: 'divider',
+                            boxShadow: 'none',
+                            display: 'flex',
+                            flexWrap: 'wrap',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            gap: 2 }}
+                        >
+                          <Box sx={{ display: 'flex', gap: { xs: 2, sm: 4, md: 6 }, flexWrap: 'wrap', alignItems: 'center' }}>
+                            <Box sx={{ minWidth: { xs: '100%', sm: 160 } }}>
+                              <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 700, textTransform: 'uppercase', fontSize: '0.7rem' }} display="block">
+                                Invoice ID
+                              </Typography>
+                              <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#051A3B' }}>
+                                {pay.invoiceNumber || pay.invoiceNo || `INV-2026-${(pay.id || '').replace(/-/g, '').slice(-6).toUpperCase()}`}
+                              </Typography>
+                            </Box>
+                            <Box sx={{ minWidth: 120 }}>
+                              <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 700, textTransform: 'uppercase', fontSize: '0.7rem' }} display="block">
+                                Due Date
+                              </Typography>
+                              <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#374151' }}>
+                                {(() => {
+                                  if (!pay.dueDate) return 'N/A';
+                                  try {
+                                    const d = new Date(pay.dueDate);
+                                    return isNaN(d.getTime()) ? String(pay.dueDate).split('T')[0] : d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+                                  } catch (e) {
+                                    return String(pay.dueDate).split('T')[0];
+                                  }
+                                })()}
+                              </Typography>
+                            </Box>
+                            <Box sx={{ minWidth: 90 }}>
+                              <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 700, textTransform: 'uppercase', fontSize: '0.7rem' }} display="block">
+                                Amount
+                              </Typography>
+                              <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#051A3B' }}>
+                                €{Number(pay.amount - (pay.discount || 0)).toFixed(2)}
+                              </Typography>
+                            </Box>
+                          </Box>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                            <StatusBadge status={pay.status} />
+                            <Button
+                              size="small"
+                              variant="outlined"
+                              onClick={() => navigate(`/payments/invoice-details/${pay.id}`)}
+                              sx={{ borderRadius: 2, fontWeight: 700, textTransform: 'none' }}
+                            >
+                              View details
+                            </Button>
+                          </Box>
+                        </Paper>
+                      ))
+                    )}
+
+                  {/* Feature 5: Refund Section in Client Profile */}
+                  <Box sx={{ mt: 4 }}>
+                    <Divider sx={{ mb: 3 }} />
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                      <Typography variant="h5" sx={{ fontWeight: 600 }}>
+                        💸 Refund Status & Requests
+                      </Typography>
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        size="small"
+                        onClick={() => setCreateRefundModalOpen(true)}
+                        sx={{ fontWeight: 700 }}
+                      >
+                        + Create Refund Request
+                      </Button>
+                    </Box>
+
+                    {(() => {
+                      const clientRefunds = refundRequests.filter(r => r.clientId === client.id);
+                      if (clientRefunds.length === 0) {
+                        return (
+                          <Paper sx={{ p: 2.5, border: '1px solid', borderColor: 'divider', borderRadius: 2, bgcolor: 'background.neutral' }}>
+                            <Typography variant="body2" color="text.secondary">
+                              No refund requests filed for this client profile. (100% Refund Guarantee applies to eligible rejected cases).
+                            </Typography>
+                          </Paper>
+                        );
+                      }
+                      return clientRefunds.map((ref) => (
+                        <Paper
+                          key={ref.id}
+                          sx={{
+                            p: 2.5,
+                            mb: 2,
+                            border: '1px solid',
+                            borderColor: ref.status === 'Processed' ? '#16A34A' : ref.status === 'Rejected' ? '#EF4444' : 'divider',
+                            borderRadius: 3,
+                            boxShadow: 'none',
+                            bgcolor: ref.status === 'Processed' ? '#F0FDF4' : ref.status === 'Rejected' ? '#FEF2F2' : '#FAF6ED'
+                          }}
+                        >
+                          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.5 }}>
+                            <Box>
+                              <Typography variant="subtitle2" sx={{ fontWeight: 800 }}>
+                                Claim Ticket #{ref.id?.substring(0, 8)}
+                              </Typography>
+                              <Typography variant="caption" color="text.secondary">
+                                Submitted On: {ref.createdAt ? dayjs(ref.createdAt).format('DD/MM/YYYY hh:mm A') : 'Recent'}
+                              </Typography>
+                            </Box>
+                            <Chip
+                              label={ref.status || 'Pending Review'}
+                              color={ref.status === 'Processed' ? 'success' : ref.status === 'Rejected' ? 'error' : 'warning'}
+                              size="small"
+                              sx={{ fontWeight: 800 }}
+                            />
+                          </Box>
+
+                          <Box className="grid grid-cols-12 gap-2" sx={{ my: 1, p: 1.5, bgcolor: 'white', borderRadius: 2, border: '1px solid #E2E8F0' }}>
+                            <Box className="col-span-6">
+                              <Typography variant="caption" color="text.secondary" display="block">Category</Typography>
+                              <Typography variant="body2" sx={{ fontWeight: 700 }}>{ref.category}</Typography>
+                            </Box>
+                            <Box className="col-span-6">
+                              <Typography variant="caption" color="text.secondary" display="block">Refund Amount</Typography>
+                              <Typography variant="body2" color="error.main" sx={{ fontWeight: 800 }}>€{ref.amount?.toLocaleString()}</Typography>
+                            </Box>
+                            {ref.reason && (
+                              <Box className="col-span-12" sx={{ mt: 0.5 }}>
+                                <Typography variant="caption" color="text.secondary" display="block">Client Reason/Statement</Typography>
+                                <Typography variant="caption" sx={{ fontWeight: 600, fontStyle: 'italic' }}>{ref.reason}</Typography>
+                              </Box>
+                            )}
+                            {ref.bankIban && (
+                              <Box className="col-span-12" sx={{ mt: 0.5, p: 1, bgcolor: '#FAF6ED', borderRadius: 1.5, border: '1px solid rgba(197, 155, 39, 0.3)' }}>
+                                <Typography variant="caption" color="text.secondary" display="block" sx={{ fontWeight: 800 }}>🏦 Client Bank Payout Info</Typography>
+                                <Typography variant="caption" display="block" sx={{ mt: 0.3 }}>
+                                  <strong>Account Holder:</strong> {ref.bankAccountName || 'N/A'}
+                                </Typography>
+                                <Typography variant="caption" display="block" sx={{ mt: 0.2 }}>
+                                  <strong>IBAN:</strong> <span style={{ fontFamily: 'monospace', fontWeight: 800, color: '#051A3B' }}>{formatIBAN(ref.bankIban) || ref.bankIban}</span>
+                                </Typography>
+                              </Box>
+                            )}
+                          </Box>
+
+                          {ref.proofUrl && (
+                            <Box sx={{ mt: 1.5, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                              <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 700 }}>
+                                📄 Embassy Rejection Letter Proof Attached
+                              </Typography>
+                              <Button
+                                size="small"
+                                variant="outlined"
+                                color="primary"
+                                href={ref.proofUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                startIcon={<VisibilityIcon />}
+                                sx={{ fontWeight: 700 }}
+                              >
+                                View Rejection Document PDF
+                              </Button>
+                            </Box>
+                          )}
+                        </Paper>
+                      ));
+                    })()}
+                  </Box>
+                </Box>
+              )}
+
+              {activeTab === 3 && (
+                <Box>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2.5, flexWrap: 'wrap', gap: 1 }}>
+                    <Typography variant="h5" sx={{ fontWeight: 600 }}>
+                      Session Log
+                    </Typography>
+
+                    <Button
+                      variant="contained"
+                      color="secondary"
+                      startIcon={<SendIcon />}
+                      disabled={sendRebookLinkMutation.isPending}
+                      onClick={() => sendRebookLinkMutation.mutate(client.id)}
+                      sx={{ fontWeight: 700, borderRadius: 2, textTransform: 'none', px: 2.5 }}
+                    >
+                      {sendRebookLinkMutation.isPending ? 'Sending Link...' : 'Send Re-book Link 📩'}
+                    </Button>
+                  </Box>
+
+                  {clientConsultations.length === 0 ? (
+                    <Typography variant="body2" color="text.secondary" align="center" sx={{ py: 3 }}>
+                      No scheduled meetings linked.
+                    </Typography>
+                  ) : (
+                    clientConsultations.map((cons) => (
+                      <Paper
+                        key={cons.id}
+                        sx={{
+                          p: 2,
+                          mb: 2,
+                          border: '1px solid',
+                          borderColor: 'divider',
+                          boxShadow: 'none',
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center' }}
+                      >
+                        <Box>
+                          <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
+                            Eligibility Meeting Session
+                          </Typography>
+                          <Typography variant="caption" color="text.secondary">
+                            Scheduled: {cons.meetingDate} at {cons.meetingTime} | Duration: {cons.durationMinutes} min
+                          </Typography>
+                        </Box>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                          <StatusBadge status={cons.status} />
+                          <Button
+                            size="small"
+                            onClick={() => navigate(`/consultations/details/${cons.id}`)}
+                          >
+                            Outcome Details
+                          </Button>
+                        </Box>
+                      </Paper>
+                    ))
+                  )}
+                </Box>
+              )}
+
+              {activeTab === 4 && (
+                <Box>
+                  <Typography variant="h5" sx={{ fontWeight: 600, mb: 2 }}>
+                    Zoom Meeting Recordings
+                  </Typography>
+                  {consultationsWithRecordings.length === 0 ? (
+                    <Typography variant="body2" color="text.secondary" align="center" sx={{ py: 3 }}>
+                      No Zoom recordings available yet.
+                    </Typography>
+                  ) : (
+                    consultationsWithRecordings.map((cons) => (
+                      <Paper
+                        key={cons.id}
+                        sx={{
+                          p: 2,
+                          mb: 2,
+                          border: '1px solid',
+                          borderColor: 'divider',
+                          boxShadow: 'none' }}
+                      >
+                        <Box sx={{ mb: 2 }}>
+                          <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
+                            {cons.type === 'eligibility' ? 'Eligibility Assessment' : 'Consultation Meeting'}
+                          </Typography>
+                          <Typography variant="caption" color="text.secondary">
+                            Date: {cons.date || cons.meetingDate} at {cons.timeSlot || cons.meetingTime}
+                          </Typography>
+                        </Box>
+                        <Box>
+                          {(cons.recordingUrl.includes('.mp4') || cons.recordingUrl.includes('.webm')) ? (
+                            <video src={cons.recordingUrl} controls style={{ width: '100%', maxHeight: '400px', borderRadius: '8px' }} />
+                          ) : (
+                            <Button variant="contained" color="primary" href={cons.recordingUrl} target="_blank">
+                              Watch Recording on Zoom
+                            </Button>
+                          )}
+                        </Box>
+                      </Paper>
+                    ))
+                  )}
+                </Box>
+              )}
+
+              {activeTab === 5 && canViewDeps && clientsActions.canManageDependents !== false && (
+                <Box>
+                  <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>
+                    👨‍👩‍👧‍👦 Family Members & Dependents Details
+                  </Typography>
+                  {!client.dependentsDetails || !Array.isArray(client.dependentsDetails) || client.dependentsDetails.length === 0 ? (
+                    <Typography variant="body2" color="text.secondary">
+                      No dependents or family details recorded for this client.
+                    </Typography>
+                  ) : (
+                    <Box className="grid grid-cols-12 gap-3">
+                      {client.dependentsDetails.map((dep, idx) => {
+                        const depDocs = clientDocuments.filter(d => d.belongsTo === `${dep.firstName} ${dep.lastName}` || d.belongsTo === dep.firstName);
+                        const totalUploaded = depDocs.length;
+                        
+                        return (
+                          <Box key={idx} className="col-span-12 sm:col-span-6">
+                            <Paper sx={{ p: 2, border: '1px solid', borderColor: 'divider', borderRadius: 2.5, boxShadow: 'none' }}>
+                              <Typography variant="subtitle2" sx={{ fontWeight: 800, mb: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <span>{dep.firstName} {dep.lastName}</span>
+                                <Chip label={dep.relation} size="small" color="secondary" sx={{ fontSize: '0.7rem', height: 20 }} />
+                              </Typography>
+                              <Divider sx={{ my: 1.5 }} />
+                              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mb: 2 }}>
+                                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                                  <Typography variant="caption" color="text.secondary">Nationality</Typography>
+                                  <Typography variant="caption" sx={{ fontWeight: 600 }}>{dep.nationality || 'N/A'}</Typography>
+                                </Box>
+                                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                                  <Typography variant="caption" color="text.secondary">Passport Number</Typography>
+                                  <Typography variant="caption" sx={{ fontWeight: 600 }}>{dep.passportNumber || 'N/A'}</Typography>
+                                </Box>
+                                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                                  <Typography variant="caption" color="text.secondary">Uploaded Documents</Typography>
+                                  <Typography variant="caption" sx={{ fontWeight: 600 }}>{totalUploaded} Document(s)</Typography>
+                                </Box>
+                              </Box>
+                              
+                              {totalUploaded > 0 ? (
+                                <Box sx={{ bgcolor: 'background.neutral', p: 1.5, borderRadius: 2 }}>
+                                  <Typography variant="caption" sx={{ fontWeight: 700, display: 'block', mb: 1 }}>Documents list:</Typography>
+                                  {depDocs.map((d) => (
+                                    <Box key={d.id} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0.5 }}>
+                                      <Typography variant="caption" color="text.secondary" sx={{ textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap', maxWidth: '70%' }}>
+                                        📄 {d.name}
+                                      </Typography>
+                                      <Chip label={d.status} size="small" color={d.status === 'VERIFIED' ? 'success' : 'warning'} sx={{ height: 16, fontSize: '0.6rem' }} />
+                                    </Box>
+                                  ))}
+                                </Box>
+                              ) : (
+                                <Typography variant="caption" color="text.secondary" sx={{ fontStyle: 'italic' }}>
+                                  No documents uploaded yet.
+                                </Typography>
+                              )}
+                            </Paper>
+                          </Box>
+                        );
+                      })}
+                    </Box>
+                  )}
+                </Box>
+              )}
+
+              {activeTab === 6 && (
+                <CommunicationHistoryTab clientId={client.id} leadId={client.leadId} />
+              )}
+            </Box>
+          </AppCard>
+        </Box>
+      </Box>
+
+      {/* MODAL */}
+      <AppModal
+        open={statusModalOpen}
+        onClose={() => setStatusModalOpen(false)}
+        title="Update Customer Registry Statuses"
+        actions={
+          <>
+            <Button onClick={() => setStatusModalOpen(false)} variant="outlined">
+              Cancel
+            </Button>
+            <Button
+              onClick={handleStatusSubmit}
+              variant="contained"
+              color="secondary"
+              disabled={updateStatusMutation.isPending}
+            >
+              Update
+            </Button>
+          </>
+        }
+      >
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5, pt: 1 }}>
+          <FormControl fullWidth size="small">
+            <InputLabel id="visa-status-select-label">Spain Visa Progression</InputLabel>
+            <Select
+              labelId="visa-status-select-label"
+              value={selectedVisaStatus || ''}
+              onChange={(e) => setSelectedVisaStatus(e.target.value)}
+              label="Spain Visa Progression"
+              MenuProps={{
+                anchorOrigin: { vertical: 'bottom', horizontal: 'left' },
+                transformOrigin: { vertical: 'top', horizontal: 'left' },
+                PaperProps: { style: { maxHeight: 220 } }
+              }}
+              sx={{ borderRadius: 2 }}
+            >
+              {visaStatuses.map((st) => (
+                <MenuItem key={st} value={st}>
+                  {st}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+          <FormControl fullWidth size="small">
+            <InputLabel id="billing-status-select-label">Billing Status</InputLabel>
+            <Select
+              labelId="billing-status-select-label"
+              value={selectedBillingStatus || ''}
+              onChange={(e) => setSelectedBillingStatus(e.target.value)}
+              label="Billing Status"
+              MenuProps={{
+                anchorOrigin: { vertical: 'bottom', horizontal: 'left' },
+                transformOrigin: { vertical: 'top', horizontal: 'left' },
+                PaperProps: { style: { maxHeight: 220 } }
+              }}
+              sx={{ borderRadius: 2 }}
+            >
+              {billingStatuses.map((st) => (
+                <MenuItem key={st} value={st}>
+                  {st}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+          <FormControl fullWidth size="small">
+            <InputLabel id="package-select-label">Assigned Client Package</InputLabel>
+            <Select
+              labelId="package-select-label"
+              value={selectedPackageId || ''}
+              onChange={(e) => setSelectedPackageId(e.target.value)}
+              label="Assigned Client Package"
+              MenuProps={{
+                anchorOrigin: { vertical: 'bottom', horizontal: 'left' },
+                transformOrigin: { vertical: 'top', horizontal: 'left' },
+                PaperProps: { style: { maxHeight: 280 } }
+              }}
+              sx={{ borderRadius: 2 }}
+            >
+              <MenuItem value="">
+                <em>-- No Package Assigned --</em>
+              </MenuItem>
+              {dbPackages.map((pkg) => (
+                <MenuItem key={pkg.id || pkg.code} value={pkg.id || pkg.code}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', gap: 1 }}>
+                    <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                      {pkg.name || pkg.title}
+                    </Typography>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
+                      {pkg.price !== undefined && (
+                        <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>
+                          €{Number(pkg.price).toLocaleString()}
+                        </Typography>
+                      )}
+                      {pkg.isRefundable ? (
+                        <Chip size="small" label="100% Refundable" color="success" sx={{ height: 20, fontSize: '0.68rem', fontWeight: 700 }} />
+                      ) : (
+                        <Chip size="small" label="Non-Refundable" color="default" sx={{ height: 20, fontSize: '0.68rem', fontWeight: 600 }} />
+                      )}
+                    </Box>
+                  </Box>
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Box>
+      </AppModal>
+      <AiSummaryModal open={aiSummaryOpen} onClose={() => setAiSummaryOpen(false)} clientData={client} isLead={false} />
+      <CredentialsModal
+        open={credentialsModalOpen}
+        onClose={() => setCredentialsModalOpen(false)}
+        client={client}
+        password={generatedPassword}
+      />
+
+      {/* Cycle Modal (Resubmission / Appeal) */}
+      <AppModal
+        open={cycleModalOpen}
+        onClose={() => setCycleModalOpen(false)}
+        title={cycleType === 'appeal' ? '⚖️ File Legal Appeal Cycle' : '🔄 Initiate Resubmission Cycle'}
+        actions={
+          <>
+            <Button onClick={() => setCycleModalOpen(false)} variant="outlined">
+              Cancel
+            </Button>
+            <Button
+              variant="contained"
+              color={cycleType === 'appeal' ? 'error' : 'warning'}
+              disabled={createCycleMutation.isPending}
+              onClick={() => {
+                createCycleMutation.mutate({
+                  clientId: client.id,
+                  type: cycleType,
+                  refusalReason,
+                  refusalDate,
+                  lawyerAssigned,
+                  appealDeadline: cycleType === 'appeal' ? appealDeadline : undefined,
+                  serviceType: client.serviceType
+                });
+              }}
+            >
+              {createCycleMutation.isPending ? 'Saving...' : cycleType === 'appeal' ? 'File Appeal' : 'Start Resubmission'}
+            </Button>
+          </>
+        }
+      >
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          <Typography variant="body2" color="text.secondary">
+            {cycleType === 'appeal'
+              ? 'Record details for filing an official appeal for this client after visa refusal.'
+              : 'Record details for a new resubmission cycle for this client.'}
+          </Typography>
+
+          <TextField
+            label="Refusal Reason / Consular Notes"
+            multiline
+            rows={3}
+            fullWidth
+            value={refusalReason}
+            onChange={(e) => setRefusalReason(e.target.value)}
+            placeholder="Enter reason specified by Spanish Consulate / Immigration office..."
+          />
+
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+            <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.primary', ml: 0.5 }}>
+              Refusal Date
+            </Typography>
+            <TextField
+              type="date"
+              fullWidth
+              value={refusalDate}
+              onChange={(e) => setRefusalDate(e.target.value)}
+            />
+          </Box>
+
+          <TextField
+            label="Assigned Immigration Lawyer (Optional)"
+            placeholder="e.g. Abogado Garcia & Associates"
+            fullWidth
+            value={lawyerAssigned}
+            onChange={(e) => setLawyerAssigned(e.target.value)}
+          />
+
+          {cycleType === 'appeal' && (
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+              <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.primary', ml: 0.5 }}>
+                Legal Appeal Filing Deadline
+              </Typography>
+              <TextField
+                type="date"
+                fullWidth
+                value={appealDeadline}
+                onChange={(e) => setAppealDeadline(e.target.value)}
+                helperText="Spanish administrative appeals usually have a 1-month deadline from notification."
+              />
+            </Box>
+          )}
+        </Box>
+      </AppModal>
+
+      {/* Modal: Create Refund Request for this Client */}
+      <AppModal
+        open={createRefundModalOpen}
+        onClose={() => setCreateRefundModalOpen(false)}
+        title={`Create Refund Request (${client?.firstName || ''} ${client?.lastName || ''})`}
+      >
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5, mt: 1 }}>
+          <Paper sx={{ p: 2, bgcolor: 'background.neutral', borderRadius: 2 }}>
+            <Typography variant="caption" color="text.secondary" display="block" sx={{ fontWeight: 700 }}>
+              TARGET CLIENT PROFILE:
+            </Typography>
+            <Typography variant="body2" sx={{ fontWeight: 800, color: 'primary.main' }}>
+              {client?.firstName} {client?.lastName} ({client?.email})
+            </Typography>
+          </Paper>
+
+          <FormControl fullWidth size="small">
+            <InputLabel id="profile-refund-category-label">Category</InputLabel>
+            <Select
+              labelId="profile-refund-category-label"
+              value={profileRefundCategory}
+              onChange={(e) => setProfileRefundCategory(e.target.value)}
+              label="Category"
+            >
+              <MenuItem value="Visa Rejection">Visa Rejection (Auto 100% Refund)</MenuItem>
+              <MenuItem value="Customer Discontent">Customer Discontent</MenuItem>
+              <MenuItem value="Service Cancellation">Service Cancellation</MenuItem>
+              <MenuItem value="Other">Other</MenuItem>
+            </Select>
+          </FormControl>
+
+          {profileRefundCategory !== 'Visa Rejection' && (
+            <TextField
+              label="Refund Amount (€)"
+              type="number"
+              fullWidth
+              size="small"
+              value={profileRefundAmount}
+              onChange={(e) => setProfileRefundAmount(e.target.value)}
+            />
+          )}
+
+          {profileRefundCategory === 'Visa Rejection' && (
+            <Box sx={{ p: 2, bgcolor: '#FEF2F2', borderRadius: 2, border: '1px solid', borderColor: '#FCA5A5' }}>
+              <Typography variant="caption" color="error.dark" sx={{ fontWeight: 700, display: 'block', mb: 0.5 }}>
+                VISA REJECTION CLAUSE (100% GUARANTEE):
+              </Typography>
+              <Typography variant="body2" sx={{ fontSize: '0.8rem', color: 'error.dark' }}>
+                System will calculate 100% of the total paid fees for this client upon submission (Subject to Terms & Conditions).
+              </Typography>
+            </Box>
+          )}
+
+          <TextField
+            label="Client Bank Account Name (Optional)"
+            fullWidth
+            size="small"
+            placeholder="e.g. John Doe"
+            value={profileRefundBankName}
+            onChange={(e) => setProfileRefundBankName(e.target.value)}
+          />
+
+          {(() => {
+            const ibanCheck = validateIBAN(profileRefundBankIban);
+            const isTouched = Boolean(profileRefundBankIban && profileRefundBankIban.trim().length > 0);
+            const isValid = ibanCheck.valid;
+
+            return (
+              <TextField
+                label="IBAN (International Bank Account Number)"
+                fullWidth
+                size="small"
+                placeholder="e.g. ES91 2100 0418 4502 0005 1332"
+                value={profileRefundBankIban}
+                onChange={(e) => {
+                  const clean = e.target.value.toUpperCase().replace(/[^A-Z0-9\s]/g, '');
+                  setProfileRefundBankIban(clean);
+                }}
+                error={isTouched && !isValid}
+                helperText={
+                  isTouched ? (
+                    isValid ? (
+                      <span style={{ color: '#16A34A', fontWeight: 700 }}>✓ Valid IBAN ({ibanCheck.countryCode})</span>
+                    ) : (
+                      <span style={{ color: '#DC2626', fontWeight: 600 }}>✕ {ibanCheck.error || 'Please enter a valid IBAN'}</span>
+                    )
+                  ) : (
+                    'Optional for manual wire transfer. Validated via ISO MOD-97.'
+                  )
+                }
+              />
+            );
+          })()}
+
+          <TextField
+            label="Reason / Notes for Refund"
+            multiline
+            rows={3}
+            fullWidth
+            size="small"
+            value={profileRefundReason}
+            onChange={(e) => setProfileRefundReason(e.target.value)}
+          />
+
+          <Box sx={{ p: 2, border: '1px dashed', borderColor: 'divider', borderRadius: 2, bgcolor: 'background.neutral' }}>
+            <Typography variant="caption" sx={{ fontWeight: 700, display: 'block', mb: 1 }}>
+              Attach Visa Rejection Letter / Bank Proof (Optional PDF/Image)
+            </Typography>
+            <Button
+              variant="outlined"
+              component="label"
+              size="small"
+              disabled={uploadingProfileProof}
+              sx={{ fontWeight: 700 }}
+            >
+              {uploadingProfileProof ? 'Uploading Proof...' : profileRefundFile ? `✓ ${profileRefundFile.name}` : 'Choose Proof File'}
+              <input
+                type="file"
+                hidden
+                accept=".pdf,.png,.jpg,.jpeg"
+                onChange={(e) => setProfileRefundFile(e.target.files[0] || null)}
+              />
+            </Button>
+            {profileRefundFile && (
+              <Typography variant="caption" color="success.main" sx={{ display: 'block', mt: 0.5, fontWeight: 700 }}>
+                File selected: {profileRefundFile.name} ({(profileRefundFile.size / 1024).toFixed(1)} KB)
+              </Typography>
+            )}
+          </Box>
+
+          <Button variant="contained" color="primary" onClick={handleCreateProfileRefund}>
+            Submit Refund Request
+          </Button>
+        </Box>
+      </AppModal>
+
+      {/* Checklist Management Modal */}
+      <ChecklistManagementModal
+        open={checklistModalOpen}
+        onClose={() => setChecklistModalOpen(false)}
+        cycle={selectedCycleForChecklist}
+        checklistItems={cycleChecklistItems}
+        onAddItem={(data) => addChecklistItemMutation.mutateAsync(data)}
+        onUpdateItem={(id, data) => updateChecklistItemMutation.mutateAsync({ id, data })}
+        onDeleteItem={(id) => deleteChecklistItemMutation.mutateAsync(id)}
+        onReviewDoc={(docId, data) => reviewDocMutation.mutateAsync({ documentId: docId, data })}
+        onGenerateDefaultChecklist={(cycleId) => generateDefaultChecklistMutation.mutateAsync(cycleId)}
+      />
+    </Box>
+  );
+};
+
+export default SuperAdminClientDetails;

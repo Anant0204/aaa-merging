@@ -1,0 +1,915 @@
+import dayjs from 'dayjs';
+import React, { useState, useEffect } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import Box from '@mui/material/Box';
+
+import Paper from '@mui/material/Paper';
+import Typography from '@mui/material/Typography';
+import Button from '@mui/material/Button';
+import TextField from '@mui/material/TextField';
+import MenuItem from '@mui/material/MenuItem';
+import IconButton from '@mui/material/IconButton';
+import Badge from '@mui/material/Badge';
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
+import Select from '@mui/material/Select';
+import Autocomplete from '@mui/material/Autocomplete';
+import List from '@mui/material/List';
+import ListItemButton from '@mui/material/ListItemButton';
+import ListItemText from '@mui/material/ListItemText';
+import Switch from '@mui/material/Switch';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Alert from '@mui/material/Alert';
+import Chip from '@mui/material/Chip';
+import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import AddIcon from '@mui/icons-material/Add';
+
+import { useNavigate, useLocation } from 'react-router-dom';
+import useAuth from '../../hooks/useAuth';
+
+import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
+import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import PaymentsIcon from '@mui/icons-material/Payments';
+import TrendingUpIcon from '@mui/icons-material/TrendingUp';
+import AssignmentIcon from '@mui/icons-material/Assignment';
+import CheckCircleOutlinedIcon from '@mui/icons-material/CheckCircleOutlined';
+import WarningAmberIcon from '@mui/icons-material/WarningAmber';
+import ReceiptIcon from '@mui/icons-material/Receipt';
+import CreditCardIcon from '@mui/icons-material/CreditCard';
+
+// Components & Services
+import { dbService } from '../../services/dbService';
+import PageHeader from '../../components/PageHeader';
+import AppModal from '../../components/AppModal';
+import StatCard from '../../components/StatCard';
+import { useAlert } from '../../contexts/AlertContext';
+import { SERVICES } from '../../constants/mockData';
+
+export const SuperAdminCalendarView = () => {
+    const [monthOffset, setMonthOffset] = useState(0);
+const navigate = useNavigate();
+  const location = useLocation();
+  const queryClient = useQueryClient();
+  const { showAlert } = useAlert();
+
+
+
+  const [cardInfo, setCardInfo] = useState(() => location.state?.cardInfo || null);
+
+  useEffect(() => {
+    if (location.state?.cardInfo) {
+      setCardInfo(location.state.cardInfo);
+    }
+  }, [location.state]);
+
+  const getCardIcon = (iconType) => {
+    switch (iconType) {
+      case 'PeopleAlt': return <PeopleAltIcon />;
+      case 'Add': return <AddIcon />;
+      case 'CalendarMonth': return <CalendarMonthIcon />;
+      case 'Payments': return <PaymentsIcon />;
+      case 'TrendingUp': return <TrendingUpIcon />;
+      case 'Assignment': return <AssignmentIcon />;
+      case 'CheckCircleOutlined': return <CheckCircleOutlinedIcon />;
+      case 'WarningAmber': return <WarningAmberIcon />;
+      case 'Receipt': return <ReceiptIcon />;
+      case 'CreditCard': return <CreditCardIcon />;
+      default: return null;
+    }
+  };
+
+  const { currentUser, isConsultant, isViewOnlyMenu } = useAuth();
+
+  const { data: customizationSettings } = useQuery({
+    queryKey: ['customization-settings'],
+    queryFn: dbService.getCustomizationSettings
+  });
+
+  const isViewOnly = isViewOnlyMenu(customizationSettings, 'Consultations');
+
+  const getRolePrefix = () => {
+    if (!currentUser) return 'super_admin';
+    if (currentUser.role === 'consultant') return 'agent';
+    return currentUser.role;
+  };
+
+  const [activeAgentId, setActiveAgentId] = useState(isConsultant ? currentUser?.id || '' : '');
+  const [selectedDate, setSelectedDate] = useState(dayjs().format('YYYY-MM-DD'));
+  const [scheduleModalOpen, setScheduleModalOpen] = useState(false);
+
+  // New consultation fields
+  const [clientName, setClientName] = useState('');
+  const [meetingTime, setMeetingTime] = useState('10:00');
+  const [duration, setDuration] = useState(30);
+  const [agentId, setAgentId] = useState(isConsultant ? currentUser?.id || 'c1' : 'c1');
+  const [meetingNotes, setMeetingNotes] = useState('');
+
+  // Manual Consultant Reassignment Toggle & Modal state
+  const [manualModeEnabled, setManualModeEnabled] = useState(false);
+  const [reassignModalOpen, setReassignModalOpen] = useState(false);
+  const [selectedMeetingForReassign, setSelectedMeetingForReassign] = useState(null);
+  const [targetConsultantId, setTargetConsultantId] = useState('');
+  const [reassignReason, setReassignReason] = useState('');
+  const [conflictWarning, setConflictWarning] = useState(null);
+
+  const reassignMutation = useMutation({
+    mutationFn: ({ id, payload }) => dbService.reassignConsultation(id, payload),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['consultations'] });
+      queryClient.invalidateQueries({ queryKey: ['leads'] });
+      showAlert('success', data.message || 'Consultant reassigned successfully!');
+      setReassignModalOpen(false);
+      setSelectedMeetingForReassign(null);
+      setTargetConsultantId('');
+      setReassignReason('');
+      setConflictWarning(null);
+    },
+    onError: (err) => {
+      if (err.response?.status === 409 && err.response?.data?.conflict) {
+        setConflictWarning(err.response.data.message);
+      } else {
+        showAlert('error', err.response?.data?.message || 'Failed to reassign consultant');
+      }
+    }
+  });
+
+  const handleOpenReassignModal = (meeting, e) => {
+    e.stopPropagation();
+    setSelectedMeetingForReassign(meeting);
+    setTargetConsultantId(meeting.assignedConsultantId || '');
+    setReassignReason('');
+    setConflictWarning(null);
+    setReassignModalOpen(true);
+  };
+
+  const handleConfirmReassign = (allowConflict = false) => {
+    if (!selectedMeetingForReassign || !targetConsultantId) return;
+    reassignMutation.mutate({
+      id: selectedMeetingForReassign.id,
+      payload: {
+        consultantId: targetConsultantId,
+        reason: reassignReason,
+        allowConflict
+      }
+    });
+  };
+
+  // Sync with currentUser role/id changes
+  useEffect(() => {
+    if (isConsultant && currentUser) {
+      setActiveAgentId(currentUser.id);
+      setAgentId(currentUser.id);
+    } else if (!isConsultant) {
+      setActiveAgentId('');
+    }
+  }, [currentUser, isConsultant]);
+
+  // Fetch consultations
+  const { data: consultations = [] } = useQuery({
+    queryKey: ['consultations'],
+    queryFn: dbService.getConsultations });
+
+  const { data: leads = [] } = useQuery({
+    queryKey: ['leads'],
+    queryFn: dbService.getLeads });
+
+  const { data: agents = [] } = useQuery({
+    queryKey: ['agents'],
+    queryFn: dbService.getAgents });
+
+  const { data: leadStages = [] } = useQuery({
+    queryKey: ['lead-stages'],
+    queryFn: dbService.getLeadStages
+  });
+
+  const roleConfig = (customizationSettings?.[currentUser?.id] || customizationSettings?.[currentUser?.role]) || {};
+  const calendarActions = roleConfig.actions?.calendar || { canAssignAgent: true, canCreateMeeting: true };
+
+  // Mutations
+  const createConsultationMutation = useMutation({
+    mutationFn: dbService.createConsultation,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['consultations'] });
+      showAlert('Consultation scheduled successfully', 'success');
+      setScheduleModalOpen(false);
+      setClientName('');
+      setMeetingNotes('');
+    } });
+
+  const handleScheduleSubmit = () => {
+    if (!clientName) {
+      showAlert('Client name is required', 'warning');
+      return;
+    }
+    
+    // Find if lead exists to bind leadId
+    const lead = leads.find(l => `${l.firstName} ${l.lastName}`.toLowerCase() === clientName.toLowerCase());
+
+    createConsultationMutation.mutate({
+      leadId: lead ? lead.id : null,
+      clientName,
+      meetingDate: selectedDate,
+      meetingTime,
+      durationMinutes: duration,
+      assignedConsultantId: agentId,
+      notes: meetingNotes });
+  };
+
+  const [activeCategoryFilter, setActiveCategoryFilter] = useState('all');
+
+  const matchesCategoryFilter = (c, filterType) => {
+    if (!filterType || filterType === 'all') return true;
+    const todayStr = dayjs().format('YYYY-MM-DD');
+    const meetingDate = (c.meetingDate || c.date || '').split('T')[0];
+    const st = (c.status || '').toLowerCase();
+
+    if (filterType === 'today') return meetingDate === todayStr;
+    if (filterType === 'upcoming') return meetingDate > todayStr && !['cancelled', 'canceled', 'no show', 'no-show', 'no_show', 'completed'].includes(st);
+    if (filterType === 'completed') return st === 'completed';
+    if (filterType === 'cancelled') return st === 'cancelled' || st === 'canceled';
+    if (filterType === 'noshow') return st === 'no show' || st === 'no-show' || st === 'no_show';
+    if (filterType === 'rescheduled') return st === 'rescheduled' || c.isRescheduled;
+    return true;
+  };
+
+  const handleCardClick = (category) => {
+    setActiveCategoryFilter(prev => prev === category ? 'all' : category);
+  };
+
+  const currentMonth = dayjs().add(monthOffset, 'month').startOf('month');
+  const daysInMonth = currentMonth.daysInMonth();
+  const yearMonthPrefix = currentMonth.format('YYYY-MM');
+  
+  // Weekday offset for Monday-first calendar (Mon=0, Tue=1, Wed=2, Thu=3, Fri=4, Sat=5, Sun=6)
+  // dayjs().day(): 0=Sun, 1=Mon, 2=Tue, 3=Wed, 4=Thu, 5=Fri, 6=Sat
+  const startDayOfWeek = (currentMonth.day() + 6) % 7;
+
+  const leadingPadding = Array.from({ length: startDayOfWeek }, (_, i) => ({
+    isPadding: true,
+    key: `pad-lead-${i}`
+  }));
+
+  const monthDays = Array.from({ length: daysInMonth }, (_, i) => {
+    const dayNum = i + 1;
+    const dateStr = `${yearMonthPrefix}-${String(dayNum).padStart(2, '0')}`;
+    const dayMeetings = consultations.filter(
+      (c) =>
+        ((c.meetingDate || c.date || '').split('T')[0] === dateStr) &&
+        (c.status !== 'Cancelled' && c.status !== 'Canceled') &&
+        (activeAgentId 
+          ? (c.assignedConsultantId === activeAgentId || c.consultantId === activeAgentId || (isConsultant && !c.assignedConsultantId && !c.consultantId))
+          : true) &&
+        matchesCategoryFilter(c, activeCategoryFilter)
+    );
+    return { dayNum, dateStr, meetings: dayMeetings, isPadding: false, key: dateStr };
+  });
+
+  const calendarCells = [...leadingPadding, ...monthDays];
+
+  // Current selected day meetings list (filtered by selected date and/or selected category)
+  const selectedDayMeetings = consultations.filter(
+    (c) => {
+      const cDate = (c.meetingDate || c.date || '').split('T')[0];
+      const dateMatches = activeCategoryFilter !== 'all' ? true : (cDate === selectedDate);
+      const agentMatches = activeAgentId 
+        ? (c.assignedConsultantId === activeAgentId || c.consultantId === activeAgentId || (isConsultant && !c.assignedConsultantId && !c.consultantId))
+        : true;
+      const categoryMatches = matchesCategoryFilter(c, activeCategoryFilter);
+      return dateMatches && agentMatches && categoryMatches;
+    }
+  );
+
+  // 6 Key Calendar Dashboard Counters (Memoized for high performance)
+  const calendarMetrics = React.useMemo(() => {
+    const todayStr = dayjs().format('YYYY-MM-DD');
+    let todayCount = 0;
+    let upcomingCount = 0;
+    let completedCount = 0;
+    let cancelledCount = 0;
+    let noShowCount = 0;
+    let rescheduledCount = 0;
+
+    // Super Admin: if no agent filter, show ALL. If agent filter selected, scope to that agent.
+    const filtered = activeAgentId 
+      ? consultations.filter(c => c.assignedConsultantId === activeAgentId || c.consultantId === activeAgentId)
+      : consultations;
+
+    filtered.forEach((c) => {
+      const cDate = (c.meetingDate || c.date || '').split('T')[0];
+      const isToday = cDate === todayStr;
+      const isFuture = cDate > todayStr;
+      const st = (c.status || '').toLowerCase();
+
+      if (isToday) todayCount++;
+      if (isFuture && !['cancelled', 'canceled', 'no show', 'no-show', 'no_show', 'completed'].includes(st)) upcomingCount++;
+      if (st === 'completed') completedCount++;
+      if (st === 'cancelled' || st === 'canceled') cancelledCount++;
+      if (st === 'no show' || st === 'no-show' || st === 'no_show') noShowCount++;
+      if (st === 'rescheduled' || c.isRescheduled) rescheduledCount++;
+    });
+
+    return { todayCount, upcomingCount, completedCount, cancelledCount, noShowCount, rescheduledCount };
+  }, [consultations, activeAgentId]);
+
+  return (
+    <Box>
+      <Button
+        startIcon={<KeyboardArrowLeftIcon />}
+        onClick={() => navigate('/dashboard')}
+        sx={{ mb: 2, color: 'text.secondary', display: 'inline-flex' }}
+      >
+        Back to Dashboard
+      </Button>
+      <PageHeader
+        title="Agent Calendar Scheduler"
+        subtitle="Manage upcoming consultation meetings, time allocations, and client booking schedules."
+        action={
+          (!isViewOnly && (currentUser?.role === 'super_admin' || calendarActions.canCreateMeeting !== false)) && (
+            <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap' }}>
+              <Button
+                variant="contained"
+                color="secondary"
+                startIcon={<AddIcon />}
+                onClick={() => setScheduleModalOpen(true)}
+              >
+                Book Appointment
+              </Button>
+            </Box>
+          )
+        }
+      />
+
+      {/* 6 Key Calendar Dashboard Counters */}
+      <Box className="grid grid-cols-12 gap-2 sm:gap-3 mb-4">
+        <Box className="col-span-6 sm:col-span-4 md:col-span-2">
+          <StatCard
+            title="Today's Appointments"
+            value={calendarMetrics.todayCount}
+            icon={<CalendarMonthIcon />}
+            color="#2563EB"
+            onClick={() => handleCardClick('today')}
+            sx={activeCategoryFilter === 'today' ? { borderColor: '#2563EB', boxShadow: '0 0 12px rgba(37,99,235,0.4)', bgcolor: '#F0F7FF' } : {}}
+          />
+        </Box>
+        <Box className="col-span-6 sm:col-span-4 md:col-span-2">
+          <StatCard
+            title="Upcoming Appointments"
+            value={calendarMetrics.upcomingCount}
+            icon={<AssignmentIcon />}
+            color="#7C3AED"
+            onClick={() => handleCardClick('upcoming')}
+            sx={activeCategoryFilter === 'upcoming' ? { borderColor: '#7C3AED', boxShadow: '0 0 12px rgba(124,58,237,0.4)', bgcolor: '#F5F3FF' } : {}}
+          />
+        </Box>
+        <Box className="col-span-6 sm:col-span-4 md:col-span-2">
+          <StatCard
+            title="Completed Appointments"
+            value={calendarMetrics.completedCount}
+            icon={<CheckCircleOutlinedIcon />}
+            color="#10B981"
+            onClick={() => handleCardClick('completed')}
+            sx={activeCategoryFilter === 'completed' ? { borderColor: '#10B981', boxShadow: '0 0 12px rgba(16,185,129,0.4)', bgcolor: '#ECFDF5' } : {}}
+          />
+        </Box>
+        <Box className="col-span-6 sm:col-span-4 md:col-span-2">
+          <StatCard
+            title="Cancelled Appointments"
+            value={calendarMetrics.cancelledCount}
+            icon={<WarningAmberIcon />}
+            color="#F59E0B"
+            onClick={() => handleCardClick('cancelled')}
+            sx={activeCategoryFilter === 'cancelled' ? { borderColor: '#F59E0B', boxShadow: '0 0 12px rgba(245,158,11,0.4)', bgcolor: '#FFFBEB' } : {}}
+          />
+        </Box>
+        <Box className="col-span-6 sm:col-span-4 md:col-span-2">
+          <StatCard
+            title="No-Show Appointments"
+            value={calendarMetrics.noShowCount}
+            icon={<WarningAmberIcon />}
+            color="#EF4444"
+            onClick={() => handleCardClick('noshow')}
+            sx={activeCategoryFilter === 'noshow' ? { borderColor: '#EF4444', boxShadow: '0 0 12px rgba(239,68,68,0.4)', bgcolor: '#FEF2F2' } : {}}
+          />
+        </Box>
+        <Box className="col-span-6 sm:col-span-4 md:col-span-2">
+          <StatCard
+            title="Rescheduled Appointments"
+            value={calendarMetrics.rescheduledCount}
+            icon={<TrendingUpIcon />}
+            color="#0D9488"
+            onClick={() => handleCardClick('rescheduled')}
+            sx={activeCategoryFilter === 'rescheduled' ? { borderColor: '#0D9488', boxShadow: '0 0 12px rgba(13,148,136,0.4)', bgcolor: '#F0FDFA' } : {}}
+          />
+        </Box>
+      </Box>
+
+      {cardInfo && (
+        <Box 
+          sx={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'space-between', 
+            mb: 3, 
+            p: '12px 24px', 
+            borderRadius: 3, 
+            background: `linear-gradient(135deg, ${cardInfo.color}0D 0%, ${cardInfo.color}1E 100%)`, 
+            border: '1px solid',
+            borderColor: `${cardInfo.color}25`,
+            boxShadow: `0 4px 20px ${cardInfo.color}08`,
+            position: 'relative',
+            '&::before': {
+              content: '""',
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '6px',
+              height: '100%',
+              backgroundColor: cardInfo.color,
+              borderRadius: '12px 0 0 12px' }
+          }}
+        >
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <Box 
+              sx={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center', 
+                width: 36,
+                height: 36,
+                borderRadius: 2,
+                backgroundColor: `${cardInfo.color}25`, 
+                color: cardInfo.color,
+                '& svg': { fontSize: '1.25rem' }
+              }}
+            >
+              {getCardIcon(cardInfo.iconType)}
+            </Box>
+            <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'text.primary', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+              {cardInfo.title}
+            </Typography>
+          </Box>
+
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <Typography variant="h5" sx={{ fontWeight: 800, color: 'text.primary' }}>
+              {cardInfo.value}
+            </Typography>
+            {cardInfo.trend && (
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Box 
+                  sx={{ 
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    p: '2px 8px',
+                    borderRadius: '12px',
+                    background: parseFloat(cardInfo.trend) >= 0 
+                      ? 'linear-gradient(135deg, #4ADE80 0%, #22C55E 100%)' 
+                      : 'linear-gradient(135deg, #F87171 0%, #EF4444 100%)',
+                    color: '#fff',
+                    fontSize: '0.75rem',
+                    fontWeight: 700,
+                    boxShadow: '0 2px 6px rgba(0,0,0,0.08)' }}
+                >
+                  {parseFloat(cardInfo.trend) >= 0 ? '↑' : '↓'} {cardInfo.trend}
+                </Box>
+                <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600, opacity: 0.8 }}>
+                  vs last month
+                </Typography>
+              </Box>
+            )}
+          </Box>
+        </Box>
+      )}
+
+      <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 3.5, alignItems: 'stretch', width: '100%' }}>
+        {/* Left: Scheduler Settings & Day List */}
+        <Box sx={{ flex: 1, minWidth: { md: '320px' }, width: '100%', display: 'flex', flexDirection: 'column', gap: 3 }}>
+          {/* Filter */}
+          <Paper sx={{ p: 2.5, borderRadius: 3, border: '1px solid', borderColor: 'divider', boxShadow: 'none' }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+              <Typography variant="h5" sx={{ fontWeight: 700 }}>
+                Agent Filter
+              </Typography>
+              {!isConsultant && (
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={manualModeEnabled}
+                      onChange={(e) => setManualModeEnabled(e.target.checked)}
+                      color="secondary"
+                      size="small"
+                    />
+                  }
+                  label={
+                    <Typography variant="caption" sx={{ fontWeight: 700, color: manualModeEnabled ? 'secondary.main' : 'text.secondary' }}>
+                      {manualModeEnabled ? '🔄 Manual ON' : '⚡ Auto Mode'}
+                    </Typography>
+                  }
+                />
+              )}
+            </Box>
+            <TextField
+              select
+              value={activeAgentId}
+              onChange={(e) => {
+                setActiveAgentId(e.target.value);
+                setCardInfo(null);
+              }}
+              label="Assigned Expert"
+              fullWidth
+              size="small"
+              disabled={isConsultant}
+            >
+              <MenuItem value="">Show All Experts</MenuItem>
+              {agents.filter(a => a.role === 'consultant').map((c) => (
+                <MenuItem key={c.id} value={c.id}>
+                  {c.name}
+                </MenuItem>
+              ))}
+            </TextField>
+          </Paper>
+
+          {/* Selected Date Meetings List */}
+          <Paper sx={{ flexGrow: 1, p: 2.5, borderRadius: 3, border: '1px solid', borderColor: 'divider', boxShadow: 'none', display: 'flex', flexDirection: 'column' }}>
+            <Typography variant="h5" sx={{ fontWeight: 700, mb: 1 }}>
+              Schedule for {dayjs(selectedDate).format('DD/MM/YYYY')}
+            </Typography>
+            <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 2 }}>
+              {selectedDayMeetings.length} sessions booked
+            </Typography>
+            
+            {selectedDayMeetings.length === 0 ? (
+              <Box sx={{ flexGrow: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', py: 4 }}>
+                <Typography variant="body2" color="text.secondary" align="center">
+                  No sessions scheduled for this date.
+                </Typography>
+              </Box>
+            ) : (
+              <List disablePadding sx={{ flexGrow: 1, overflowY: 'auto', maxHeight: 400 }}>
+                {selectedDayMeetings.map((mt) => {
+                  const c = agents.find((cons) => cons.id === mt.assignedConsultantId);
+                  return (
+                    <ListItemButton
+                      key={mt.id}
+                      onClick={() => navigate(`/${getRolePrefix()}/consultations/details/${mt.id}`)}
+                      sx={{
+                        borderRadius: 2,
+                        mb: 1,
+                        borderLeft: '4px solid',
+                        borderLeftColor: 
+                          mt.status === 'Completed' 
+                            ? 'success.main' 
+                            : (mt.status === 'Cancelled' || mt.status === 'No-Show' ? '#F59E0B' : 'secondary.main'),
+                        bgcolor: 'background.neutral',
+                        py: 1 }}
+                    >
+                      <ListItemText
+                        primary={
+                          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
+                              {mt.clientName}
+                            </Typography>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                              <Typography variant="caption" sx={{ fontWeight: 700, color: 'secondary.main' }}>
+                                {mt.meetingTime}
+                              </Typography>
+                              {manualModeEnabled && !isConsultant && (
+                                <Button
+                                  size="small"
+                                  variant="outlined"
+                                  color="secondary"
+                                  onClick={(e) => handleOpenReassignModal(mt, e)}
+                                  sx={{ textTransform: 'none', py: 0.2, px: 1, fontSize: '0.7rem', borderRadius: 1 }}
+                                >
+                                  Reassign
+                                </Button>
+                              )}
+                            </Box>
+                          </Box>
+                        }
+                        secondary={`Host: ${c ? c.name : (mt.agentName || mt.assignedConsultantName || 'Unassigned')} (${mt.durationMinutes} min)`}
+                      />
+                    </ListItemButton>
+                  );
+                })}
+              </List>
+            )}
+          </Paper>
+        </Box>
+
+        {/* Right: Calendar Grid */}
+        <Box sx={{ flex: 2.2, minWidth: 0, width: '100%' }}>
+          <Paper sx={{ p: 3, borderRadius: 3, border: '1px solid', borderColor: 'divider', boxShadow: 'none', height: '100%', display: 'flex', flexDirection: 'column' }}>
+            {/* Header controls */}
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+              <Typography variant="h4" sx={{ fontWeight: 700 }}>{currentMonth.format('MMMM YYYY')}</Typography>
+              <Box sx={{ display: 'flex', gap: 0.5 }}>
+                <IconButton onClick={() => setMonthOffset(p => p - 1)}  size="small"><ArrowBackIosIcon fontSize="inherit" /></IconButton>
+                <IconButton onClick={() => setMonthOffset(p => p + 1)}  size="small"><ArrowForwardIosIcon fontSize="inherit" /></IconButton>
+              </Box>
+            </Box>
+
+            {/* Weekdays Labels */}
+            <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 1, mb: 1, textAlign: 'center', fontWeight: 600, color: 'text.secondary', fontSize: '0.8rem' }}>
+              {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day) => (
+                <Box key={day} sx={{ py: 0.5 }}>
+                  {day}
+                </Box>
+              ))}
+            </Box>
+
+            {/* Calendar Cells Grid */}
+            <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 1, flexGrow: 1 }}>
+              {calendarCells.map((cell) => {
+                if (cell.isPadding) {
+                  return (
+                    <Box
+                      key={cell.key}
+                      sx={{
+                        height: 72,
+                        borderRadius: 2,
+                        bgcolor: 'transparent',
+                        opacity: 0.15,
+                        border: '1px dashed',
+                        borderColor: 'divider',
+                        pointerEvents: 'none'
+                      }}
+                    />
+                  );
+                }
+
+                const isSelected = cell.dateStr === selectedDate;
+                const isToday = cell.dateStr === dayjs().format('YYYY-MM-DD');
+                const hasMeetings = cell.meetings.length > 0;
+                const hasNoShowOrCancelled = cell.meetings.some(m => m.status === 'Cancelled' || m.status === 'No-Show');
+                
+                // Color Code styling based on state (Available, Booked, Priority Rebooking)
+                let borderStyle = '1px solid';
+                let borderColor = isToday ? 'primary.main' : 'divider';
+                let bgColor = isToday ? '#F0F7FF' : 'background.paper';
+                
+                if (isSelected) {
+                  borderStyle = '2px solid';
+                  borderColor = 'secondary.main';
+                  bgColor = 'background.neutral';
+                } else if (hasNoShowOrCancelled) {
+                  // Priority Rebooking: Orange highlights
+                  borderStyle = '2px solid';
+                  borderColor = '#F59E0B';
+                  bgColor = '#FFFBEB';
+                } else if (hasMeetings) {
+                  // Booked: solid/neutral highlights
+                  borderStyle = '1px solid';
+                  borderColor = 'primary.main';
+                  bgColor = '#F0F9FF';
+                } else {
+                  // Available: transparent green accents
+                  borderStyle = '1px solid';
+                  borderColor = isToday ? 'primary.main' : '#10B981';
+                  bgColor = isToday ? '#EFF6FF' : '#ECFDF5';
+                }
+
+                return (
+                  <Paper
+                    key={cell.key}
+                    onClick={() => setSelectedDate(cell.dateStr)}
+                    sx={{
+                      height: 72,
+                      p: 1.2,
+                      cursor: 'pointer',
+                      borderRadius: 2,
+                      border: borderStyle,
+                      borderColor: borderColor,
+                      backgroundColor: bgColor,
+                      boxShadow: 'none',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      justifyContent: 'space-between',
+                      position: 'relative',
+                      transition: 'all 0.15s ease',
+                      '&:hover': {
+                        borderColor: 'secondary.main',
+                        transform: 'translateY(-1px)'
+                      }
+                    }}
+                  >
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          fontWeight: (isSelected || isToday) ? 800 : 600,
+                          color: isSelected ? 'secondary.main' : (isToday ? 'primary.main' : 'text.primary'),
+                          fontSize: '0.85rem'
+                        }}
+                      >
+                        {cell.dayNum}
+                      </Typography>
+                      {isToday && (
+                        <Chip
+                          label="Today"
+                          size="small"
+                          color="primary"
+                          sx={{ height: 16, fontSize: '0.6rem', fontWeight: 800, px: 0 }}
+                        />
+                      )}
+                    </Box>
+                    {hasMeetings && (
+                      <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap', alignItems: 'center' }}>
+                        {cell.meetings.slice(0, 4).map((m) => (
+                          <Box
+                            key={m.id}
+                            sx={{
+                              width: 6,
+                              height: 6,
+                              borderRadius: '50%',
+                              backgroundColor: 
+                                m.status === 'Completed' 
+                                  ? 'success.main' 
+                                  : (m.status === 'Cancelled' || m.status === 'No-Show' ? '#F59E0B' : 'secondary.main') }}
+                          />
+                        ))}
+                        {cell.meetings.length > 4 && (
+                          <Typography variant="caption" sx={{ fontSize: '0.65rem', fontWeight: 800, color: 'text.secondary', ml: 0.2 }}>
+                            +{cell.meetings.length - 4}
+                          </Typography>
+                        )}
+                      </Box>
+                    )}
+                  </Paper>
+                );
+              })}
+            </Box>
+          </Paper>
+        </Box>
+      </Box>
+
+      {/* MODAL: Book Consultation */}
+      <AppModal
+        open={scheduleModalOpen}
+        onClose={() => setScheduleModalOpen(false)}
+        title={`Book Assessment Consultation for ${dayjs(selectedDate).format('DD/MM/YYYY')}`}
+        actions={
+          <>
+            <Button onClick={() => setScheduleModalOpen(false)} variant="outlined">
+              Cancel
+            </Button>
+            <Button
+              onClick={handleScheduleSubmit}
+              variant="contained"
+              color="secondary"
+              disabled={createConsultationMutation.isPending}
+            >
+              Book Session
+            </Button>
+          </>
+        }
+      >
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5, pt: 1 }}>
+          <Autocomplete
+            freeSolo
+            options={leads.map(lead => `${lead.firstName} ${lead.lastName}`)}
+            value={clientName}
+            onInputChange={(event, newInputValue) => {
+              setClientName(newInputValue);
+            }}
+            onChange={(event, newValue) => {
+              if (newValue !== null) {
+                setClientName(newValue);
+              }
+            }}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Client or Lead Name"
+                placeholder="e.g. Amelia Watson"
+                required
+              />
+            )}
+          />
+
+          <Box className="grid grid-cols-12 gap-2">
+            <Box className="col-span-6">
+              <TextField
+                value={meetingTime}
+                onChange={(e) => setMeetingTime(e.target.value)}
+                label="Start Time"
+                type="time"
+                fullWidth
+                required
+              />
+            </Box>
+            <Box className="col-span-6">
+              <FormControl fullWidth size="small">
+                <InputLabel id="duration-select-label">Duration</InputLabel>
+                <Select
+                  labelId="duration-select-label"
+                  value={duration}
+                  onChange={(e) => setDuration(parseInt(e.target.value, 10))}
+                  label="Duration"
+                >
+                  <MenuItem value={30}>30 Minutes</MenuItem>
+                  <MenuItem value={45}>45 Minutes</MenuItem>
+                  <MenuItem value={60}>60 Minutes</MenuItem>
+                </Select>
+              </FormControl>
+            </Box>
+          </Box>
+
+          <FormControl fullWidth size="small" disabled={isConsultant || (currentUser?.role !== 'super_admin' && calendarActions.canAssignAgent === false)}>
+            <InputLabel id="agent-host-select-label">Select Agent Host</InputLabel>
+            <Select
+              labelId="agent-host-select-label"
+              value={agentId}
+              onChange={(e) => setAgentId(e.target.value)}
+              label="Select Agent Host"
+            >
+              {agents.filter(a => a.role === 'consultant').map((c) => (
+                <MenuItem key={c.id} value={c.id}>
+                  {c.name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+          <TextField
+            value={meetingNotes}
+            onChange={(e) => setMeetingNotes(e.target.value)}
+            label="Meeting Objectives"
+            multiline
+            rows={3}
+            fullWidth
+            placeholder="Inquire passive income proofs or check remote work details..."
+          />
+        </Box>
+      </AppModal>
+
+      {/* Reassign Expert Modal */}
+      <AppModal
+        open={reassignModalOpen}
+        onClose={() => {
+          setReassignModalOpen(false);
+          setConflictWarning(null);
+        }}
+        title="Reassign Consultant (Manual Override)"
+        confirmText={conflictWarning ? "Override Conflict & Reassign" : "Confirm Reassignment"}
+        onConfirm={() => handleConfirmReassign(!!conflictWarning)}
+        confirmButtonProps={{ color: conflictWarning ? 'warning' : 'primary', loading: reassignMutation.isPending }}
+      >
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 1 }}>
+          {selectedMeetingForReassign && (
+            <Paper sx={{ p: 2, bgcolor: 'background.neutral', borderRadius: 2 }}>
+              <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
+                {selectedMeetingForReassign.clientName}
+              </Typography>
+              <Typography variant="caption" color="text.secondary" display="block">
+                Date: <strong>{dayjs(selectedMeetingForReassign.date || selectedDate).format('DD/MM/YYYY')}</strong> | Time: <strong>{selectedMeetingForReassign.meetingTime}</strong>
+              </Typography>
+              <Typography variant="caption" color="text.secondary" display="block">
+                Current Host: <strong>{agents.find(a => a.id === selectedMeetingForReassign.assignedConsultantId)?.name || 'Unassigned'}</strong>
+              </Typography>
+            </Paper>
+          )}
+
+          {conflictWarning && (
+            <Alert severity="warning" sx={{ borderRadius: 2 }}>
+              {conflictWarning}
+            </Alert>
+          )}
+
+          <FormControl fullWidth size="small" required>
+            <InputLabel id="new-agent-select-label">Select New Consultant Host</InputLabel>
+            <Select
+              labelId="new-agent-select-label"
+              value={targetConsultantId}
+              onChange={(e) => {
+                setTargetConsultantId(e.target.value);
+                setConflictWarning(null);
+              }}
+              label="Select New Consultant Host"
+            >
+              {agents.filter(a => a.role === 'consultant').map((c) => (
+                <MenuItem key={c.id} value={c.id}>
+                  {c.name} ({c.email || c.role})
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+          <TextField
+            value={reassignReason}
+            onChange={(e) => setReassignReason(e.target.value)}
+            label="Reason for Reassignment (Audit Log)"
+            placeholder="e.g. Consultant out sick, customer requested Arabic speaker, load balancing..."
+            multiline
+            rows={2}
+            fullWidth
+            required
+          />
+        </Box>
+      </AppModal>
+    </Box>
+  );
+};
+
+export default SuperAdminCalendarView;

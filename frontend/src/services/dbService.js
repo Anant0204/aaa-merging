@@ -1,0 +1,824 @@
+import axios from 'axios';
+
+const API_URL = import.meta.env.VITE_API_URL || 'https://aaa-consultancy-backend-production.up.railway.app/api/v1';
+
+// Setup Axios instance with JWT Interceptor
+export const apiClient = axios.create({
+  baseURL: API_URL
+});
+
+apiClient.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token') || localStorage.getItem('clientToken');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+export const dbService = {
+  // LEADS
+  purgeAllData: async () => {
+    const res = await apiClient.delete('/settings/purge-all-data');
+    return res.data;
+  },
+  getLeads: async () => {
+    const res = await apiClient.get('/leads');
+    return res.data;
+  },
+  getLeadById: async (id) => {
+    const res = await apiClient.get(`/leads/${id}`);
+    return res.data;
+  },
+  createLead: async (lead) => {
+    const res = await apiClient.post('/leads', lead);
+    return res.data;
+  },
+  updateLead: async (lead) => {
+    const res = await apiClient.put(`/leads/${lead.id}`, lead);
+    return res.data;
+  },
+  updateLeadStatus: async (leadId, status) => {
+    const res = await apiClient.post('/leads/status', { leadId, status });
+    return res.data;
+  },
+  assignAgent: async (leadId, agentId) => {
+    const res = await apiClient.post('/leads/assign', { leadId, agentId });
+    return res.data;
+  },
+  deleteLead: async (leadId) => {
+    const res = await apiClient.delete(`/leads/${leadId}`);
+    return res.data;
+  },
+  assignConsultant: async (leadId, consultantId) => {
+    const res = await apiClient.post('/leads/assign', { leadId, agentId: consultantId });
+    return res.data;
+  },
+  // Public — no auth needed — find lead by email for self-fill form
+  findLeadByEmail: async (email) => {
+    const res = await axios.get(`${API_URL}/leads/find-by-email?email=${encodeURIComponent(email)}`);
+    return res.data;
+  },
+  // Public — lead submits meeting preference form
+  updateMeetingPreference: async (leadId, data) => {
+    const res = await axios.patch(`${API_URL}/leads/${leadId}/meeting-preference`, data);
+    return res.data;
+  },
+  // Agent accepts or declines a consultation
+  respondToConsultation: async (consultationId, action, declineReason = '') => {
+    const res = await apiClient.patch(`/consultations/${consultationId}/respond`, { action, declineReason });
+    return res.data;
+  },
+  // Admin auto-creates a Pending Acceptance consultation when assigning agent
+  createConsultationForLead: async (data) => {
+    const res = await apiClient.post('/consultations/create-for-lead', data);
+    return res.data;
+  },
+  // Reassign consultation to a different consultant with audit log
+  reassignConsultation: async (consultationId, { consultantId, reason, allowConflict }) => {
+    const res = await apiClient.patch(`/consultations/${consultationId}/reassign`, { consultantId, reason, allowConflict });
+    return res.data;
+  },
+  assignAgentToConsultation: async (consultationId, consultantId) => {
+    const res = await apiClient.patch(`/consultations/${consultationId}/reassign`, { consultantId });
+    return res.data;
+  },
+
+  // CLIENTS & CASES
+  getClients: async () => {
+    const res = await apiClient.get('/clients');
+    return res.data;
+  },
+  getClientProfile: async () => {
+    const res = await apiClient.get('/clients/profile/me');
+    return res.data;
+  },
+  createClient: async (client) => {
+    const res = await apiClient.post('/clients', client);
+    return res.data;
+  },
+  updateClientVisaStatus: async (clientId, visaStatus, status, nextFollowUpDate, packageId) => {
+    const payload = typeof visaStatus === 'object' && visaStatus !== null
+      ? visaStatus
+      : { visaStatus, status, nextFollowUpDate, packageId };
+    const res = await apiClient.patch(`/clients/${clientId}/status`, payload);
+    return res.data;
+  },
+  updateClient: async (client) => {
+    const res = await apiClient.put(`/clients/${client.id}`, client);
+    return res.data;
+  },
+  deleteClient: async (clientId) => {
+    const res = await apiClient.delete(`/clients/${clientId}`);
+    return res.data;
+  },
+  updateClientDependents: async (clientId, payload) => {
+    const body = Array.isArray(payload) ? { dependents: payload } : (payload || {});
+    const res = await apiClient.patch(`/clients/${clientId}/dependents`, body);
+    return res.data;
+  },
+  generateClientCredentials: async (clientId, forceReset = false) => {
+    const res = await apiClient.post(`/clients/${clientId}/credentials${forceReset ? '?forceReset=true' : ''}`);
+    return res.data;
+  },
+  sendRebookLink: async (clientId) => {
+    const res = await apiClient.post(`/clients/${clientId}/send-rebook-link`);
+    return res.data;
+  },
+  clientLogin: async (clientId, password) => {
+    const res = await apiClient.post('/clients/login', { clientId, password });
+    return res.data;
+  },
+  selectPackage: async (clientId, packageId) => {
+    const res = await apiClient.post(`/clients/${clientId}/select-package`, {
+      packageId,
+      status: 'Payment Received',
+      visaStatus: 'Document Preparation'
+    });
+    return res.data;
+  },
+  getActiveCases: async () => {
+    const res = await apiClient.get('/cases/active');
+    return res.data;
+  },
+  getClosedCases: async () => {
+    const res = await apiClient.get('/cases/closed');
+    return res.data;
+  },
+
+  // CONSULTATIONS
+  getConsultations: async () => {
+    const res = await apiClient.get('/consultations');
+    return res.data;
+  },
+  createConsultation: async (cons) => {
+    const res = await apiClient.post('/consultations', cons);
+    return res.data;
+  },
+
+  updateConsultationStatus: async (consultationId, status) => {
+    const res = await apiClient.patch(`/consultations/${consultationId}/outcome`, { status });
+    return res.data;
+  },
+  completeConsultation: async (consultationId, outcome, notes, recommendedService, recommendedPackageId) => {
+    const res = await apiClient.patch(`/consultations/${consultationId}/outcome`, {
+      status: 'Completed',
+      eligibility: outcome,
+      internalNotes: notes,
+      recommendedService,
+      recommendedPackageId
+    });
+    return res.data;
+  },
+  completeConsultationAndUnlockDocs: async (consultationId, outcome, notes, recommendedService, recommendedPackageId) => {
+    const res = await apiClient.patch(`/consultations/${consultationId}/outcome`, {
+      status: 'Completed',
+      eligibility: outcome || 'Eligible',
+      internalNotes: notes,
+      recommendedService,
+      recommendedPackageId
+    });
+    return res.data;
+  },
+  bookClientConsultation: async (data) => {
+    const res = await apiClient.post('/consultations', data);
+    return res.data;
+  },
+
+  // PAYMENTS
+  getPayments: async () => {
+    const res = await apiClient.get('/payments');
+    return res.data;
+  },
+  getRevenueAnalytics: async () => {
+    const res = await apiClient.get('/payments/revenue-analytics');
+    return res.data;
+  },
+  generatePaymentLink: async (payment) => {
+    const res = await apiClient.post('/payments/generate-link', payment);
+    return res.data;
+  },
+  createInvoice: async (invoice) => {
+    const res = await apiClient.post('/payments/generate-link', invoice);
+    return res.data;
+  },
+  updatePaymentStatus: async (paymentId, status, paymentMethod, transactionId) => {
+    const res = await apiClient.patch(`/payments/${paymentId}/status`, { status, paymentMethod, transactionId });
+    return res.data;
+  },
+  createCheckoutSession: async ({ packageId, amount, discount, paymentMethod, clientId, couponCode }) => {
+    const res = await apiClient.post('/payments/create-checkout-session', { packageId, amount, discount, paymentMethod, clientId, couponCode });
+    return res.data;
+  },
+  verifyCheckoutSession: async (sessionId, paymentId, leadId) => {
+    const res = await apiClient.post('/payments/verify-checkout-session', { sessionId, paymentId, leadId });
+    return res.data;
+  },
+  getCommissionHistory: async (agentId) => {
+    const res = await apiClient.get(`/payments/commissions/history/${agentId}`);
+    return res.data;
+  },
+  triggerAWSBackup: async (invoice) => {
+    if (invoice && invoice.file) {
+      return await dbService.uploadDocument(invoice);
+    }
+    return { success: true, message: 'Backed up to storage bucket', invoiceId: invoice?.id };
+  },
+
+
+  // DOCUMENTS
+  getDocuments: async () => {
+    const res = await apiClient.get(`/documents?t=${Date.now()}`);
+    return res.data;
+  },
+  uploadDocument: async (doc) => {
+    let formData;
+    if (doc instanceof FormData) {
+      formData = doc;
+      if (!formData.has('file') && formData.has('document')) {
+        const fileObj = formData.get('document');
+        formData.delete('document');
+        formData.append('file', fileObj);
+      }
+    } else {
+      formData = new FormData();
+      const fileObj = (doc instanceof File || doc instanceof Blob) ? doc : (doc?.file || doc?.document);
+      if (fileObj) {
+        formData.append('file', fileObj);
+      }
+      if (doc?.clientId) formData.append('clientId', doc.clientId);
+      if (doc?.category) formData.append('category', doc.category || 'General');
+      if (doc?.belongsTo) formData.append('belongsTo', doc.belongsTo);
+      if (doc?.status) formData.append('status', doc.status);
+      if (doc?.uploadedByRole) formData.append('uploadedByRole', doc.uploadedByRole);
+      if (doc?.name) formData.append('name', doc.name);
+    }
+
+    const res = await apiClient.post('/documents/upload', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+    return res.data;
+  },
+  uploadDocumentBatch: async (formData) => {
+    const res = await apiClient.post('/documents/upload-batch', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+    return res.data;
+  },
+  getIntegrations: async () => {
+    const res = await apiClient.get('/settings/customization');
+    return res.data?.integrations || {};
+  },
+  saveIntegrations: async (integrationsData) => {
+    const res = await apiClient.post('/settings/customization', {
+      settings: {
+        integrations: integrationsData
+      }
+    });
+    return res.data;
+  },
+  reviewDocument: async (documentId, status, comment) => {
+    const res = await apiClient.patch(`/documents/${documentId}/verify`, { status, feedbackComment: comment });
+    return res.data;
+  },
+  uploadTranslatedDocument: async (documentId, file, extraMeta = {}) => {
+    const formData = new FormData();
+    formData.append('translatedFile', file);
+    formData.append('file', file);
+    if (extraMeta.clientId) formData.append('clientId', extraMeta.clientId);
+    if (extraMeta.name) formData.append('name', extraMeta.name);
+    if (extraMeta.fileUrl) formData.append('fileUrl', extraMeta.fileUrl);
+
+    const res = await apiClient.patch(`/documents/${documentId}/translated`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+    return res.data;
+  },
+
+  // MARKETING
+  getMarketingSpend: async () => {
+    const res = await apiClient.get('/marketing/spend');
+    return res.data;
+  },
+  updateMarketingSpend: async (spendData) => {
+    const res = await apiClient.post('/marketing/spend', spendData);
+    return res.data;
+  },
+
+  // TEMPLATES MANAGEMENT
+  getTemplates: async () => {
+    const res = await apiClient.get('/templates');
+    return res.data;
+  },
+  getAllTemplatesAdmin: async () => {
+    const res = await apiClient.get('/templates/all');
+    return res.data;
+  },
+  createTemplate: async (data) => {
+    const res = await apiClient.post('/templates', data);
+    return res.data;
+  },
+  updateTemplate: async ({ id, ...data }) => {
+    const res = await apiClient.put(`/templates/${id}`, data);
+    return res.data;
+  },
+  deleteTemplate: async (id) => {
+    const res = await apiClient.delete(`/templates/${id}`);
+    return res.data;
+  },
+  checkTemplateApprovalStatus: async (id) => {
+    const res = await apiClient.get(`/templates/check-status/${id}`);
+    return res.data;
+  },
+
+  // SETTINGS & CUSTOMIZATION
+  getCustomizationSettings: async () => {
+    try {
+      if (typeof window !== 'undefined' && localStorage.getItem('crm_customization_settings')) {
+        localStorage.removeItem('crm_customization_settings');
+      }
+      const res = await apiClient.get('/settings/customization');
+      return res.data;
+    } catch (error) {
+      console.error('[dbService] getCustomizationSettings error:', error);
+      throw error;
+    }
+  },
+  saveCustomizationSettings: async (settings) => {
+    try {
+      if (typeof window !== 'undefined' && localStorage.getItem('crm_customization_settings')) {
+        localStorage.removeItem('crm_customization_settings');
+      }
+      const res = await apiClient.put('/settings/customization', { settings });
+      return res.data;
+    } catch (error) {
+      console.error('[dbService] saveCustomizationSettings error:', error);
+      throw error;
+    }
+  },
+  getCompanySettings: async () => {
+    const res = await apiClient.get('/settings/company');
+    return res.data;
+  },
+  updateCompanySettings: async (data) => {
+    const res = await apiClient.put('/settings/company', data);
+    return res.data;
+  },
+  getLeadStages: async () => {
+    const res = await apiClient.get('/settings/lead-stages');
+    return res.data;
+  },
+  saveLeadStages: async (stages) => {
+    const res = await apiClient.put('/settings/lead-stages', stages);
+    return res.data;
+  },
+
+  // PACKAGES & SERVICES
+  getServices: async () => {
+    const res = await apiClient.get('/settings/services');
+    return res.data;
+  },
+  updateServices: async (services) => {
+    const res = await apiClient.put('/settings/services', services);
+    return res.data;
+  },
+  getPackages: async () => {
+    const res = await apiClient.get('/settings/packages');
+    return res.data;
+  },
+  createPackage: async (pkg) => {
+    const res = await apiClient.post('/settings/packages', pkg);
+    return res.data;
+  },
+  updatePackages: async (packages) => {
+    const res = await apiClient.put('/settings/packages', packages);
+    return res.data;
+  },
+  deletePackage: async (id) => {
+    const res = await apiClient.delete(`/settings/packages/${id}`);
+    return res.data;
+  },
+  getEmailTemplates: async () => {
+    const res = await apiClient.get('/settings/templates/email');
+    return res.data;
+  },
+  updateEmailTemplates: async (templates) => {
+    const res = await apiClient.put('/settings/templates/email', templates);
+    return res.data;
+  },
+  getWhatsappTemplates: async () => {
+    const res = await apiClient.get('/settings/templates/whatsapp');
+    return res.data;
+  },
+  updateWhatsappTemplates: async (templates) => {
+    const res = await apiClient.put('/settings/templates/whatsapp', templates);
+    return res.data;
+  },
+
+  // AGENTS
+  getAgents: async () => {
+    const res = await apiClient.get('/users/agents');
+    return res.data;
+  },
+  createAgent: async (agent) => {
+    const payload = {
+      fullName: agent.name,
+      email: agent.email,
+      password: agent.password,
+      hotlineNumber: agent.phone,
+      role: agent.role,
+      spokenLanguages: agent.languages,
+      nationalities: agent.nationalities,
+      commissionRate: agent.commissionRate,
+      immigrationBio: agent.bio,
+      customPermissions: agent.customPermissions
+    };
+    const res = await apiClient.post('/users', payload);
+    return res.data;
+  },
+  updateAgent: async (agent) => {
+    const payload = {
+      fullName: agent.name || agent.fullName,
+      email: agent.email,
+      hotlineNumber: agent.phone || agent.hotlineNumber,
+      role: agent.role,
+      spokenLanguages: agent.languages || agent.spokenLanguages,
+      nationalities: agent.nationalities,
+      commissionRate: agent.commissionRate,
+      immigrationBio: agent.bio || agent.immigrationBio,
+      customPermissions: agent.customPermissions
+    };
+    const res = await apiClient.put(`/users/${agent.id}`, payload);
+    return res.data;
+  },
+  updateSuperAdminProfile: async (data) => {
+    const res = await apiClient.put('/users/profile/super-admin', data);
+    return res.data;
+  },
+  resetAgentPassword: async (id, newPassword) => {
+    const res = await apiClient.put(`/users/${id}/password`, { newPassword });
+    return res.data;
+  },
+  deleteAgent: async (id) => {
+    const res = await apiClient.delete(`/users/${id}`);
+    return res.data;
+  },
+  getConsultants: async () => {
+    const res = await apiClient.get('/users/agents');
+    // filter consultants if needed
+    return res.data;
+  },
+  getPublicLeadDetails: async (id) => {
+    const res = await apiClient.get(`/leads/${id}/public-details`);
+    return res.data;
+  },
+
+  // AUTH
+  authLogin: async (email, password) => {
+    const res = await apiClient.post('/auth/login', { email, password });
+    return res.data;
+  },
+  // Verify stored JWT token is still valid against backend
+  verifyToken: async () => {
+    const res = await apiClient.get('/auth/me');
+    return res.data;
+  },
+
+  changeClientPassword: async (clientId, newPassword) => {
+    const res = await apiClient.put(`/clients/${clientId}/change-password`, { newPassword });
+    return res.data;
+  },
+
+  // STUBS (To prevent UI crash where APIs are not yet built)
+  getNotifications: async () => [],
+  addNotification: async () => ({}),
+
+  getConversations: async () => {
+    const res = await apiClient.get('/social/conversations');
+    return res.data;
+  },
+  addConversation: async (newConv) => {
+    return newConv;
+  },
+  sendSocialMessage: async ({ conversationId, phone, message }) => {
+    try {
+      let targetPhone = phone;
+      if (!targetPhone) {
+        const conv = await apiClient.get(`/social/conversations`);
+        const found = conv.data.find(c => c.id === conversationId);
+        targetPhone = found ? found.phone : null;
+      }
+
+      const res = await apiClient.post('/social/messages/send', { phone: targetPhone, message });
+      return res.data;
+    } catch (e) {
+      console.error(e);
+      throw e;
+    }
+  },
+  deleteSocialMessage: async (messageId) => {
+    const res = await apiClient.delete(`/social/messages/${messageId}`);
+    return res.data;
+  },
+  clearSocialChat: async (phone) => {
+    const res = await apiClient.delete(`/social/conversations/${encodeURIComponent(phone)}`);
+    return res.data;
+  },
+  markConversationRead: async (conversationId) => {
+    try {
+      const res = await apiClient.get('/social/conversations');
+      const conversations = res.data;
+      const conv = conversations.find(c => c.id === conversationId);
+      const phone = conv ? conv.phone : conversationId.replace('conv_phone_', '');
+      const readRes = await apiClient.get(`/social/messages/${encodeURIComponent(phone)}`);
+      return readRes.data;
+    } catch (e) {
+      console.error('Failed to mark conversation as read:', e);
+      return { success: false };
+    }
+  },
+  receiveSocialMessage: async ({ conversationId, message, isActive }) => {
+    return { success: true };
+  },
+  sendSocialMessage: async ({ conversationId, phone, channel, message, templateName }) => {
+    try {
+      let targetPhone = phone;
+      let targetChannel = channel;
+      if ((!targetPhone || !targetChannel) && conversationId) {
+        if (conversationId.includes('+')) {
+          targetPhone = conversationId;
+        } else if (conversationId.startsWith('conv_phone_')) {
+          targetPhone = conversationId.replace('conv_phone_', '');
+        } else {
+          try {
+            const res = await apiClient.get('/social/conversations');
+            const conv = res.data?.find(c => c.id === conversationId);
+            if (conv) {
+              if (!targetPhone) targetPhone = conv.phone;
+              if (!targetChannel) targetChannel = conv.platform || conv.channel;
+            }
+          } catch (err) {
+            console.warn('Could not resolve phone from conversations list:', err.message);
+          }
+        }
+      }
+      const textContent = typeof message === 'string' ? message : (message?.text || '');
+      const mediaUrl = typeof message === 'string' ? null : (message?.mediaUrl || null);
+
+      const sendRes = await apiClient.post('/social/messages/send', {
+        phone: targetPhone || conversationId,
+        channel: targetChannel,
+        text: textContent,
+        mediaUrl: mediaUrl,
+        templateName: templateName
+      });
+      return sendRes.data;
+    } catch (e) {
+      console.error('Error sending social message:', e);
+      throw e;
+    }
+  },
+  clearSocialChat: async (phone) => {
+    try {
+      const res = await apiClient.delete(`/social/conversations/${encodeURIComponent(phone)}`);
+      return res.data;
+    } catch (err) {
+      console.error('Error in clearSocialChat:', err);
+      throw err;
+    }
+  },
+  deleteSocialMessage: async (messageId) => {
+    try {
+      const res = await apiClient.delete(`/social/messages/${encodeURIComponent(messageId)}`);
+      return res.data;
+    } catch (err) {
+      console.error('Error in deleteSocialMessage:', err);
+      throw err;
+    }
+  },
+  uploadSocialMedia: async (file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    const res = await apiClient.post('/social/upload-media', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+    return res.data;
+  },
+  getSettings: async () => {
+    const res = await apiClient.get('/settings/company');
+    return res.data;
+  },
+  updateSettings: async (data) => {
+    const res = await apiClient.put('/settings/company', data);
+    return res.data;
+  },
+  getServices: async () => {
+    const res = await apiClient.get('/settings/services');
+    return res.data;
+  },
+  updateServices: async (data) => {
+    const res = await apiClient.put('/settings/services', data);
+    return res.data;
+  },
+  getPackages: async () => {
+    const res = await apiClient.get(`/settings/packages?t=${Date.now()}`);
+    return res.data;
+  },
+  getPayments: async () => {
+    try {
+      const res = await apiClient.get('/payments');
+      return Array.isArray(res.data) ? res.data : (res.data?.payments || []);
+    } catch (err) {
+      return [];
+    }
+  },
+  getClientPackages: async () => {
+    const res = await apiClient.get('/payments/packages');
+    return res.data;
+  },
+  createPackageCheckout: async ({ packageId, additionalApplicants, clientId }) => {
+    const res = await apiClient.post('/payments/package-checkout', { packageId, additionalApplicants, clientId });
+    return res.data;
+  },
+  updatePackages: async (data) => {
+    const res = await apiClient.put('/settings/packages', data);
+    return res.data;
+  },
+  getEmailTemplates: async () => {
+    const res = await apiClient.get('/settings/templates/email');
+    return res.data;
+  },
+  updateEmailTemplates: async (data) => {
+    const res = await apiClient.put('/settings/templates/email', data);
+    return res.data;
+  },
+  getWhatsappTemplates: async () => {
+    const res = await apiClient.get('/settings/templates/whatsapp');
+    return res.data;
+  },
+  updateWhatsappTemplates: async (data) => {
+    const res = await apiClient.put('/settings/templates/whatsapp', data);
+    return res.data;
+  },
+  getIntegrations: async () => {
+    const res = await apiClient.get('/settings/integrations');
+    return res.data;
+  },
+  saveIntegrations: async (data) => {
+    const res = await apiClient.post('/settings/integrations', data);
+    return res.data;
+  },
+  getCommissionRates: async () => {
+    const res = await apiClient.get('/payments/commissions/rates');
+    return res.data;
+  },
+  getCommissionsReport: async () => {
+    const res = await apiClient.get('/payments/commissions/report');
+    return res.data;
+  },
+  updateCommissionRate: async (agentId, type, value) => {
+    const res = await apiClient.patch('/payments/commissions/rates', { agentId, type, value });
+    return res.data;
+  },
+  getRefundRequests: async () => {
+    const res = await apiClient.get('/payments/refunds');
+    return res.data;
+  },
+  createRefundRequest: async (data) => {
+    const res = await apiClient.post('/payments/refunds', data);
+    return res.data;
+  },
+  updateRefundStatus: async (refundId, status, payoutMethod, transactionRef, adminNotes, amount) => {
+    const res = await apiClient.patch(`/payments/refunds/${refundId}/status`, { status, payoutMethod, transactionRef, adminNotes, amount });
+    return res.data;
+  },
+  getBackupLogs: async () => [],
+
+  // ─── Notifications ───────────────────────────────────────────────────────
+  getMyNotifications: async () => {
+    const res = await apiClient.get('/notifications/my');
+    return res.data;
+  },
+  getUnreadNotificationCount: async () => {
+    const res = await apiClient.get('/notifications/unread-count');
+    return res.data; // { count: N }
+  },
+  markNotificationRead: async (id) => {
+    const res = await apiClient.patch(`/notifications/${id}/read`);
+    return res.data;
+  },
+  markAllNotificationsRead: async () => {
+    const res = await apiClient.patch('/notifications/read-all');
+    return res.data;
+  },
+
+  // ─── Communications ───────────────────────────────────────────────────
+  getCommunications: async ({ clientId, leadId }) => {
+    const params = new URLSearchParams();
+    if (clientId) params.append('clientId', clientId);
+    if (leadId) params.append('leadId', leadId);
+    const res = await apiClient.get(`/communications?${params.toString()}`);
+    return res.data;
+  },
+  createCommunicationLog: async (data) => {
+    const res = await apiClient.post('/communications', data);
+    return res.data;
+  },
+
+  // ─── Application Cycles (Resubmission & Appeal) ────────────────────────
+  getApplicationCycles: async (clientId) => {
+    const res = await apiClient.get(`/cases/cycles/${clientId}`);
+    return res.data;
+  },
+  createApplicationCycle: async (data) => {
+    const res = await apiClient.post('/cases/cycles', data);
+    return res.data;
+  },
+  updateApplicationCycle: async (id, data) => {
+    const res = await apiClient.patch(`/cases/cycles/${id}`, data);
+    return res.data;
+  },
+
+  // ─── Checklist & Resubmission Endpoints ────────────────────────────────
+  getCycleChecklist: async (cycleId) => {
+    const res = await apiClient.get(`/cases/cycles/${cycleId}/checklist`);
+    return res.data;
+  },
+  addChecklistItem: async (data) => {
+    const res = await apiClient.post('/cases/checklists/item', data);
+    return res.data;
+  },
+  updateChecklistItem: async (id, data) => {
+    const res = await apiClient.patch(`/cases/checklists/item/${id}`, data);
+    return res.data;
+  },
+  deleteChecklistItem: async (id) => {
+    const res = await apiClient.delete(`/cases/checklists/item/${id}`);
+    return res.data;
+  },
+  uploadChecklistDoc: async (checklistItemId, formData) => {
+    const res = await apiClient.post(`/cases/checklists/item/${checklistItemId}/upload`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+    return res.data;
+  },
+  reviewChecklistDoc: async (documentId, { status, comment }) => {
+    const res = await apiClient.patch(`/cases/documents/${documentId}/review`, { status, comment });
+    return res.data;
+  },
+  recordResubmissionDetails: async (cycleId, data) => {
+    const res = await apiClient.post(`/cases/cycles/${cycleId}/resubmit`, data);
+    return res.data;
+  },
+  recordGovernmentDecision: async (cycleId, { governmentDecision, governmentDecisionDate }) => {
+    const res = await apiClient.post(`/cases/cycles/${cycleId}/government-decision`, { governmentDecision, governmentDecisionDate });
+    return res.data;
+  },
+  generateDefaultChecklist: async (cycleId) => {
+    const res = await apiClient.post(`/cases/cycles/${cycleId}/generate-checklist`);
+    return res.data;
+  },
+
+  // ─── AI CEO Dashboard ───────────────────────────────────────────────────
+  getCeoBrief: async () => {
+    const res = await apiClient.get('/ai/ceo-brief');
+    return res.data;
+  },
+
+  summarizeClient: async (clientId) => {
+    const res = await apiClient.post('/ai/summarize-client', { clientId });
+    return res.data;
+  },
+
+  // ─── Coupons & Discounts ────────────────────────────────────────────────
+  validateCoupon: async (code, amount) => {
+    const res = await apiClient.post('/coupons/validate', { code, amount });
+    return res.data;
+  },
+  createCoupon: async (code, discountPercent) => {
+    const res = await apiClient.post('/coupons', { code, discountPercent });
+    return res.data;
+  },
+  getCoupons: async () => {
+    const res = await apiClient.get('/coupons');
+    return res.data;
+  },
+  deactivateCoupon: async (id) => {
+    const res = await apiClient.delete(`/coupons/${id}`);
+    return res.data;
+  },
+  deleteCouponPermanently: async (id) => {
+    const res = await apiClient.delete(`/coupons/${id}/permanent`);
+    return res.data;
+  },
+
+  // ─── Revenue Analytics ──────────────────────────────────────────────────
+  getRevenueAnalytics: async (params = {}) => {
+    const query = new URLSearchParams();
+    if (params.startDate) query.append('startDate', params.startDate);
+    if (params.endDate) query.append('endDate', params.endDate);
+    if (params.consultantId) query.append('consultantId', params.consultantId);
+    const queryStr = query.toString();
+    const res = await apiClient.get(`/payments/revenue-analytics${queryStr ? `?${queryStr}` : ''}`);
+    return res.data;
+  },
+};
