@@ -900,11 +900,7 @@ export const LeadSelfFillForm = () => {
         }
 
         if (success) {
-          if (resLink) {
-            setConfirmedMeetingLink(resLink);
-          } else if (!confirmedMeetingLink) {
-            setConfirmedMeetingLink("https://zoom.us/j/" + Math.floor(100000000 + Math.random() * 900000000));
-          }
+          setConfirmedMeetingLink(null);
           setActionDoneMsg(msg);
           setRescheduleConsultationId(null);
           setStep(2);
@@ -939,54 +935,6 @@ export const LeadSelfFillForm = () => {
         }
       });
       return;
-    }
-
-    if (!form.meetingPreferredDate || !form.meetingPreferredTime) {
-      setError("Please select your preferred meeting date and time.");
-      return;
-    }
-
-    const selectTime = form.meetingPreferredTime;
-    const cleanTimeStr = (str) => {
-      if (!str) return '';
-      return String(str)
-        .toLowerCase()
-        .replace(/\(uae\)/gi, '')
-        .replace(/[–—]/g, '-')
-        .replace(/\b0(\d):/g, '$1:')
-        .replace(/\s+/g, ' ')
-        .trim();
-    };
-
-    const cleanSelectTime = cleanTimeStr(selectTime);
-
-    // 1. Check if slot is already booked in DB
-    if (Array.isArray(bookedSlotsData) && bookedSlotsData.length > 0) {
-      const isAlreadyBooked = bookedSlotsData.some(b => {
-        const cleanB = cleanTimeStr(b);
-        return cleanB && (cleanB.includes(cleanSelectTime) || cleanSelectTime.includes(cleanB));
-      });
-      if (isAlreadyBooked) {
-        setError("This time slot is already booked. Please select another available time slot.");
-        return;
-      }
-    }
-
-    // 2. Check if slot falls within total configured booking windows
-    const allWindowSlots = getAvailableTimeSlots(customizationSettings, form.meetingPreferredDate, []);
-    if (allWindowSlots && allWindowSlots.length > 0) {
-      const isWithinWindow = allWindowSlots.some((slot) => {
-        const cleanVal = cleanTimeStr(slot.value);
-        const cleanShort12 = cleanTimeStr(slot.short12h);
-        return cleanVal === cleanSelectTime ||
-               cleanSelectTime.includes(cleanVal) ||
-               cleanVal.includes(cleanSelectTime) ||
-               cleanSelectTime.includes(cleanShort12);
-      });
-      if (!isWithinWindow) {
-        setError("Selected meeting time slot is outside of configured booking windows.");
-        return;
-      }
     }
 
     setLoading(true);
@@ -1024,12 +972,7 @@ export const LeadSelfFillForm = () => {
       success = true;
 
       if (success) {
-        const mLink = resData?.meetingLink || resData?.consultation?.meetingLink || resData?.data?.consultation?.meetingLink;
-        if (mLink) {
-          setConfirmedMeetingLink(mLink);
-        } else {
-          setConfirmedMeetingLink("https://zoom.us/j/" + Math.floor(100000000 + Math.random() * 900000000));
-        }
+        setConfirmedMeetingLink(null);
         localStorage.removeItem("aaa_lead_booking_draft");
         setForm({
           firstName: "",
@@ -1583,182 +1526,9 @@ export const LeadSelfFillForm = () => {
                   </div>
                 )}
 
-                {/* Section: Meeting Preferences */}
+                {/* Section: Inquiry Preferences */}
                 {serviceCategory !== "translation" && (
                   <>
-
-                    <div style={{ marginBottom: "14px" }}>
-                      <label style={labelStyle}>MEETING DATE *</label>
-                      <div style={{ position: "relative" }}>
-                        <div
-                          style={{
-                            ...inputStyle,
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "space-between",
-                            cursor: "pointer",
-                            background: "rgba(255, 255, 255, 0.07)",
-                            color: form.meetingPreferredDate ? "#fff" : "rgba(255, 255, 255, 0.4)",
-                            border: "1px solid rgba(255, 255, 255, 0.15)"
-                          }}
-                        >
-                          <span>
-                            {form.meetingPreferredDate
-                              ? (() => {
-                                  const parts = form.meetingPreferredDate.split("-");
-                                  return parts.length === 3 ? `${parts[2]}/${parts[1]}/${parts[0]}` : form.meetingPreferredDate;
-                                })()
-                              : "dd/mm/yyyy"}
-                          </span>
-                          <span style={{ fontSize: "14px", opacity: 0.8 }}>📅</span>
-                        </div>
-                        <input
-                          type="date"
-                          required={serviceCategory !== "translation"}
-                          min={minBookingDate}
-                          value={form.meetingPreferredDate}
-                          onKeyDown={(e) => e.preventDefault()}
-                          onClick={(e) => {
-                            if (e.target.showPicker) {
-                              try { e.target.showPicker(); } catch (err) {}
-                            }
-                          }}
-                          onChange={(e) => {
-                            const newDate = e.target.value;
-                            setForm((prev) => ({
-                              ...prev,
-                              meetingPreferredDate: newDate,
-                              meetingPreferredTime: ""
-                            }));
-                          }}
-                          style={{
-                            position: "absolute",
-                            top: 0,
-                            left: 0,
-                            width: "100%",
-                            height: "100%",
-                            opacity: 0,
-                            cursor: "pointer"
-                          }}
-                        />
-                      </div>
-                      {holidayInfo && (
-                        <div
-                          style={{
-                            marginTop: "10px",
-                            padding: "12px 16px",
-                            borderRadius: "10px",
-                            background: "rgba(239, 68, 68, 0.18)",
-                            border: "1px solid rgba(239, 68, 68, 0.4)",
-                            color: "#fca5a5",
-                            fontSize: "13px",
-                            fontWeight: 600,
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "10px"
-                          }}
-                        >
-                          <span style={{ fontSize: "18px" }}>🏖️</span>
-                          <div>
-                            <strong>Office Closed / Holiday:</strong> {holidayInfo.title}. Please select another date for booking.
-                          </div>
-                        </div>
-                      )}
-                      {!holidayInfo && form.meetingPreferredDate && availableTimeSlots.length === 0 && (
-                        <div
-                          style={{
-                            marginTop: "10px",
-                            padding: "12px 16px",
-                            borderRadius: "10px",
-                            background: "rgba(245, 158, 11, 0.18)",
-                            border: "1px solid rgba(245, 158, 11, 0.4)",
-                            color: "#fde68a",
-                            fontSize: "13px",
-                            fontWeight: 600,
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "10px"
-                          }}
-                        >
-                          <span style={{ fontSize: "18px" }}>⚠️</span>
-                          <div>
-                            <strong>No Booking Slots:</strong> No office hours configured for this date. Please select another date.
-                          </div>
-                        </div>
-                      )}
-                    </div>
-
-                    <div style={{ marginBottom: "14px", opacity: (holidayInfo || (form.meetingPreferredDate && availableTimeSlots.length === 0)) ? 0.7 : 1 }}>
-                      <label style={labelStyle}>TIME SLOT *</label>
-                      <div style={{ position: "relative", width: "100%" }}>
-                        <div
-                          style={{
-                            ...inputStyle,
-                            width: "100%",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "space-between",
-                            color: (holidayInfo || (form.meetingPreferredDate && availableTimeSlots.length === 0)) ? "#fca5a5" : ((form.meetingPreferredTime && !form.meetingPreferredTime.toLowerCase().includes("tbd") && !form.meetingPreferredTime.toLowerCase().includes("flexible")) ? "#fff" : "rgba(255, 255, 255, 0.4)"),
-                            background: (holidayInfo || (form.meetingPreferredDate && availableTimeSlots.length === 0)) ? "rgba(239, 68, 68, 0.12)" : inputStyle.background,
-                            border: (holidayInfo || (form.meetingPreferredDate && availableTimeSlots.length === 0)) ? "1px solid rgba(239, 68, 68, 0.35)" : inputStyle.border,
-                            cursor: (holidayInfo || (form.meetingPreferredDate && availableTimeSlots.length === 0)) ? "not-allowed" : "pointer"
-                          }}
-                        >
-                          <span>
-                            {holidayInfo
-                              ? `🚫 Office Closed (${holidayInfo.title})`
-                              : (form.meetingPreferredDate && availableTimeSlots.length === 0
-                                  ? "🚫 No Slots Available For Selected Date"
-                                  : ((form.meetingPreferredTime && !form.meetingPreferredTime.toLowerCase().includes("tbd") && !form.meetingPreferredTime.toLowerCase().includes("flexible"))
-                                      ? `⏰ ${form.meetingPreferredTime} (UAE)`
-                                      : "Select Time Slot (UAE)"))}
-                          </span>
-                          <span style={{ fontSize: "10px", opacity: 0.6 }}>{(holidayInfo || (form.meetingPreferredDate && availableTimeSlots.length === 0)) ? "🔒" : "▼"}</span>
-                        </div>
-                        <select
-                          disabled={Boolean(holidayInfo || (form.meetingPreferredDate && availableTimeSlots.length === 0))}
-                          required={serviceCategory !== "translation" && !holidayInfo && !(form.meetingPreferredDate && availableTimeSlots.length === 0)}
-                          value={(form.meetingPreferredTime && !form.meetingPreferredTime.toLowerCase().includes("tbd") && !form.meetingPreferredTime.toLowerCase().includes("flexible")) ? form.meetingPreferredTime : ""}
-                          onChange={(e) =>
-                            handleChange("meetingPreferredTime", e.target.value)
-                          }
-                          style={{
-                            position: "absolute",
-                            top: 0,
-                            left: 0,
-                            width: "100%",
-                            height: "100%",
-                            opacity: 0,
-                            cursor: (holidayInfo || (form.meetingPreferredDate && availableTimeSlots.length === 0)) ? "not-allowed" : "pointer"
-                          }}
-                        >
-                          <option value="" disabled style={{ background: "#24243e" }}>
-                            {holidayInfo ? `🚫 Office Closed: ${holidayInfo.title}` : (form.meetingPreferredDate && availableTimeSlots.length === 0 ? "🚫 No Slots Available For Selected Date" : "Select Time Slot (UAE)")}
-                          </option>
-                          {!holidayInfo && availableTimeSlots.map((slot) => (
-                            <option key={slot.value} value={slot.value} style={{ background: "#24243e", color: "#fff" }}>
-                              {slot.label}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                    </div>
-
-                    {serviceCategory === "visa" && (
-                      <div style={{
-                        background: "rgba(239, 68, 68, 0.12)",
-                        border: "1px solid rgba(239, 68, 68, 0.35)",
-                        borderRadius: "10px",
-                        padding: "14px 16px",
-                        marginBottom: "18px",
-                        fontSize: "12px",
-                        lineHeight: "1.6",
-                        color: "rgba(255, 255, 255, 0.9)"
-                      }}>
-                        <span style={{ color: "#F87171", fontWeight: "700" }}>⚠️ Booking Policy Notice:</span> If you do not join your scheduled Free Eligibility Assessment within 10 minutes of the appointment time, your booking will be automatically cancelled. Due to high demand, missed appointments are not eligible for rescheduling.
-                      </div>
-                    )}
-
                     <div style={{ marginBottom: "14px" }}>
                       <label style={labelStyle}>CONSULTATION LANGUAGE</label>
                       <input
@@ -1779,7 +1549,7 @@ export const LeadSelfFillForm = () => {
 
                     <div style={{ marginBottom: "28px" }}>
                       <label style={labelStyle}>
-                        YOUR QUESTIONS/MESSAGES
+                        YOUR QUESTIONS / PROJECT DETAILS (OPTIONAL)
                       </label>
                       <textarea
                         value={form.meetingNotes}
@@ -1790,7 +1560,7 @@ export const LeadSelfFillForm = () => {
                         placeholder={
                           serviceCategory === "property"
                             ? "What are your property investment goals? E.g. 'I want a Golden Visa property in Malaga...'"
-                            : "What would you like to discuss? E.g. 'I want to know about DNV visa requirements for my family...'"
+                            : "What would you like to discuss? E.g. 'I want to know about Spain Visa requirements for my family...'"
                         }
                         style={{
                           ...inputStyle,
@@ -1813,11 +1583,7 @@ export const LeadSelfFillForm = () => {
                     ? "Submitting..."
                     : serviceCategory === "translation"
                       ? "✅ Proceed to Sworn Translation Tool"
-                      : serviceCategory === "property"
-                        ? "✅ Book Free Consultation"
-                        : serviceCategory === "case_assessment"
-                          ? "✅ Book Free Case Assessment"
-                          : "✅ Book Free Eligibility Assessment"}
+                      : "✅ Submit Inquiry & Connect with Specialist"}
                 </button>
               </form>
             </>
@@ -1835,7 +1601,7 @@ export const LeadSelfFillForm = () => {
                   margin: "0 0 12px",
                 }}
               >
-                All Done!
+                Inquiry Submitted Successfully!
               </h2>
               <p
                 style={{
@@ -1847,48 +1613,39 @@ export const LeadSelfFillForm = () => {
               >
                 {actionDoneMsg || (
                   <>
-                    🎉 Your assessment is confirmed for <strong>{form.meetingPreferredDate ? dayjs(form.meetingPreferredDate).format('DD/MM/YYYY') : 'your selected date'}</strong> at <strong>{form.meetingPreferredTime || 'your selected time'} (UAE)</strong>!
+                    Thank you, <strong>{form.firstName || "valued client"}</strong>! We have received your inquiry.
                     <br />
-                    <span style={{ color: '#a78bfa', fontWeight: 600 }}>Your Zoom Meeting link has been dispatched immediately to your WhatsApp number ({form.phone}).</span>
+                    <span style={{ color: '#a78bfa', fontWeight: 600 }}>
+                      Our specialist team is reviewing your requirements and will reach out to you directly via WhatsApp or phone.
+                    </span>
                   </>
                 )}
               </p>
 
-              {confirmedMeetingLink && (
-                <div
+              <div style={{ marginBottom: "24px" }}>
+                <a
+                  href="https://wa.me/971509554142"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   style={{
-                    background: "rgba(37, 211, 102, 0.12)",
-                    border: "1px solid rgba(37, 211, 102, 0.4)",
-                    borderRadius: "14px",
-                    padding: "18px 20px",
-                    marginBottom: "24px",
-                    textAlign: "center"
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    background: "#25D366",
+                    color: "#fff",
+                    textDecoration: "none",
+                    fontWeight: 700,
+                    fontSize: "15px",
+                    padding: "14px 28px",
+                    borderRadius: "10px",
+                    boxShadow: "0 4px 15px rgba(37, 211, 102, 0.35)",
+                    transition: "all 0.2s ease"
                   }}
                 >
-                  <div style={{ fontSize: "14px", fontWeight: 700, color: "#25D366", marginBottom: "8px" }}>
-                    🎥 Instant Zoom Meeting Join Link:
-                  </div>
-                  <a
-                    href={confirmedMeetingLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{
-                      display: "inline-block",
-                      fontSize: "14px",
-                      fontWeight: 700,
-                      color: "#60A5FA",
-                      wordBreak: "break-all",
-                      textDecoration: "underline",
-                      padding: "10px 16px",
-                      background: "rgba(0, 0, 0, 0.35)",
-                      borderRadius: "8px",
-                      border: "1px solid rgba(96, 165, 250, 0.3)"
-                    }}
-                  >
-                    🔗 {confirmedMeetingLink}
-                  </a>
-                </div>
-              )}
+                  <span>💬 Chat Directly on WhatsApp</span>
+                </a>
+              </div>
+
               <div
                 style={{
                   background: "rgba(102,126,234,0.15)",
@@ -1916,13 +1673,13 @@ export const LeadSelfFillForm = () => {
                     lineHeight: 2,
                   }}
                 >
-                  <li>✅ Zoom Join Link dispatched to your WhatsApp & Email</li>
+                  <li>✅ Inquiry recorded in our CRM system</li>
                   <li>
                     {serviceCategory === "property"
-                      ? "✅ A property investment expert has been assigned to your case"
-                      : "✅ A Spain Visa expert has been assigned to your consultation"}
+                      ? "✅ A property investment specialist has been assigned to your case"
+                      : "✅ A dedicated consultant has been assigned to your profile"}
                   </li>
-                  <li>✅ Automated 24h and 1h reminders will be sent prior to the call</li>
+                  <li>✅ You will receive direct updates on your WhatsApp ({form.phone || 'provided number'})</li>
                 </ul>
               </div>
             </div>

@@ -1,7 +1,4 @@
 const prisma = require('../config/db');
-const zoomService = require('../services/zoomService');
-const { sendEmail } = require('../services/emailService');
-const { sendWhatsAppMessage, sendGoogleReviewRequestWhatsApp } = require('../services/whatsappService');
 const { remindersQueue } = require('../queues/queueSetup');
 
 function getSortableTimestamp(dateStr, timeSlotStr, status) {
@@ -257,52 +254,27 @@ const createConsultation = async (req, res) => {
       }
     }
 
-    let meetingLink = 'https://zoom.us/j/' + Math.floor(100000000 + Math.random() * 900000000);
-    let zoomMeetingId = null;
-    
-    if (zoomService.isConfigured) {
-      try {
-        let startTimeISO = new Date().toISOString();
-        if (meetingDate) {
-          const timeStr = meetingTime && meetingTime.includes(':') ? meetingTime : '10:00';
-          const dateObj = new Date(`${meetingDate}T${timeStr}`);
-          if (!isNaN(dateObj.getTime())) {
-            startTimeISO = dateObj.toISOString();
-          }
-        }
-        
-        const zoomMeeting = await zoomService.createZoomMeeting({
-          topic: `Eligibility Assessment for Lead ${leadId || ''}`,
-          startTime: startTimeISO,
-          durationMinutes: durationMinutes || 30
-        });
-        
-        if (zoomMeeting) {
-          meetingLink = zoomMeeting.joinUrl;
-          zoomMeetingId = zoomMeeting.meetingId;
-        }
-      } catch (zoomErr) {
-        console.error('Failed to create Zoom meeting, falling back to mock link:', zoomErr.message);
-      }
-    }
+    const meetingLink = null;
+    const zoomMeetingId = null;
     
     const consultation = await prisma.consultation.create({
       data: {
         leadId,
-        date: meetingDate,
-        timeSlot: meetingTime,
+        date: meetingDate || new Date().toISOString().split('T')[0],
+        timeSlot: meetingTime || 'TBD',
         durationMinutes: durationMinutes || 30,
         consultantId: assignedConsultantId,
         internalNotes: notes,
-        meetingLink,
-        zoomMeetingId
+        meetingLink: null,
+        zoomMeetingId: null,
+        status: assignedConsultantId ? 'Inquiry Assigned' : 'Inquiry Received'
       }
     });
 
     if (leadId) {
       await prisma.lead.update({
         where: { id: leadId },
-        data: { status: 'Meeting Scheduled' }
+        data: { status: 'New Lead' }
       }).catch(e => console.warn('Could not update lead status on createConsultation:', e.message));
     }
 
@@ -405,48 +377,6 @@ const autoConvertLeadToClient = async (leadId) => {
 
     const frontendUrl = process.env.FRONTEND_URL || 'https://aaa-crm-service.netlify.app';
     const portalUrl = `${frontendUrl}/#/portal/login`;
-
-    // Dispatch Credentials Email
-    if (clientRecord.email) {
-      try {
-        const { sendEmail } = require('../services/emailService');
-        sendEmail({
-          to: clientRecord.email,
-          subject: 'Welcome to AAA Business Consultancy - Your Client Portal is Ready! ✈️',
-          html: `
-            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; color: #2d3748;">
-              <h2 style="color: #4f46e5;">Welcome to AAA Business Consultancy! 🎉</h2>
-              <p>Dear <strong>${clientRecord.firstName} ${clientRecord.lastName}</strong>,</p>
-              <p>Congratulations! Based on your consultation assessment, you are <strong>ELIGIBLE</strong> for your Spain Visa / Residency package.</p>
-              <div style="background: #f7fafc; border-left: 4px solid #4f46e5; padding: 16px; margin: 20px 0;">
-                <h4 style="margin: 0 0 8px; color: #4f46e5;">Your Portal Credentials</h4>
-                <p><strong>Portal URL:</strong> <a href="${portalUrl}">${portalUrl}</a></p>
-                <p><strong>Username:</strong> ${clientRecord.email}</p>
-                <p><strong>Temporary Password:</strong> <code style="background: #edf2f7; padding: 2px 6px; color: #e11d48;">${plainPassword}</code></p>
-              </div>
-              <p>Please log in to select your preferred package and complete your application.</p>
-            </div>
-          `
-        }).catch(err => console.error('[Auto-Convert Email Error]:', err.message));
-      } catch (emailErr) {
-        console.error('[Auto-Convert Email Exception]:', emailErr.message);
-      }
-    }
-
-    // Dispatch Single Clean WhatsApp Credentials Message
-    if (clientRecord.phone) {
-      try {
-        const { sendCustomWhatsApp } = require('../services/chatbotService');
-        const activeNote = (lead?.notes || clientRecord?.profileSummary || clientRecord?.aiNotes || '').trim();
-        const noteSection = activeNote ? `\n\n📝 *Note:* ${activeNote}` : '';
-        const credsMsg = `Hello *${clientRecord.firstName} ${clientRecord.lastName}*, welcome to AAA Business Consultancy! 🇪🇸\n\nYour Spain Relocation profile has been initialized. 🎉\n\n🔑 *Client Portal Login Credentials:*\n🔗 *Login URL:* ${portalUrl}\n👤 *Username:* ${clientRecord.email}\n🔑 *Temp Password:* ${plainPassword}\n\n📦 *Service Packages:*\nYou can log in to your Client Portal using the link above to view all residency packages, select the package that best fits your needs, and complete your payment.${noteSection}\n\n📅 *Need to book another consultation?*\nSimply reply with "rebook" in this chat, and we'll send you a new meeting booking link.\n\nThank you for choosing AAA Business Consultancy!`;
-        
-        await sendCustomWhatsApp(clientRecord.phone, credsMsg).catch(err => console.error('[Auto-Convert WA Creds Error]:', err.message));
-        console.log(`[Auto-Convert WA Creds Sent] Dispatched WhatsApp credentials message to ${clientRecord.phone}`);
-      } catch (waCredErr) {
-        console.error('[Auto-Convert WA Creds Exception]:', waCredErr.message);
-      }
-    }
 
     console.log(`[Conversion] Conversion completed successfully for leadId=${leadId} clientId=${clientRecord.id}`);
     return clientRecord;
@@ -617,75 +547,6 @@ const updateOutcome = async (req, res) => {
           data: { serviceType: recommendedService }
         }).catch(err => console.warn('[Outcome ServiceType Sync Warning]:', err.message));
       }
-
-      // Schedule €250 Drip follow-ups (3 days & 7 days later) if remindersQueue is active
-      try {
-        if (remindersQueue && remindersQueue.add && updatedLead) {
-          // Schedule Drip #2 (3 days)
-          await remindersQueue.add('consultation-completed-drip', {
-            leadId: updatedLead.id,
-            clientId: updatedLead.clientId,
-            email: updatedLead.email,
-            phone: updatedLead.phone,
-            firstName: updatedLead.firstName,
-            lastName: updatedLead.lastName,
-            dripIndex: 2
-          }, {
-            delay: 3 * 24 * 60 * 60 * 1000 // 3 days
-          });
-
-          // Schedule Drip #3 (7 days / 1 week)
-          await remindersQueue.add('consultation-completed-drip', {
-            leadId: updatedLead.id,
-            clientId: updatedLead.clientId,
-            email: updatedLead.email,
-            phone: updatedLead.phone,
-            firstName: updatedLead.firstName,
-            lastName: updatedLead.lastName,
-            dripIndex: 3
-          }, {
-            delay: 7 * 24 * 60 * 60 * 1000 // 7 days
-          });
-          console.log(`[Auto-Completed] Scheduled €250 assessment drips for lead ${updatedLead.id}`);
-        }
-      } catch (queueErr) {
-        console.warn('[Queue Schedule Warning]: Could not schedule drips:', queueErr.message);
-      }
-    }
-
-    // Trigger automated post-consultation Google Review WhatsApp messages (Immediate + 3d + 7d drips)
-    if (status === 'Completed') {
-      (async () => {
-        try {
-          let targetPhone = null;
-          let targetName = null;
-          let targetClientId = null;
-
-          if (consultation.leadId) {
-            const lead = await prisma.lead.findUnique({
-              where: { id: consultation.leadId },
-              select: { phone: true, firstName: true, lastName: true, clientId: true }
-            });
-            if (lead) {
-              targetPhone = lead.phone;
-              targetName = `${lead.firstName} ${lead.lastName}`.trim();
-              targetClientId = lead.clientId;
-            }
-          }
-
-          // Trigger 1: 1st Google Review Message (Immediate Post-Consultation)
-          await sendGoogleReviewRequestWhatsApp({
-            phone: targetPhone,
-            clientName: targetName,
-            clientId: targetClientId,
-            leadId: consultation.leadId,
-            triggerStage: 'POST_CONSULTATION'
-          });
-          console.log(`[Google Review] Dispatched Trigger 1 (Post-Consultation Immediate) for lead ${consultation.leadId}`);
-        } catch (gReviewErr) {
-          console.error('[Google Review Trigger] Error triggering review request:', gReviewErr.message);
-        }
-      })();
     }
 
     // Auto-update associated lead status if No Show
@@ -721,33 +582,6 @@ const updateOutcome = async (req, res) => {
         where: { id: consultation.leadId },
         data: { status: 'Meeting Cancelled' }
       });
-
-      // Send Rebook link (fire-and-forget — non-blocking)
-      try {
-        const { notifyClient } = require('../services/notificationService');
-        notifyClient({
-          event: 'MEETING_CANCELLED',
-          clientId: updatedLead.clientId || null,
-          leadId: updatedLead.id,
-          consultationId: consultation.id
-        }).catch(err => console.error('[Auto-Cancel] notifyClient failed:', err.message));
-
-        // Schedule 24-hour delayed rebooking reminder if remindersQueue is active
-        if (remindersQueue && remindersQueue.add) {
-          await remindersQueue.add('cancelled-rebook-reminder', {
-            leadId: updatedLead.id,
-            email: updatedLead.email,
-            phone: updatedLead.phone,
-            firstName: updatedLead.firstName,
-            lastName: updatedLead.lastName
-          }, {
-            delay: 24 * 60 * 60 * 1000 // 24 hours
-          });
-          console.log(`[Auto-Cancel] Scheduled 24-hour rebook reminder for lead ${updatedLead.id}`);
-        }
-      } catch (err) {
-        console.error('[Auto-Cancel] Failed to dispatch cancellation notifications:', err.message);
-      }
     }
 
     // Auto-update associated lead status & send WhatsApp rebooking link when Unblocked & Restored
@@ -776,31 +610,6 @@ const updateOutcome = async (req, res) => {
               ]
             }
           }).catch(err => console.warn('[Unblock Restore] Blacklist cleanup warning:', err.message));
-        }
-
-        // 4. Send WhatsApp message with fresh booking form link
-        if (updatedLead && updatedLead.phone) {
-          const frontendUrl = process.env.FRONTEND_URL || 'https://aaa-crm-service.netlify.app';
-          const rebookUrl = `${frontendUrl}/#/public/lead-form?reschedule=true&consultationId=${consultation.id}`;
-          const clientName = `${updatedLead.firstName || ''} ${updatedLead.lastName || ''}`.trim() || 'Valued Client';
-
-          const waMsg = `🔓 *AAA Business Consultancy - Access Restored!*
-
-Dear *${clientName}*,
-
-Your account has been unblocked by our team! 🎉
-
-You can now select a new date and time slot for your Spain Visa Consultation using the link below:
-
-📅 *Book New Appointment Slot:*
-${rebookUrl}
-
-We look forward to assisting you!
-_AAA Business Consultancy_`;
-
-          const { sendCustomWhatsApp } = require('../services/chatbotService');
-          await sendCustomWhatsApp(updatedLead.phone, waMsg);
-          console.log(`[Unblock & Restore] Restored Consultation ${consultation.id} & Lead ${consultation.leadId}, dispatched WhatsApp rebooking link to ${updatedLead.phone}.`);
         }
       } catch (unblockErr) {
         console.error('[Unblock Restore Error]:', unblockErr.message);
@@ -833,6 +642,7 @@ const respondToConsultation = async (req, res) => {
       return res.status(404).json({ message: 'Consultation not found.' });
     }
 
+<<<<<<< HEAD
     if (req.user && (req.user.role === 'consultant' || req.user.role === 'agent')) {
       if (existingConsultation.consultantId && existingConsultation.consultantId !== req.user.id) {
         return res.status(403).json({ message: 'Access denied. You can only respond to your assigned consultations.' });
@@ -871,6 +681,9 @@ const respondToConsultation = async (req, res) => {
         meetingLink = 'https://zoom.us/j/' + Math.floor(100000000 + Math.random() * 900000000);
       }
     }
+=======
+    let meetingLink = null;
+>>>>>>> 94a253b0a28ced33752956c1c33c40c5f5b4c740
 
     const consultation = await prisma.consultation.update({
       where: { id },
@@ -955,34 +768,8 @@ const createConsultationForLead = async (req, res) => {
       return res.json({ success: true, consultation: updated, reassigned: true });
     }
 
-    let meetingLink = 'https://zoom.us/j/' + Math.floor(100000000 + Math.random() * 900000000);
-    let zoomMeetingId = null;
-    
-    if (zoomService.isConfigured) {
-      try {
-        let startTimeISO = new Date().toISOString();
-        if (meetingDate) {
-          const timeStr = meetingTime && meetingTime.includes(':') ? meetingTime : '10:00';
-          const dateObj = new Date(`${meetingDate}T${timeStr}`);
-          if (!isNaN(dateObj.getTime())) {
-            startTimeISO = dateObj.toISOString();
-          }
-        }
-        
-        const zoomMeeting = await zoomService.createZoomMeeting({
-          topic: `Eligibility Assessment for Lead ${leadId || ''}`,
-          startTime: startTimeISO,
-          durationMinutes: durationMinutes || 30
-        });
-        
-        if (zoomMeeting) {
-          meetingLink = zoomMeeting.joinUrl;
-          zoomMeetingId = zoomMeeting.meetingId;
-        }
-      } catch (zoomErr) {
-        console.error('Failed to create Zoom meeting, falling back to mock link:', zoomErr.message);
-      }
-    }
+    const meetingLink = null;
+    const zoomMeetingId = null;
 
     const consultation = await prisma.consultation.create({
       data: {
@@ -992,8 +779,8 @@ const createConsultationForLead = async (req, res) => {
         timeSlot: meetingTime || 'TBD',
         durationMinutes: durationMinutes || 30,
         status: 'Pending Acceptance',
-        meetingLink,
-        zoomMeetingId
+        meetingLink: null,
+        zoomMeetingId: null
       }
     });
 
@@ -1134,7 +921,7 @@ async function sendConsultationNotifications(consultation) {
     const name = `${lead.firstName} ${lead.lastName}`;
     const date = consultation.date;
     const time = consultation.timeSlot;
-    const link = consultation.meetingLink || 'https://zoom.us';
+    const link = consultation.meetingLink || null;
 
     console.log(`[NOTIFICATIONS] Dispatching scheduling notifications for Lead: ${name} (${phone} / ${email})`);
 
@@ -1142,98 +929,6 @@ async function sendConsultationNotifications(consultation) {
     const rescheduleUrl = `${frontendUrl}/#/public/lead-form?reschedule=true&consultationId=${consultation.id}`;
     const cancelUrl = `${frontendUrl}/#/public/lead-form?cancel=true&consultationId=${consultation.id}`;
     const packagesUrl = "https://aaabusinessconsultancy.com/services-and-packages/";
-
-    // 1. Send WhatsApp Message
-    try {
-      const { sendCustomWhatsApp } = require('../services/chatbotService');
-      const { getServiceTitleInfo } = require('../utils/serviceTitleHelper');
-      const svcInfo = getServiceTitleInfo(consultation.serviceType || (lead && lead.serviceType));
-
-      const waMsg = `${svcInfo.icon} *${svcInfo.title} Confirmed!*
-
-Dear *${name}*,
-
-Your Free ${svcInfo.assessmentName} with *AAA Business Consultancy* has been scheduled successfully! 🎉
-
-📅 *Date:* ${date}
-⏰ *Time:* ${time} (UAE)
-🔗 *Meeting Join Link:* ${link}
-
-─────────────
-👇 *Quick Action Links:*
-• 🔄 *Reschedule Booking:* ${rescheduleUrl}
-• ❌ *Cancel Booking:* ${cancelUrl}
-• 📦 *View Visa Packages:* ${packagesUrl}
-
-_Note: Please join within 10 minutes of appointment time to avoid automatic cancellation._`;
-
-      await sendCustomWhatsApp(phone, waMsg);
-    } catch (waErr) {
-      console.error('[NOTIFICATIONS] Failed to send WhatsApp confirmation:', waErr.message);
-    }
-
-    // 2. Send Branded Email
-    try {
-      const { sendAppointmentConfirmationEmail } = require('../services/emailService');
-      await sendAppointmentConfirmationEmail({
-        to: email,
-        firstName: lead ? lead.firstName : name,
-        date,
-        timeSlot: time,
-        meetingLink: link,
-        consultationId: consultation.id,
-        serviceType: consultation.serviceType || (lead && lead.serviceType)
-      });
-      console.log(`[NOTIFICATIONS] Sent appointment confirmation email to ${email}`);
-    } catch (emailErr) {
-      console.error('[NOTIFICATIONS] Failed to send confirmation email:', emailErr.message);
-    }
-
-    // 3. Schedule 3 Reminders (24h, 1h, 10m before)
-    if (remindersQueue && remindersQueue.add) {
-      const meetingStart = new Date(`${date}T${time.includes(':') ? time : '10:00'}`);
-      if (!isNaN(meetingStart.getTime())) {
-        const now = Date.now();
-
-        const scheduleReminder = async (label, timeBeforeMs, subject, textLabel) => {
-          const reminderTime = meetingStart.getTime() - timeBeforeMs;
-          const delay = reminderTime - now;
-          if (delay > 0) {
-            await remindersQueue.add('send-reminder', {
-              toEmail: email,
-              toPhone: phone,
-              subject: subject,
-              emailHtml: `<h3>Meeting Reminder</h3><p>Dear ${lead.firstName}, your Spain Visa Consultation is in ${textLabel}.</p><p>Zoom Join Link: <a href="${link}">${link}</a></p>`,
-              whatsappTemplate: 'consultation_scheduled_confirmation',
-              whatsappComponents: [
-                {
-                  type: 'body',
-                  parameters: [
-                    { type: 'text', text: lead.firstName },
-                    { type: 'text', text: date },
-                    { type: 'text', text: time },
-                    { type: 'text', text: link }
-                  ]
-                }
-              ]
-            }, {
-              jobId: `reminder-${label}-${consultation.id}`,
-              delay: delay
-            });
-            console.log(`[NOTIFICATIONS] Enqueued ${label} reminder with delay: ${Math.round(delay / 60000)} minutes`);
-          }
-        };
-
-        // 24 Hours Reminder (24 * 60 * 60 * 1000)
-        await scheduleReminder('24h', 24 * 60 * 60 * 1000, 'Reminder: Spain Visa Consultation in 24 Hours', '24 Hours');
-
-        // 1 Hour Reminder (1 * 60 * 60 * 1000)
-        await scheduleReminder('1h', 1 * 60 * 60 * 1000, 'Reminder: Spain Visa Consultation in 1 Hour', '1 Hour');
-
-        // 10 Minutes Reminder (10 * 60 * 1000)
-        await scheduleReminder('10m', 10 * 60 * 1000, 'Urgent Reminder: Spain Visa Consultation in 10 Minutes', '10 Minutes');
-      }
-    }
   } catch (err) {
     console.error('[NOTIFICATIONS] Error in sendConsultationNotifications:', err);
   }
@@ -1433,7 +1128,7 @@ async function getPublicConsultationDetails(req, res) {
         package: (lead.qualificationData && lead.qualificationData.package) || 'Standard',
         currentDate: consultation.date,
         currentTime: consultation.timeSlot,
-        meetingLink: consultation.meetingLink || 'https://zoom.us',
+        meetingLink: consultation.meetingLink || null,
         status: consultation.status,
         canReschedule,
         canCancel,
@@ -1517,10 +1212,7 @@ async function publicRescheduleConsultation(req, res) {
       }
     }
 
-    let linkToSave = consultation.meetingLink;
-    if (!linkToSave || linkToSave.includes('undefined')) {
-      linkToSave = `https://zoom.us/j/${Math.floor(100000000 + Math.random() * 900000000)}`;
-    }
+    const linkToSave = null;
 
     // Atomic update of EXISTING consultation record ONLY
     const updatedConsultation = await prisma.consultation.update({
@@ -1528,15 +1220,15 @@ async function publicRescheduleConsultation(req, res) {
       data: {
         date,
         timeSlot,
-        status: 'Scheduled',
-        meetingLink: linkToSave
+        status: 'Inquiry Updated',
+        meetingLink: null
       }
     });
 
     if (consultation.leadId) {
       await prisma.lead.update({
         where: { id: consultation.leadId },
-        data: { status: 'Meeting Scheduled' }
+        data: { status: 'New Lead' }
       }).catch(e => console.warn('Could not update lead status on reschedule:', e.message));
     }
 
@@ -1557,69 +1249,13 @@ async function publicRescheduleConsultation(req, res) {
     const clientName = lead ? `${lead.firstName} ${lead.lastName}` : (client ? `${client.firstName} ${client.lastName}` : 'Client');
     const email = lead?.email || client?.email || null;
     const phone = lead?.phone || client?.phone || null;
-    const link = updatedConsultation.meetingLink || consultation.meetingLink || `https://zoom.us/j/${Math.floor(100000000 + Math.random() * 900000000)}`;
+    const link = null;
 
     const consultationId = consultation.id;
     const dayjs = require('dayjs');
     const formattedDate = date ? (date.includes('-') ? dayjs(date).format('DD/MM/YYYY') : date) : date;
 
-    const token = generateBookingToken(consultationId);
-    const frontendUrl = process.env.FRONTEND_URL || 'https://aaa-crm-service.netlify.app';
-    const rescheduleUrl = `${frontendUrl}/#/public/lead-form?reschedule=true&consultationId=${consultationId}`;
-    const cancelUrl = `${frontendUrl}/#/public/lead-form?cancel=true&consultationId=${consultationId}`;
-    const packagesUrl = "https://aaabusinessconsultancy.com/services-and-packages/";
-
-    // Send WhatsApp & Email Notifications
-    if (phone) {
-      try {
-        const { sendCustomWhatsApp } = require('../services/chatbotService');
-        const { getServiceTitleInfo } = require('../utils/serviceTitleHelper');
-        const svcInfo = getServiceTitleInfo(lead?.serviceType || client?.serviceType || consultation?.serviceType);
-
-        const waMsg = `${svcInfo.icon} *${svcInfo.title} Rescheduled!*
-
-Dear *${clientName}*,
-
-Your Free ${svcInfo.assessmentName} with *AAA Business Consultancy* has been scheduled successfully! 🎉
-
-📅 *Date:* ${formattedDate}
-⏰ *Time:* ${timeSlot} (UAE)
-🔗 *Meeting Join Link:* ${link}
-
-─────────────
-👇 *Quick Action Links:*
-• 🔄 *Reschedule Booking:* ${rescheduleUrl}
-• ❌ *Cancel Booking:* ${cancelUrl}
-• 📦 *View Visa Packages:* ${packagesUrl}
-
-_Note: Please join within 10 minutes of appointment time to avoid automatic cancellation._`;
-
-        await sendCustomWhatsApp(phone, waMsg).catch(waErr => console.error('Reschedule WhatsApp error:', waErr.message));
-        console.log(`[Reschedule WA Sent] Dispatched WhatsApp reschedule message to ${phone}`);
-      } catch (waErr) {
-        console.error('Reschedule WhatsApp error:', waErr.message);
-      }
-    }
-
-    if (email) {
-      try {
-        const { sendAppointmentConfirmationEmail } = require('../services/emailService');
-        await sendAppointmentConfirmationEmail({
-          to: email,
-          firstName: lead ? lead.firstName : 'Client',
-          date,
-          timeSlot,
-          meetingLink: link,
-          consultationId: consultationId,
-          serviceType: lead?.serviceType || client?.serviceType || consultation?.serviceType
-        });
-        console.log(`[Reschedule Email Sent] Dispatched confirmation email to ${email}`);
-      } catch (emailErr) {
-        console.error('Reschedule Email error:', emailErr.message);
-      }
-    }
-
-    // 🔔 Create In-App CRM Notifications for Super Admin, Admin, Operations, Consultant & Assigned Staff
+    // 🔔 Create In-App CRM Notifications for Staff
     try {
       const { createRescheduleNotification } = require('./notificationController');
       await createRescheduleNotification({
@@ -1635,9 +1271,9 @@ _Note: Please join within 10 minutes of appointment time to avoid automatic canc
       // Record CRM AuditLog entry
       await prisma.auditLog.create({
         data: {
-          action: `Meeting Rescheduled for ${clientName}`,
+          action: `Inquiry Preferences Updated for ${clientName}`,
           performedBy: clientName,
-          details: `Meeting for ${clientName} was rescheduled to ${formattedDate} at ${timeSlot}.`
+          details: `Inquiry preferences for ${clientName} were updated.`
         }
       }).catch(err => console.warn('[AuditLog Warning] Could not record reschedule audit:', err.message));
     } catch (notifErr) {
@@ -1646,13 +1282,13 @@ _Note: Please join within 10 minutes of appointment time to avoid automatic canc
 
     return res.status(200).json({
       success: true,
-      message: 'Meeting rescheduled successfully',
-      meetingLink: link,
+      message: 'Inquiry updated successfully',
+      meetingLink: null,
       data: {
         bookingId: updatedConsultation.id,
         date: updatedConsultation.date,
         time: updatedConsultation.timeSlot,
-        meetingLink: link,
+        meetingLink: null,
         consultation: updatedConsultation
       }
     });
@@ -1720,50 +1356,6 @@ async function publicCancelConsultation(req, res) {
     const rebookUrl = targetLeadId 
       ? `${frontendUrl}/#/public/lead-form?leadId=${targetLeadId}&rebook=true`
       : `${frontendUrl}/#/public/lead-form`;
-
-    if (phone) {
-      try {
-        const { sendCustomWhatsApp } = require('../services/chatbotService');
-        const { getServiceTitleInfo } = require('../utils/serviceTitleHelper');
-        const svcInfo = getServiceTitleInfo(lead?.serviceType || consultation?.serviceType);
-
-        const waMsg = `❌ *${svcInfo.title} Cancelled*
-
-Dear *${clientName}*,
-
-Your ${svcInfo.assessmentName} scheduled for ${displayDate} at ${consultation.timeSlot} (UAE) has been cancelled as requested.
-
-If you ever wish to re-book, feel free to visit our booking page anytime:
-${rebookUrl}`;
-
-        await sendCustomWhatsApp(phone, waMsg);
-      } catch (waErr) {
-        console.error('Cancel WhatsApp error:', waErr.message);
-      }
-    }
-
-    if (email) {
-      try {
-        const { sendEmail } = require('../services/emailService');
-        const { getServiceTitleInfo } = require('../utils/serviceTitleHelper');
-        const svcInfo = getServiceTitleInfo(lead?.serviceType || consultation?.serviceType);
-
-        await sendEmail({
-          to: email,
-          subject: `Appointment Cancelled: ${svcInfo.title}`,
-          html: `
-            <div style="font-family: Arial, sans-serif; padding: 20px;">
-              <h3>Appointment Cancellation Confirmed</h3>
-              <p>Dear ${lead ? lead.firstName : 'Client'},</p>
-              <p>Your ${svcInfo.assessmentName} scheduled for <b>${displayDate}</b> at <b>${consultation.timeSlot} (UAE)</b> has been cancelled.</p>
-              <p>You can book a new session anytime at <a href="${rebookUrl}">AAA Business Consultancy</a>.</p>
-            </div>
-          `
-        });
-      } catch (emailErr) {
-        console.error('Cancel Email error:', emailErr.message);
-      }
-    }
 
     // Create CRM Notifications for Super Admin, Admin, Operations & Assigned Staff
     try {

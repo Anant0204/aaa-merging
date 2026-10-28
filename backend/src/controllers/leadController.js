@@ -503,38 +503,8 @@ const updateLeadStatus = async (req, res) => {
           where: { leadId: lead.id, status: { notIn: ['Cancelled', 'Completed'] } },
           data: { status: 'Cancelled' }
         }).catch(err => console.warn('[updateLeadStatus] Consultation cancel warning:', err.message));
-
-        const consultation = await prisma.consultation.findFirst({
-          where: { leadId: lead.id },
-          orderBy: { createdAt: 'desc' }
-        });
-
-        const { notifyClient } = require('../services/notificationService');
-        notifyClient({
-          event: 'MEETING_CANCELLED',
-          leadId: lead.id,
-          consultationId: consultation?.id || null,
-          data: {
-            date: consultation?.date || lead.meetingPreferredDate,
-            time: consultation?.timeSlot || lead.meetingPreferredTime
-          }
-        }).catch(err => console.error('[updateLeadStatus] Cancellation notifyClient failed:', err.message));
-
-        const remindersQueue = req.app ? req.app.get('remindersQueue') : null;
-        if (remindersQueue && remindersQueue.add) {
-          await remindersQueue.add('cancelled-rebook-reminder', {
-            leadId: lead.id,
-            email: lead.email,
-            phone: lead.phone,
-            firstName: lead.firstName,
-            lastName: lead.lastName
-          }, {
-            delay: 24 * 60 * 60 * 1000 // 24 hours
-          }).catch(err => console.warn('[updateLeadStatus] Reminders queue warning:', err.message));
-        }
-        console.log(`[updateLeadStatus] Dispatched cancellation notifications & rebook link for lead ${lead.id}`);
       } catch (cancelErr) {
-        console.error('[updateLeadStatus] Failed to process cancellation triggers:', cancelErr.message);
+        console.error('[updateLeadStatus] Failed to process cancellation:', cancelErr.message);
       }
     }
 
@@ -936,104 +906,27 @@ async function updateMeetingPreference(req, res) {
     });
 
     if (clientObj) {
-      let meetingLink = 'https://zoom.us/j/' + Math.floor(100000000 + Math.random() * 900000000);
-      let zoomMeetingId = null;
-
-      const zoomService = require('../services/zoomService');
-      if (zoomService.isConfigured) {
-        try {
-          let startTimeISO = new Date().toISOString();
-          if (meetingPreferredDate) {
-            const timeStr = meetingPreferredTime && meetingPreferredTime.includes(':') ? meetingPreferredTime : '10:00';
-            const dateObj = new Date(`${meetingPreferredDate}T${timeStr}`);
-            if (!isNaN(dateObj.getTime())) {
-              startTimeISO = dateObj.toISOString();
-            }
-          }
-          const zoomMeeting = await zoomService.createZoomMeeting({
-            topic: `Follow-up Consultation for ${clientObj.firstName} ${clientObj.lastName}`,
-            startTime: startTimeISO,
-            durationMinutes: 30
-          });
-          if (zoomMeeting && zoomMeeting.joinUrl) {
-            meetingLink = zoomMeeting.joinUrl;
-            zoomMeetingId = zoomMeeting.meetingId;
-          }
-        } catch (zErr) {
-          console.error('[ZOOM] Failed creating rebook Zoom link:', zErr.message);
-        }
-      }
-
       const consultation = await prisma.consultation.create({
         data: {
           clientId: clientObj.id,
           leadId: clientObj.lead?.id || null,
-          date: meetingPreferredDate,
-          timeSlot: meetingPreferredTime,
+          date: meetingPreferredDate || new Date().toISOString().split('T')[0],
+          timeSlot: meetingPreferredTime || 'TBD',
           durationMinutes: 30,
           type: 'follow_up',
-          status: 'Scheduled',
+          status: 'Inquiry Received',
           consultantId: clientObj.assignedToId || undefined,
-          internalNotes: meetingNotes || 'Client Follow-up Rebook Meeting',
-          meetingLink,
-          zoomMeetingId
+          internalNotes: meetingNotes || 'Client Follow-up Request',
+          meetingLink: null,
+          zoomMeetingId: null
         }
       });
 
-      const { sendCustomWhatsApp } = require('../services/chatbotService');
-      const { sendAppointmentConfirmationEmail } = require('../services/emailService');
-      const dayjs = require('dayjs');
-
-      const formattedDate = meetingPreferredDate.includes('-') ? dayjs(meetingPreferredDate).format('DD/MM/YYYY') : meetingPreferredDate;
-      const frontendUrl = process.env.FRONTEND_URL || 'https://aaa-crm-service.netlify.app';
-      const rescheduleUrl = `${frontendUrl}/#/public/lead-form?reschedule=true&consultationId=${consultation.id}`;
-      const cancelUrl = `${frontendUrl}/#/public/lead-form?cancel=true&consultationId=${consultation.id}`;
-      const packagesUrl = "https://aaabusinessconsultancy.com/services-and-packages/";
-
-      const clientFullName = `${clientObj.firstName || ''} ${clientObj.lastName || ''}`.trim() || 'Client';
-      const targetPhone = phone || clientObj.phone || clientObj.lead?.phone;
-      const targetEmail = email || clientObj.email || clientObj.lead?.email;
-
-      const waMsg = `✈️ *Spain Visa Follow-up Consultation Confirmed!*
-
-Dear *${clientFullName}*,
-
-Thank you for rebooking your consultation meeting with *AAA Business Consultancy*! 🎉
-
-📅 *Date:* ${formattedDate}
-⏰ *Time:* ${meetingPreferredTime} (UAE)
-🔗 *Meeting Join Link:* ${meetingLink}
-
-─────────────
-👇 *Quick Action Links:*
-• 🔄 *Reschedule Booking:* ${rescheduleUrl}
-• ❌ *Cancel Booking:* ${cancelUrl}
-• 📦 *View Visa Packages:* ${packagesUrl}
-
-_Note: Please join on time (within 10 minutes of appointment time to avoid automatic cancellation)._`;
-
-      if (targetPhone) {
-        sendCustomWhatsApp(targetPhone, waMsg).catch(e => console.error('[REBOOK WA Error]:', e.message));
-        console.log(`[REBOOK WA Sent] Dispatched WhatsApp follow-up confirmation to ${targetPhone}`);
-      }
-
-      if (targetEmail) {
-        sendAppointmentConfirmationEmail({
-          to: targetEmail,
-          firstName: clientObj.firstName || 'Client',
-          date: meetingPreferredDate,
-          timeSlot: meetingPreferredTime,
-          meetingLink,
-          consultationId: consultation.id
-        }).catch(e => console.error('[REBOOK EMAIL Error]:', e.message));
-        console.log(`[REBOOK Email Sent] Dispatched Email follow-up confirmation to ${targetEmail}`);
-      }
-
       return res.json({
         success: true,
-        message: 'Follow-up meeting booked successfully!',
+        message: 'Inquiry received successfully!',
         consultation,
-        meetingLink
+        meetingLink: null
       });
     }
 
@@ -1140,49 +1033,11 @@ async function syncLeadConsultation(leadId, reqApp = null) {
     const meetingDate = lead.meetingPreferredDate || fallbackDate;
     const meetingTime = lead.meetingPreferredTime || 'TBD / Flexible';
 
-    // 1. Idempotency Check: Reuse existing Zoom link if already generated
-    let meetingLink = consultation?.meetingLink || null;
-    let zoomFailed = false;
+    // 1. Meeting Flow Removed: Set meetingLink to null, no Zoom meeting generated
+    let meetingLink = null;
 
-    if (!meetingLink) {
-      console.log(`[ZOOM] Creating meeting for ${lead.firstName} ${lead.lastName} on ${meetingDate} at ${meetingTime}`);
-      const zoomService = require('../services/zoomService');
-      if (zoomService.isConfigured) {
-        try {
-          let startTimeISO = new Date().toISOString();
-          if (meetingDate) {
-            const timeStr = meetingTime && meetingTime.includes(':') ? meetingTime : '10:00';
-            const dateObj = new Date(`${meetingDate}T${timeStr}`);
-            if (!isNaN(dateObj.getTime())) {
-              startTimeISO = dateObj.toISOString();
-            }
-          }
-          const zoomMeeting = await zoomService.createZoomMeeting({
-            topic: `Eligibility Assessment for ${lead.firstName} ${lead.lastName}`,
-            startTime: startTimeISO,
-            durationMinutes: Number(duration) || 30
-          });
-          if (zoomMeeting && zoomMeeting.joinUrl) {
-            meetingLink = zoomMeeting.joinUrl;
-            console.log(`[ZOOM] Meeting created successfully: ${meetingLink}`);
-          }
-        } catch (zoomErr) {
-          console.error('[ZOOM] Meeting creation failed:', zoomErr.message);
-          zoomFailed = true;
-        }
-      }
-
-      // Fallback: Generate mock/placeholder link if Zoom not configured
-      if (!meetingLink && !zoomFailed) {
-        console.log('[ZOOM] Zoom service not configured. Generating mock meeting link.');
-        meetingLink = 'https://zoom.us/j/' + Math.floor(100000000 + Math.random() * 900000000);
-      }
-    } else {
-      console.log(`[ZOOM] Reusing existing meetingLink for Consultation ID: ${consultation.id}: ${meetingLink}`);
-    }
-
-    // Determine Consultation status based on Zoom creation result
-    const consultationStatus = (zoomFailed && !meetingLink) ? 'Pending Zoom' : (lead.assignedToId ? 'Scheduled' : 'Pending Assignment');
+    // Determine Consultation / Inquiry status
+    const consultationStatus = lead.assignedToId ? 'Inquiry Assigned' : 'Inquiry Received';
 
     if (!consultation) {
       consultation = await prisma.consultation.create({
@@ -1194,27 +1049,23 @@ async function syncLeadConsultation(leadId, reqApp = null) {
           leadId: lead.id,
           consultantId: lead.assignedToId || null,
           internalNotes: lead.meetingNotes || '',
-          meetingLink: meetingLink
+          meetingLink: null
         }
       });
-      console.log(`[BOOKING] Created consultation (ID: ${consultation.id}) with status: ${consultationStatus}`);
+      console.log(`[INQUIRY] Created consultation/inquiry record (ID: ${consultation.id}) with status: ${consultationStatus}`);
     } else {
-      const updatedStatus = (consultation.status === 'Cancelled' || consultation.status === 'Pending Assignment')
-        ? (lead.assignedToId ? 'Scheduled' : 'Pending Assignment')
-        : consultation.status;
-
       consultation = await prisma.consultation.update({
         where: { id: consultation.id },
         data: {
           date: meetingDate,
           timeSlot: meetingTime,
-          status: updatedStatus,
+          status: consultationStatus,
           consultantId: lead.assignedToId || consultation.consultantId || null,
           internalNotes: lead.meetingNotes || consultation.internalNotes || '',
-          meetingLink: meetingLink || consultation.meetingLink
+          meetingLink: null
         }
       });
-      console.log(`[BOOKING] Updated consultation (ID: ${consultation.id}) with status: ${updatedStatus}`);
+      console.log(`[INQUIRY] Updated consultation/inquiry record (ID: ${consultation.id}) with status: ${consultationStatus}`);
     }
 
     // Clean up any stale duplicate Pending Acceptance cards for this lead
@@ -1224,154 +1075,16 @@ async function syncLeadConsultation(leadId, reqApp = null) {
         id: { not: consultation.id },
         status: 'Pending Acceptance'
       }
-    }).catch(err => console.warn('[BOOKING] Cleanup duplicate consultation warning:', err.message));
+    }).catch(err => console.warn('[INQUIRY] Cleanup duplicate consultation warning:', err.message));
 
-    // Update Lead status to Meeting Scheduled if scheduled
-    if (consultationStatus === 'Scheduled' || consultation.status === 'Scheduled') {
-      await prisma.lead.update({
-        where: { id: lead.id },
-        data: { status: 'Meeting Scheduled' }
-      }).catch(err => console.error('[BOOKING] Failed to update lead status:', err.message));
-      console.log(`[BOOKING] Consultation marked Scheduled for Lead ID: ${lead.id}`);
-    }
+    // Update Lead status to New Lead
+    await prisma.lead.update({
+      where: { id: lead.id },
+      data: { status: 'New Lead' }
+    }).catch(err => console.error('[INQUIRY] Failed to update lead status:', err.message));
+    console.log(`[INQUIRY] Lead marked as New Lead for Lead ID: ${lead.id}`);
 
-    // 2. Immediate Idempotent WhatsApp Confirmation for Lead
-    if ((consultationStatus === 'Scheduled' || consultation.status === 'Scheduled') && meetingLink) {
-      try {
-        // Idempotency check on WhatsApp notification per consultation slot
-        const existingLog = await prisma.communicationLog.findFirst({
-          where: {
-            phone: lead.phone,
-            channel: 'WHATSAPP',
-            externalProviderId: consultation.id
-          }
-        });
-
-        const dayjs = require('dayjs');
-        const formattedDate = meetingDate ? (meetingDate.includes('-') ? dayjs(meetingDate).format('DD/MM/YYYY') : meetingDate) : meetingDate;
-        const isAlreadyNotifiedForThisDate = existingLog && existingLog.content && existingLog.content.includes(formattedDate);
-
-        if (!isAlreadyNotifiedForThisDate) {
-          console.log(`[WHATSAPP] Dispatching booking confirmation in background for Lead: ${lead.firstName} ${lead.lastName} (${lead.phone})`);
-          
-          // Asynchronously dispatch WhatsApp in background so API responds instantly
-          (async () => {
-            try {
-              const { sendCustomWhatsApp } = require('../services/chatbotService');
-
-              const dayjs = require('dayjs');
-              const formattedDate = meetingDate ? (meetingDate.includes('-') ? dayjs(meetingDate).format('DD/MM/YYYY') : meetingDate) : meetingDate;
-
-              const frontendUrl = process.env.FRONTEND_URL || 'https://aaa-crm-service.netlify.app';
-              const rescheduleUrl = `${frontendUrl}/#/public/lead-form?reschedule=true&consultationId=${consultation.id}`;
-              const cancelUrl = `${frontendUrl}/#/public/lead-form?cancel=true&consultationId=${consultation.id}`;
-              const packagesUrl = "https://aaabusinessconsultancy.com/services-and-packages/";
-
-              const clientName = `${lead.firstName} ${lead.lastName}`.trim();
-              const { getServiceTitleInfo } = require('../utils/serviceTitleHelper');
-              const svcInfo = getServiceTitleInfo(lead.serviceType);
-
-              const messageBody = `${svcInfo.icon} *${svcInfo.title} Confirmed!*
-
-Dear *${clientName}*,
-
-Your Free ${svcInfo.assessmentName} with *AAA Business Consultancy* has been scheduled successfully! 🎉
-
-📅 *Date:* ${formattedDate}
-⏰ *Time:* ${meetingTime} (UAE)
-🔗 *Meeting Join Link:* ${meetingLink}
-
-─────────────
-👇 *Quick Action Links:*
-• 🔄 *Reschedule Booking:* ${rescheduleUrl}
-• ❌ *Cancel Booking:* ${cancelUrl}
-• 📦 *View Visa Packages:* ${packagesUrl}
-
-_Note: Please join within 10 minutes of appointment time to avoid automatic cancellation._`;
-
-              await sendCustomWhatsApp(lead.phone, messageBody).catch(err => console.error('[WHATSAPP Direct Send Error]:', err.message));
-
-              // Log consultation-specific idempotency marker
-              await prisma.communicationLog.create({
-                data: {
-                  phone: lead.phone,
-                  name: clientName,
-                  channel: 'WHATSAPP',
-                  direction: 'OUTBOUND',
-                  externalProviderId: consultation.id,
-                  deliveryStatus: 'SENT',
-                  content: messageBody
-                }
-              }).catch(err => console.warn('[WHATSAPP Log Warning]:', err.message));
-
-              console.log(`[WHATSAPP] Async confirmation sent for Consultation ID: ${consultation.id}`);
-            } catch (asyncErr) {
-              console.error('[WHATSAPP Async Dispatch Error]:', asyncErr.message);
-            }
-          })();
-        } else {
-          console.log(`[WHATSAPP] Booking confirmation already sent for Consultation ID: ${consultation.id}`);
-        }
-      } catch (waErr) {
-        console.error('[WHATSAPP] Confirmation failed:', waErr.message);
-        // Do NOT rollback database status — keep consultation scheduled
-      }
-    }
-
-    // 3. Immediate Email Confirmation for User (Applicant) and Admin Notification (Runs for every booking)
-    try {
-      const { sendAppointmentConfirmationEmail, sendEmail } = require('../services/emailService');
-      const clientName = `${lead.firstName} ${lead.lastName}`.trim();
-      const adminSenderEmail = process.env.RESEND_FROM_EMAIL || process.env.SMTP_USER || 'client@aaabusinessconsultancy.com';
-      const mLink = meetingLink || consultation.meetingLink || 'https://zoom.us';
-      const mDate = meetingDate || consultation.date || 'TBD';
-      const mTime = meetingTime || consultation.timeSlot || 'TBD';
-
-      // Send Confirmation Email to User/Applicant
-      if (lead.email) {
-        sendAppointmentConfirmationEmail({
-          to: lead.email,
-          firstName: lead.firstName || 'Client',
-          date: mDate,
-          timeSlot: mTime,
-          meetingLink: mLink,
-          consultationId: consultation.id
-        })
-        .then(() => console.log(`[BOOKING EMAIL] Sent confirmation email to user ${lead.email}`))
-        .catch(err => console.error('[BOOKING EMAIL] User email failed:', err.message));
-      }
-
-      // Send Booking Notification Email to Admin/Sender
-      sendEmail({
-        to: adminSenderEmail,
-        subject: `🔔 New Assessment Booking Received: ${clientName} (${mDate} at ${mTime})`,
-        html: `
-          <div style="font-family: Arial, sans-serif; padding: 20px; color: #1e293b;">
-            <h2 style="color: #0f172a;">📅 New Assessment Consultation Booked</h2>
-            <p>A new consultation has been booked on the website portal.</p>
-            <hr style="border: 1px solid #e2e8f0; margin: 15px 0;" />
-            <ul style="line-height: 1.8;">
-              <li><b>Client Name:</b> ${clientName}</li>
-              <li><b>Email:</b> ${lead.email || 'N/A'}</li>
-              <li><b>Phone:</b> ${lead.phone || 'N/A'}</li>
-              <li><b>Service Category:</b> ${lead.serviceType || 'Spain Visa / Residency'}</li>
-              <li><b>Date:</b> ${mDate}</li>
-              <li><b>Time:</b> ${mTime} (UAE)</li>
-              <li><b>Zoom Link:</b> <a href="${mLink}">${mLink}</a></li>
-            </ul>
-            <br/>
-            <p><b>AAA Business Consultancy CRM System</b></p>
-          </div>
-        `
-      })
-      .then(() => console.log(`[BOOKING EMAIL] Sent notification email to Admin (${adminSenderEmail})`))
-      .catch(err => console.error('[BOOKING EMAIL] Admin notification failed:', err.message));
-
-    } catch (emailErr) {
-      console.error('[BOOKING EMAIL] Error invoking email dispatch:', emailErr.message);
-    }
-
-    // 4. Socket.io Notification to CRM Staff
+    // Socket.io Notification to CRM Staff
       try {
         if (reqApp) {
           const io = reqApp.get('io');

@@ -18,11 +18,7 @@ const getFileUrl = (file) => {
   }
   return `/uploads/${file.filename}`;
 };
-const { remindersQueue, noShowEnforcerQueue } = require('../queues/queueSetup');
 const { extractText } = require('unpdf');
-const { sendEmail } = require('../services/emailService');
-const { sendWhatsAppMessage } = require('../services/whatsappService');
-const zoomService = require('../services/zoomService');
 
 exports.createEligibilityBooking = async (req, res) => {
   try {
@@ -330,56 +326,20 @@ exports.createEligibilityBooking = async (req, res) => {
       where: { leadId: lead.id }
     });
 
-    let meetingLink = existingConsultation?.meetingLink || null;
-    let zoomFailed = false;
-
-    if (!meetingLink) {
-      console.log(`[ZOOM] Creating meeting for ${firstName} ${lastName} on ${date} at ${timeSlot}`);
-      if (zoomService.isConfigured) {
-        try {
-          let startTimeISO = new Date().toISOString();
-          const timeStr = timeSlot && timeSlot.includes(':') ? timeSlot : '10:00';
-          const dateObj = new Date(`${date}T${timeStr}`);
-          if (!isNaN(dateObj.getTime())) {
-            startTimeISO = dateObj.toISOString();
-          }
-
-          const zoomMeeting = await zoomService.createZoomMeeting({
-            topic: `Eligibility Assessment for ${firstName} ${lastName}`,
-            startTime: startTimeISO,
-            durationMinutes: 20
-          });
-
-          if (zoomMeeting && zoomMeeting.joinUrl) {
-            meetingLink = zoomMeeting.joinUrl;
-            console.log(`[ZOOM] Meeting created successfully: ${meetingLink}`);
-          }
-        } catch (zoomErr) {
-          console.error('[ZOOM] Meeting creation failed:', zoomErr.message);
-          zoomFailed = true;
-        }
-      }
-
-      if (!meetingLink && !zoomFailed) {
-        console.log('[ZOOM] Zoom service not configured. Generating mock meeting link.');
-        meetingLink = `https://zoom.us/j/${Math.floor(Math.random() * 9000000000 + 1000000000)}`;
-      }
-    } else {
-      console.log(`[ZOOM] Reusing existing meetingLink: ${meetingLink}`);
-    }
-
-    const consultationStatus = (zoomFailed && !meetingLink) ? 'Pending Zoom' : 'Scheduled';
+    // Meeting Flow Removed: Set meetingLink to null, no Zoom meeting generated
+    const meetingLink = null;
+    const consultationStatus = 'Inquiry Received';
 
     // 7. Create or Update Booking (Consultation)
     let consultation;
     if (!existingConsultation) {
       consultation = await prisma.consultation.create({
         data: {
-          date,
-          timeSlot,
+          date: date || new Date().toISOString().split('T')[0],
+          timeSlot: timeSlot || 'TBD',
           status: consultationStatus,
           leadId: lead.id,
-          meetingLink,
+          meetingLink: null,
           consultantId: bestConsultantId,
           type: (serviceType || '').toLowerCase().includes('property') ? 'property_guidance' : 'eligibility'
         }
@@ -388,22 +348,20 @@ exports.createEligibilityBooking = async (req, res) => {
       consultation = await prisma.consultation.update({
         where: { id: existingConsultation.id },
         data: {
-          date,
-          timeSlot,
+          date: date || existingConsultation.date,
+          timeSlot: timeSlot || existingConsultation.timeSlot,
           status: consultationStatus,
-          meetingLink: meetingLink || existingConsultation.meetingLink,
+          meetingLink: null,
           consultantId: bestConsultantId
         }
       });
     }
 
-    if (consultationStatus === 'Scheduled') {
-      await prisma.lead.update({
-        where: { id: lead.id },
-        data: { status: 'Meeting Scheduled' }
-      }).catch(err => console.error('[BOOKING] Failed to update lead status:', err.message));
-      console.log(`[BOOKING] Consultation marked Scheduled for Lead ID: ${lead.id}`);
-    }
+    await prisma.lead.update({
+      where: { id: lead.id },
+      data: { status: 'New Lead' }
+    }).catch(err => console.error('[BOOKING] Failed to update lead status:', err.message));
+    console.log(`[BOOKING] Consultation marked Inquiry Received for Lead ID: ${lead.id}`);
 
     // 7. Create CRM Notification Record & Broadcast Real-Time Socket Event
     try {
@@ -411,8 +369,8 @@ exports.createEligibilityBooking = async (req, res) => {
         data: {
           userId: bestConsultantId || 'admin',
           type: 'new_booking',
-          title: 'New Consultation Booked 📅',
-          body: `New assessment booked for ${firstName} ${lastName} on ${date} at ${timeSlot}.`,
+          title: 'New Client Inquiry Received 📩',
+          body: `New inquiry submitted by ${firstName} ${lastName} (${serviceType || 'General'}).`,
           clientId: client.id
         }
       });
@@ -443,111 +401,16 @@ exports.createEligibilityBooking = async (req, res) => {
         phone,
         country: countryOfResidence,
         serviceCategory: serviceType,
-        appointmentDate: `${date} ${timeSlot}`,
+        appointmentDate: date ? `${date} ${timeSlot || ''}` : null,
         reqApp: req.app
       }).catch(err => console.error('[Booking Notification Error]:', err.message));
     } catch (notifErr) {
       console.error('[Booking Notification Init Error]:', notifErr.message);
     }
 
-    // 7. Enqueue Reminders and No-Show Enforcer Jobs
-    // Assuming meeting date/time is parsed to a JS Date object `meetingStart`
-    const meetingStart = new Date(`${date} ${timeSlot}`); // Naive parsing
-    const tenMinsAfterStart = new Date(meetingStart.getTime() + 10 * 60000);
-
-    // Schedule NO-SHOW enforcer precisely at meetingStart + 10 mins
-    const delay = tenMinsAfterStart.getTime() - Date.now();
-
-    if (delay > 0) {
-      await noShowEnforcerQueue.add('enforce-no-show', {
-        consultationId: consultation.id,
-        clientId: client.id,
-      }, {
-        jobId: `noshow-${consultation.id}`,
-        delay: delay
-      });
-    }
-
-    // Asynchronously trigger instant Email and WhatsApp confirmations + reminders
-    (async () => {
-      try {
-        const clientName = `${firstName} ${lastName}`;
-        const link = meetingLink || 'https://zoom.us';
-
-        console.log(`[NOTIFICATIONS] Dispatching booking confirmation for Lead: ${clientName} (${phone} / ${email})`);
-
-        const { generateBookingToken } = require('./consultationController');
-        const token = generateBookingToken(consultation.id);
-        const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
-        const rescheduleUrl = `${frontendUrl}/#/public/lead-form?reschedule=true&consultationId=${consultation.id}`;
-        const cancelUrl = `${frontendUrl}/#/public/lead-form?cancel=true&consultationId=${consultation.id}`;
-        const packagesUrl = "https://aaabusinessconsultancy.com/services-and-packages/";
-
-        // 1 & 2. Send WhatsApp Message and Branded Email via centralized service
-        try {
-          const { notifyClient } = require('../services/notificationService');
-          await notifyClient({
-            event: 'MEETING_BOOKED',
-            clientId: client.id,
-            consultationId: consultation.id,
-            data: {
-              date,
-              time: timeSlot,
-              link
-            }
-          });
-        } catch (notifErr) {
-          console.error('[NOTIFICATIONS] Failed to trigger central notification:', notifErr.message);
-        }
-
-        // 3. Schedule 3 Reminders (24h, 1h, 10m before)
-        if (remindersQueue && remindersQueue.add) {
-          const mStart = new Date(`${date}T${timeSlot.includes(':') ? timeSlot : '10:00'}`);
-          if (!isNaN(mStart.getTime())) {
-            const now = Date.now();
-
-            const scheduleReminder = async (label, timeBeforeMs, subject, textLabel) => {
-              const reminderTime = mStart.getTime() - timeBeforeMs;
-              const dly = reminderTime - now;
-              if (dly > 0) {
-                await remindersQueue.add('send-reminder', {
-                  toEmail: email,
-                  toPhone: phone,
-                  subject: subject,
-                  emailHtml: `<h3>Meeting Reminder</h3><p>Dear ${firstName}, your Spain Visa Consultation is in ${textLabel}.</p><p>Zoom Join Link: <a href="${link}">${link}</a></p>`,
-                  whatsappTemplate: 'consultation_scheduled_confirmation',
-                  whatsappComponents: [
-                    {
-                      type: 'body',
-                      parameters: [
-                        { type: 'text', text: firstName },
-                        { type: 'text', text: date },
-                        { type: 'text', text: timeSlot },
-                        { type: 'text', text: link }
-                      ]
-                    }
-                  ]
-                }, {
-                  jobId: `reminder-${label}-${consultation.id}`,
-                  delay: dly
-                });
-                console.log(`[NOTIFICATIONS] Enqueued ${label} reminder with delay: ${Math.round(dly / 60000)} minutes`);
-              }
-            };
-
-            await scheduleReminder('24h', 24 * 60 * 60 * 1000, 'Reminder: Spain Visa Consultation in 24 Hours', '24 Hours');
-            await scheduleReminder('1h', 1 * 60 * 60 * 1000, 'Reminder: Spain Visa Consultation in 1 Hour', '1 Hour');
-            await scheduleReminder('10m', 10 * 60 * 1000, 'Urgent Reminder: Spain Visa Consultation in 10 Minutes', '10 Minutes');
-          }
-        }
-      } catch (err) {
-        console.error('[NOTIFICATIONS] Error sending booking confirmation:', err);
-      }
-    })().catch(err => console.error('[NOTIFICATIONS] Async error:', err));
-
     return res.status(201).json({
       success: true,
-      message: 'Booking confirmed successfully',
+      message: 'Inquiry received successfully',
       data: { consultation, client }
     });
 

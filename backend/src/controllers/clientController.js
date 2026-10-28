@@ -211,167 +211,22 @@ const createClient = async (req, res) => {
       });
     }
 
-    // Send auto welcome email with portal credentials dynamically
-    if (credentialsGenerated && client.email) {
-      const { sendEmail } = require('../services/emailService');
-      const { getCustomization } = require('./settingsController');
-      
-      const settings = getCustomization();
-      const flowSettings = settings.flowAutomationSettings || {};
-      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
-      const portalUrl = `${frontendUrl}/#/portal/login`;
-      
-      const customSubject = flowSettings.welcomeEmailSubject || 'Welcome to AAA Business Consultancy - Your Client Portal is Ready! ✈️';
-      let customHtml = flowSettings.welcomeEmailTemplate || '';
-      
-      if (!customHtml) {
-        customHtml = `
-          <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px; color: #2d3748;">
-            <div style="text-align: center; margin-bottom: 24px;">
-              <h2 style="color: #4f46e5; margin: 0;">AAA Business Consultancy</h2>
-              <p style="color: #718096; font-size: 14px; margin: 4px 0 0;">Relocation & Spain Visa Services</p>
-            </div>
-            <h3 style="color: #1a202c; border-bottom: 1px solid #edf2f7; padding-bottom: 10px;">Welcome to the Client Portal! 🎉</h3>
-            <p>Hello <strong>{client_name}</strong>,</p>
-            <p>Congratulations! Your file has been initialized. We have successfully set up your profile and created your Client Portal account.</p>
-            <p>You can now log in to select your relocation package, complete your payment, and upload your visa documents.</p>
-            <div style="background-color: #f7fafc; border-left: 4px solid #4f46e5; padding: 16px; margin: 20px 0; border-radius: 4px;">
-              <h4 style="margin: 0 0 8px; color: #4f46e5;">Access Credentials</h4>
-              <p style="margin: 4px 0;"><strong>Portal URL:</strong> <a href="{portal_url}" style="color: #4f46e5; text-decoration: underline;">Login Here</a></p>
-              <p style="margin: 4px 0;"><strong>Username:</strong> {username}</p>
-              <p style="margin: 4px 0;"><strong>Temporary Password:</strong> <code style="background-color: #edf2f7; padding: 2px 6px; border-radius: 4px; font-weight: bold; color: #e11d48;">{temp_password}</code></p>
-            </div>
-            <p style="font-size: 13px; color: #e11d48; font-weight: 600;">
-              ⚠️ Note: For your security, you will be prompted to change this temporary password immediately upon your first login.
-            </p>
-            <p>If you have any questions, feel free to contact your assigned consultant.</p>
-            <p style="font-size: 13px; color: #718096; margin-top: 30px; border-top: 1px solid #edf2f7; padding-top: 10px;">
-              This is an automated notification from AAA Visa CRM. Please do not reply directly to this email.
-            </p>
-          </div>
-        `;
-      }
-      
-      // Perform dynamic placeholders replacement
-      const clientFullName = `${client.firstName} ${client.lastName}`;
-      const renderedHtml = customHtml
-        .replace(/{client_name}/g, clientFullName)
-        .replace(/{portal_url}/g, portalUrl)
-        .replace(/{username}/g, client.email)
-        .replace(/{temp_password}/g, plainPassword);
-
-       sendEmail({
-        to: client.email,
-        subject: customSubject,
-        html: renderedHtml
-      }).catch(err => console.error('Failed to send auto welcome email:', err));
-
-      // Dispatch Invoice & Payment Link notifications (Email + WhatsApp) with portal credentials & direct Stripe Checkout URL
-      try {
-        const { sendInvoiceNotificationEmail } = require('../services/emailService');
-        const { sendInvoiceWhatsApp } = require('../services/whatsappService');
-        const clientFullName = `${client.firstName} ${client.lastName}`.trim();
-
-        // 1. Create Pending Payment record & generate direct Stripe Checkout URL if available
-        let directCheckoutUrl = null;
-        const stripe = process.env.STRIPE_SECRET_KEY && !process.env.STRIPE_SECRET_KEY.includes('your_stripe') 
-          ? require('stripe')(process.env.STRIPE_SECRET_KEY) 
-          : null;
-
-        try {
-          const initPayment = await prisma.payment.create({
-            data: {
-              clientId: client.id,
-              amount: 2000,
-              discount: 0,
-              status: 'Pending',
-              paymentMethod: 'STRIPE',
-              dueDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000)
-            }
-          });
-
-          if (stripe) {
-            const session = await stripe.checkout.sessions.create({
-              payment_method_types: ['card'],
-              line_items: [{
-                price_data: {
-                  currency: 'eur',
-                  product_data: {
-                    name: 'Spain Relocation Legal & Consulting Package',
-                    description: `Payment for client ID: ${client.id}`
-                  },
-                  unit_amount: 200000 // €2,000 in cents
-                },
-                quantity: 1
-              }],
-              mode: 'payment',
-              success_url: `${frontendUrl}/#/portal/login?payment=success&id=${initPayment.id}&session_id={CHECKOUT_SESSION_ID}`,
-              cancel_url: `${frontendUrl}/#/portal/documents/${client.id}?cancelled=true`,
-              client_reference_id: initPayment.id,
-              metadata: { paymentId: initPayment.id, clientId: client.id }
-            });
-
-            if (session && session.url) {
-              directCheckoutUrl = session.url;
-              await prisma.payment.update({
-                where: { id: initPayment.id },
-                data: { gatewayId: session.id }
-              });
-            }
-          }
-        } catch (stripeErr) {
-          console.warn('[Client Init Stripe Warning]:', stripeErr.message);
-        }
-
-        // 2. Generate Zoho Invoice URL (or Stripe Checkout URL fallback)
-        let zohoInvoiceUrl = null;
-        try {
-          const zohoInvoiceService = require('../services/zohoInvoiceService');
-          const zohoRes = await zohoInvoiceService.createZohoInvoice({
-            client,
-            amount: 2000,
-            discount: 0,
-            netAmount: 2000,
-            serviceType: client.serviceType
-          });
-          if (zohoRes && zohoRes.paymentUrl) {
-            zohoInvoiceUrl = zohoRes.paymentUrl;
-          }
-        } catch (zohoErr) {
-          console.warn('[Client Init Zoho Invoice Warning]:', zohoErr.message);
-        }
-
-        const finalCheckoutUrl = zohoInvoiceUrl || directCheckoutUrl || portalUrl;
-
-        sendInvoiceNotificationEmail({
-          to: client.email,
-          clientName: clientFullName,
+    // Optionally initialize pending payment record
+    try {
+      await prisma.payment.create({
+        data: {
+          clientId: client.id,
           amount: 2000,
           discount: 0,
-          netAmount: 2000,
-          serviceType: client.serviceType,
-          checkoutUrl: finalCheckoutUrl,
-          portalUrl,
-          tempPassword: plainPassword
-        }).catch(err => console.error('[Client Init Invoice Email Error]:', err.message));
-
-        if (client.phone) {
-          sendInvoiceWhatsApp({
-            client,
-            amount: 2000,
-            discount: 0,
-            netAmount: 2000,
-            serviceType: client.serviceType,
-            checkoutUrl: finalCheckoutUrl,
-            portalUrl,
-            tempPassword: plainPassword,
-            note: profileSummary || client.profileSummary
-          }).catch(err => console.error('[Client Init Invoice WA Error]:', err.message));
+          status: 'Pending',
+          paymentMethod: 'STRIPE',
+          dueDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000)
         }
-      } catch (invErr) {
-        console.error('[Client Init Invoice Notification Error]:', invErr.message);
-      }
+      });
+    } catch (invErr) {
+      console.warn('[Client Init Payment Warning]:', invErr.message);
     }
+
 
     if (leadId) {
       await prisma.lead.update({
@@ -570,19 +425,6 @@ const updateClientStatus = async (req, res) => {
       }
     }
 
-    // 🔔 Trigger Visa Decision WhatsApp & Email Notifications for Client
-    if (visaStatus) {
-      const vUpper = (visaStatus || '').toUpperCase();
-      if (vUpper.includes('APPROV') || vUpper.includes('REFUS') || vUpper.includes('REJECT')) {
-        try {
-          const { sendVisaDecisionWhatsApp } = require('../services/whatsappService');
-          await sendVisaDecisionWhatsApp({ client, status: visaStatus });
-        } catch (vErr) {
-          console.error('[Visa Decision WA Trigger Error]:', vErr.message);
-        }
-      }
-    }
-    
     res.json(client);
   } catch (error) {
     res.status(500).json({ message: 'Server error updating client' });
@@ -912,17 +754,7 @@ const updateClient = async (req, res) => {
       data
     });
 
-    if (visaStatus) {
-      const vUpper = (visaStatus || '').toUpperCase();
-      if (vUpper.includes('APPROV') || vUpper.includes('REFUS') || vUpper.includes('REJECT')) {
-        try {
-          const { sendVisaDecisionWhatsApp } = require('../services/whatsappService');
-          await sendVisaDecisionWhatsApp({ client, status: visaStatus });
-        } catch (vErr) {
-          console.error('[Visa Decision WA Trigger Error]:', vErr.message);
-        }
-      }
-    }
+
 
     res.json({
       ...client,
@@ -980,65 +812,10 @@ const deleteClient = async (req, res) => {
 };
 
 const sendRebookLink = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const client = await prisma.client.findFirst({
-      where: {
-        OR: [
-          { id: id },
-          { lead: { id: id } }
-        ]
-      },
-      include: { lead: true }
-    });
-
-    if (!client) {
-      return res.status(404).json({ success: false, message: 'Client profile not found.' });
-    }
-
-    const frontendUrl = process.env.FRONTEND_URL || 'https://aaa-crm-service.netlify.app';
-    const rebookUrl = `${frontendUrl}/#/public/lead-form?clientId=${client.id}&rebook=true`;
-    const clientName = `${client.firstName || ''} ${client.lastName || ''}`.trim() || 'Valued Client';
-    const targetPhone = client.phone || client.lead?.phone;
-    const targetEmail = client.email || client.lead?.email;
-
-    // 1. Dispatch WhatsApp message
-    if (targetPhone) {
-      const { sendCustomWhatsApp } = require('../services/chatbotService');
-      const waMsg = `📅 *Schedule Follow-up Consultation with Your Case Officer*\n\nDear *${clientName}*,\n\nYour Case Officer has unlocked your follow-up consultation booking. Please click the link below to select your preferred Date & Time slot:\n\n🔗 ${rebookUrl}\n\n_AAA Business Consultancy_`;
-      await sendCustomWhatsApp(targetPhone, waMsg).catch(e => console.error('[REBOOK MANUAL WA ERR]:', e.message));
-    }
-
-    // 2. Dispatch Email message
-    if (targetEmail) {
-      const { sendEmail } = require('../services/emailService');
-      await sendEmail({
-        to: targetEmail,
-        subject: 'Schedule Your Follow-up Consultation Meeting 📅',
-        html: `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; color: #2d3748;">
-            <h2 style="color: #4f46e5;">Follow-up Consultation Booking 📅</h2>
-            <p>Dear <strong>${clientName}</strong>,</p>
-            <p>Your Case Officer has unlocked your follow-up consultation booking. Please click the button below to select your preferred date and time slot:</p>
-            <div style="text-align: center; margin: 30px 0;">
-              <a href="${rebookUrl}" style="background-color: #4f46e5; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">
-                🔄 Schedule Follow-up Meeting
-              </a>
-            </div>
-            <p style="font-size: 13px; color: #718096;">If you have any questions, feel free to contact your assigned consultant.</p>
-          </div>
-        `
-      }).catch(e => console.error('[REBOOK MANUAL EMAIL ERR]:', e.message));
-    }
-
-    return res.json({
-      success: true,
-      message: `Re-book booking link successfully sent to ${clientName} via WhatsApp & Email!`
-    });
-  } catch (error) {
-    console.error('Error in sendRebookLink:', error);
-    return res.status(500).json({ success: false, message: 'Server error sending re-book link', error: error.message });
-  }
+  return res.json({
+    success: true,
+    message: 'Consultation scheduling feature has been disabled.'
+  });
 };
 
 module.exports = { 
