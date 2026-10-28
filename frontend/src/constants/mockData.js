@@ -744,7 +744,7 @@ export const MOCK_CONSULTATIONS = [
     durationMinutes: 45,
     assignedConsultantId: 'c2',
     status: 'Scheduled',
-    meetingLink: 'https://zoom.us/j/987654321',
+    meetingLink: null,
     notes: 'To discuss passive income certificates from UAE assets.',
     recordingUrl: '',
     outcome: null
@@ -758,7 +758,7 @@ export const MOCK_CONSULTATIONS = [
     durationMinutes: 30,
     assignedConsultantId: 'c4',
     status: 'Completed',
-    meetingLink: 'https://zoom.us/j/123456789',
+    meetingLink: null,
     notes: 'Qualifies easily for Study Visa. Needs full processing support. Standard tuition verification is ready.',
     recordingUrl: 'https://storage.googleapis.com/aaa-consultancy-recordings/CS3002_recording.mp3',
     outcome: {
@@ -776,7 +776,7 @@ export const MOCK_CONSULTATIONS = [
     durationMinutes: 60,
     assignedConsultantId: 'c5',
     status: 'Completed',
-    meetingLink: 'https://zoom.us/j/444555666',
+    meetingLink: null,
     notes: 'Wants to buy €550,000 villa in Malaga. Needs residency + complete NIE, Spanish bank accounts, utilities, and tax registration assistance.',
     recordingUrl: 'https://storage.googleapis.com/aaa-consultancy-recordings/CS3003_recording.mp3',
     outcome: {
@@ -794,7 +794,7 @@ export const MOCK_CONSULTATIONS = [
     durationMinutes: 30,
     assignedConsultantId: 'c5',
     status: 'Cancelled',
-    meetingLink: 'https://zoom.us/j/111222333',
+    meetingLink: null,
     notes: 'Client cancelled 1 hour before due to personal issues.',
     recordingUrl: '',
     outcome: null
@@ -808,7 +808,7 @@ export const MOCK_CONSULTATIONS = [
     durationMinutes: 45,
     assignedConsultantId: 'c4',
     status: 'Completed',
-    meetingLink: 'https://zoom.us/j/333444555',
+    meetingLink: null,
     notes: 'Passive income details were unclear. Questionable source of dividends.',
     recordingUrl: 'https://storage.googleapis.com/aaa-consultancy-recordings/CS3005_recording.mp3',
     outcome: {
@@ -826,7 +826,7 @@ export const MOCK_CONSULTATIONS = [
     durationMinutes: 45,
     assignedConsultantId: 'c1',
     status: 'Scheduled',
-    meetingLink: 'https://zoom.us/j/888999000',
+    meetingLink: null,
     notes: 'Reviewing real estate investment options in Madrid and Golden Visa eligibility.',
     recordingUrl: '',
     outcome: null
@@ -840,7 +840,6 @@ export const MOCK_CONSULTATIONS = [
     durationMinutes: 30,
     assignedConsultantId: 'c1',
     status: 'No Show',
-    meetingLink: 'https://zoom.us/j/222333444',
     notes: 'Client did not log in. Tried calling, no answer. Triggered automatics rebook email notifications.',
     recordingUrl: '',
     outcome: null

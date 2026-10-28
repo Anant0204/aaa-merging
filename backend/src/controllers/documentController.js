@@ -141,28 +141,6 @@ const uploadDocument = async (req, res) => {
       const fileNameLower = (req.file.originalname || '').toLowerCase();
       const isTranslationDoc = (category || '').toLowerCase().includes('translation') || fileNameLower.includes('translation') || fileNameLower.includes('sworn');
 
-      // Check if uploaded by staff/agent for the client -> Send client email notification
-      if (req.body.uploadedByRole === 'agent' || category === 'Official Sworn Output' || belongsTo === 'Staff Upload') {
-        if (client.email) {
-          const { sendEmail } = require('../services/emailService');
-          sendEmail({
-            to: client.email,
-            subject: `[COMPLETED] Your Official Sworn Translation is Ready! 📜`,
-            html: `
-              <h3>Hello ${clientName},</h3>
-              <p>Great news! Your official Spanish Sworn Translation document <b>${req.file.originalname}</b> has been completed and uploaded by our operations team.</p>
-              <p>It is now available for direct download on your <b>Client Portal</b> under your documents section.</p>
-              <br/>
-              <p>Best regards,<br/><b>AAA Immigration Services LLC</b></p>
-            `
-          }).then(() => {
-            console.log(`[Sworn Delivery] Client notification email sent to ${client.email}`);
-          }).catch((e) => {
-            console.error('Failed to notify client via email:', e.message);
-          });
-        }
-      }
-      
       // Simulate classification check: handwritten/unreadable names trigger the routing override
       const isHandwritten = fileNameLower.includes('handwritten') || fileNameLower.includes('blurry') || fileNameLower.includes('draft');
       
@@ -303,94 +281,7 @@ const reviewDocument = async (req, res) => {
         const frontendUrl = process.env.FRONTEND_URL || 'https://aaa-crm-service.netlify.app';
         const portalUrl = `${frontendUrl}/#/portal/login`;
 
-        // 1. Send Email Notification to Client
-        if (clientEmail) {
-          const { sendEmail } = require('../services/emailService');
-          const emailSubject = isApproved
-            ? `✅ Document Approved: ${document.name} - AAA Business Consultancy`
-            : `⚠️ Action Required: Document Re-upload Needed - AAA Business Consultancy`;
-
-          const emailHtml = isApproved
-            ? `
-              <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-                <h3 style="color: #051A3B;">Hello ${targetClient.firstName || clientName},</h3>
-                <p>Great news! Your uploaded document has been reviewed and <b style="color: #2e7d32;">APPROVED</b> by our verification team:</p>
-                <ul>
-                  <li><b>Document Name:</b> ${document.name}</li>
-                  <li><b>Category:</b> ${document.category || 'General'}</li>
-                  <li><b>Status:</b> Approved / Verified</li>
-                </ul>
-                <p>You can view your application progress anytime on your client portal.</p>
-                <p style="margin-top: 20px;">
-                  <a href="${portalUrl}" style="background-color: #051A3B; color: #E5C058; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;">
-                     Go to Client Portal
-                  </a>
-                </p>
-                <br/>
-                <p>Best regards,<br/><b>AAA Business Consultancy Team</b></p>
-              </div>
-            `
-            : `
-              <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-                <h3 style="color: #051A3B;">Hello ${targetClient.firstName || clientName},</h3>
-                <p>Your uploaded document requires revision and has been <b style="color: #d32f2f;">REJECTED</b> during verification:</p>
-                <ul>
-                  <li><b>Document Name:</b> ${document.name}</li>
-                  <li><b>Category:</b> ${document.category || 'General'}</li>
-                  <li><b>Rejection Reason:</b> <span style="color: #d32f2f; font-weight: bold;">${feedbackComment || 'Requires clear re-upload'}</span></li>
-                </ul>
-                <p>Please log in to your Client Portal and re-upload an updated, clear copy of this document at your earliest convenience.</p>
-                <p style="margin-top: 20px;">
-                  <a href="${portalUrl}" style="background-color: #d32f2f; color: #ffffff; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;">
-                     Re-upload Document Now
-                  </a>
-                </p>
-                <br/>
-                <p>Best regards,<br/><b>AAA Business Consultancy Team</b></p>
-              </div>
-            `;
-
-          await sendEmail({ to: clientEmail, subject: emailSubject, html: emailHtml }).catch(err => {
-            console.error('[DocReview Email Error]:', err.message);
-          });
-        }
-
-        // 2. Send WhatsApp Notification to Client
-        if (clientPhone) {
-          const { sendCustomWhatsApp } = require('../services/chatbotService');
-          const waMsg = isApproved
-            ? `✅ *Document Verified & Approved!*
-
-Hello *${targetClient.firstName || clientName}*,
-
-Good news! Your uploaded document has been verified and approved by our team:
-
-📄 *Document Name:* ${document.name}
-📂 *Category:* ${document.category || 'General'}
-Status: ✅ *APPROVED*
-
-You can view your application progress on your Client Portal:
-🔗 ${portalUrl}`
-            : `❌ *Action Required: Document Revision Needed*
-
-Hello *${targetClient.firstName || clientName}*,
-
-Your uploaded document requires revision:
-
-📄 *Document Name:* ${document.name}
-📂 *Category:* ${document.category || 'General'}
-Status: ❌ *REJECTED*
-⚠️ *Rejection Reason:* ${feedbackComment || 'Please upload a clear, updated copy.'}
-
-Please log in to your Client Portal to re-upload an updated copy:
-🔗 ${portalUrl}`;
-
-          await sendCustomWhatsApp(clientPhone, waMsg).catch(err => {
-            console.error('[DocReview WA Error]:', err.message);
-          });
-        }
-
-        // 3. Create In-App DB Notification for Client User (if user record exists)
+        // In-App DB Notification for Client User (if user record exists)
         if (prisma.notification && typeof prisma.notification.create === 'function') {
           const title = isApproved ? `✅ Document Approved: ${document.name}` : `⚠️ Document Rejected: ${document.name}`;
           const body = isApproved
@@ -447,24 +338,7 @@ const uploadTranslatedDocument = async (req, res) => {
       }
     });
 
-    // 2. Trigger email to client notifying them that translation is ready
-    if (document.client && document.client.email) {
-      const { sendEmail } = require('../services/emailService');
-      sendEmail({
-        to: document.client.email,
-        subject: 'Your Certified Sworn Translation is Ready! 🇪🇸',
-        html: `
-          <h3>Dear ${document.client.firstName},</h3>
-          <p>We are pleased to inform you that the sworn translation of your document (<b>${document.name}</b>) is complete and ready.</p>
-          <p>You can now download the certified PDF directly from your Client Portal dashboard.</p>
-          <p><a href="${process.env.FRONTEND_URL || 'http://localhost:5173'}/#/portal/login">Log in to Client Portal</a></p>
-          <br/>
-          <p>Best regards,<br/>AAA Business Consultancy Team</p>
-        `
-      }).catch((emailErr) => {
-        console.error('Failed to send email notification:', emailErr);
-      });
-    }
+
 
     res.json({ success: true, document });
   } catch (error) {

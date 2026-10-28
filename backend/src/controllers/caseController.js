@@ -917,104 +917,7 @@ const reviewChecklistDoc = async (req, res) => {
       targetClient = cycleWithClient?.client || null;
     }
 
-    if (targetClient && (isApproved || isRejected)) {
-      try {
-        const clientName = `${targetClient.firstName || ''} ${targetClient.lastName || ''}`.trim() || 'Client';
-        const clientEmail = targetClient.email;
-        const clientPhone = targetClient.phone;
-        const frontendUrl = process.env.FRONTEND_URL || 'https://aaa-crm-service.netlify.app';
-        const portalUrl = `${frontendUrl}/#/portal/login`;
 
-        // 1. Send Email Notification to Client
-        if (clientEmail) {
-          const { sendEmail } = require('../services/emailService');
-          const emailSubject = isApproved
-            ? `✅ Document Approved: ${doc.name} - AAA Business Consultancy`
-            : `⚠️ Action Required: Document Re-upload Needed - AAA Business Consultancy`;
-
-          const emailHtml = isApproved
-            ? `
-              <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-                <h3 style="color: #051A3B;">Hello ${targetClient.firstName || clientName},</h3>
-                <p>Great news! Your uploaded document has been reviewed and <b style="color: #2e7d32;">APPROVED</b> by our verification team:</p>
-                <ul>
-                  <li><b>Document Name:</b> ${doc.name}</li>
-                  <li><b>Category:</b> ${doc.category || 'General'}</li>
-                  <li><b>Status:</b> Approved / Verified</li>
-                </ul>
-                <p>You can view your application progress anytime on your client portal.</p>
-                <p style="margin-top: 20px;">
-                  <a href="${portalUrl}" style="background-color: #051A3B; color: #E5C058; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;">
-                     Go to Client Portal
-                  </a>
-                </p>
-                <br/>
-                <p>Best regards,<br/><b>AAA Business Consultancy Team</b></p>
-              </div>
-            `
-            : `
-              <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-                <h3 style="color: #051A3B;">Hello ${targetClient.firstName || clientName},</h3>
-                <p>Your uploaded document requires revision and has been <b style="color: #d32f2f;">REJECTED</b> during verification:</p>
-                <ul>
-                  <li><b>Document Name:</b> ${doc.name}</li>
-                  <li><b>Category:</b> ${doc.category || 'General'}</li>
-                  <li><b>Rejection Reason:</b> <span style="color: #d32f2f; font-weight: bold;">${comment || 'Requires clear re-upload'}</span></li>
-                </ul>
-                <p>Please log in to your Client Portal and re-upload an updated, clear copy of this document at your earliest convenience.</p>
-                <p style="margin-top: 20px;">
-                  <a href="${portalUrl}" style="background-color: #d32f2f; color: #ffffff; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;">
-                     Re-upload Document Now
-                  </a>
-                </p>
-                <br/>
-                <p>Best regards,<br/><b>AAA Business Consultancy Team</b></p>
-              </div>
-            `;
-
-          await sendEmail({ to: clientEmail, subject: emailSubject, html: emailHtml }).catch(err => {
-            console.error('[ChecklistReview Email Error]:', err.message);
-          });
-        }
-
-        // 2. Send WhatsApp Notification to Client
-        if (clientPhone) {
-          const { sendCustomWhatsApp } = require('../services/chatbotService');
-          const waMsg = isApproved
-            ? `✅ *Document Verified & Approved!*
-
-Hello *${targetClient.firstName || clientName}*,
-
-Good news! Your uploaded document has been verified and approved by our team:
-
-📄 *Document Name:* ${doc.name}
-📂 *Category:* ${doc.category || 'General'}
-Status: ✅ *APPROVED*
-
-You can view your application progress on your Client Portal:
-🔗 ${portalUrl}`
-            : `❌ *Action Required: Document Revision Needed*
-
-Hello *${targetClient.firstName || clientName}*,
-
-Your uploaded document requires revision:
-
-📄 *Document Name:* ${doc.name}
-📂 *Category:* ${doc.category || 'General'}
-Status: ❌ *REJECTED*
-⚠️ *Rejection Reason:* ${comment || 'Please upload a clear, updated copy.'}
-
-Please log in to your Client Portal to re-upload an updated copy:
-🔗 ${portalUrl}`;
-
-          await sendCustomWhatsApp(clientPhone, waMsg).catch(err => {
-            console.error('[ChecklistReview WA Error]:', err.message);
-          });
-        }
-      } catch (notifErr) {
-        console.error('[ChecklistReview Notification Error]:', notifErr.message);
-      }
-    }
 
     res.json({ document: updatedDoc, cycleAutoUpdated });
   } catch (error) {
@@ -1113,17 +1016,6 @@ const recordGovernmentDecision = async (req, res) => {
       action: 'GOVERNMENT_DECISION_RECORDED',
       description: `Official Government Decision recorded: ${governmentDecision} on ${governmentDecisionDate || new Date().toISOString().split('T')[0]}. Client visa status updated to "${newVisaStatus}".`
     });
-
-    // 🔔 Trigger Visa Decision WhatsApp & Email Notifications for Client
-    try {
-      const clientObj = existingCycle.client || (await prisma.client.findUnique({ where: { id: existingCycle.clientId } }).catch(() => null));
-      if (clientObj) {
-        const { sendVisaDecisionWhatsApp } = require('../services/whatsappService');
-        await sendVisaDecisionWhatsApp({ client: clientObj, status: newVisaStatus, decisionDate: governmentDecisionDate });
-      }
-    } catch (vErr) {
-      console.error('[Government Decision WA Error]:', vErr.message);
-    }
 
     res.json({ cycle: updatedCycle, clientVisaStatus: newVisaStatus });
   } catch (error) {
