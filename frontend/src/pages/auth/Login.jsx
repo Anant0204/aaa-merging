@@ -62,7 +62,7 @@ export const Login = () => {
       const verifyPayment = async () => {
         try {
           await dbService.verifyCheckoutSession(null, paymentId);
-          showAlert('Payment successfully processed & verified! Please log in to your portal.', 'success');
+          showAlert('Payment successfully processed & verified!', 'success');
           const cleanUrl = window.location.hash.split('?')[0];
           navigate(cleanUrl, { replace: true });
         } catch (err) {
@@ -259,22 +259,6 @@ export const Login = () => {
           </Button>
         </Box>
       </form>
-
-
-      <Box sx={{ mt: 2, textAlign: 'center' }}>
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
-          Are you a client looking for your portal?
-        </Typography>
-        <Button 
-          component={RouterLink} 
-          to="/portal/login" 
-          variant="text" 
-          color="primary"
-          sx={{ fontWeight: 'bold' }}
-        >
-          Go to Client Portal Login
-        </Button>
-      </Box>
     </Box>
   );
 };

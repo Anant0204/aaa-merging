@@ -501,41 +501,12 @@ export const DashboardLayout = () => {
       path: '/active-cases',
       roles: ['admin', 'operations', 'super_admin'],
     },
-    {
-      label: 'Doc Verification',
-      icon: <AssignmentTurnedInIcon />,
-      path: '/documents/verify',
-      roles: ['admin', 'operations', 'super_admin'],
-    },
-    // {
-    //   label: 'AWS Cloud Backups',
-    //   icon: <CloudUploadIcon />,
-    //   path: '/documents/storage',
-    //   roles: ['super_admin'],
-    // },
-    {
-      label: 'Finance',
-      icon: <MonetizationOnIcon />,
-      path: '/payments',
-      roles: ['admin', 'finance', 'super_admin'],
-    },
-    {
-      label: 'Refunds & Commissions',
-      icon: <MonetizationOnIcon />,
-      path: '/payments/refund-commission',
-      roles: ['admin', 'operations', 'finance', 'super_admin'],
-    },
+
     {
       label: 'Closed Cases',
       icon: <AssignmentTurnedInIcon />,
       path: '/closed-cases',
       roles: ['admin', 'operations', 'super_admin'],
-    },
-    {
-      label: 'Clients',
-      icon: <BusinessCenterIcon />,
-      path: '/clients',
-      roles: ['admin', 'consultant', 'operations', 'super_admin'],
     },
     {
       label: 'Leads',

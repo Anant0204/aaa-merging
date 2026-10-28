@@ -89,13 +89,6 @@ export const OperationsLeadList = () => {
     queryFn: dbService.getCustomizationSettings
   });
 
-  const watchServiceId = watch('serviceId');
-  const watchSource = watch('source');
-  const watchMeetingPreferredTime = watch('meetingPreferredTime');
-  const watchMeetingPreferredDate = watch('meetingPreferredDate');
-  const availableTimeSlots = getAvailableTimeSlots(customizationSettings, watchMeetingPreferredDate);
-  const minBookingDate = getTomorrowMinDateStr();
-
   const roleConfig = (customizationSettings?.[currentUser?.id] || customizationSettings?.[currentUser?.role]) || {};
   const isViewOnly = roleConfig.viewOnlyMenus?.includes('Leads') || false;
 
@@ -315,6 +308,13 @@ export const OperationsLeadList = () => {
       meetingPreferredDate: '',
       meetingPreferredTime: ''
     } });
+
+  const watchServiceId = watch('serviceId');
+  const watchSource = watch('source');
+  const watchMeetingPreferredTime = watch('meetingPreferredTime');
+  const watchMeetingPreferredDate = watch('meetingPreferredDate');
+  const availableTimeSlots = getAvailableTimeSlots(customizationSettings, watchMeetingPreferredDate);
+  const minBookingDate = getTomorrowMinDateStr();
 
   const { data: leadStages = [] } = useQuery({
     queryKey: ['lead-stages'],

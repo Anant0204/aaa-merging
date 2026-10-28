@@ -65,9 +65,6 @@ import AgentSocialInbox from '../pages/social/AgentSocialInbox';
 import ClientIntakeForm from '../pages/public/ClientIntakeForm';
 import SwornTranslationForm from '../pages/public/SwornTranslationForm';
 import LandingPage from '../pages/public/LandingPage';
-import ClientPortalLogin from '../pages/public/ClientPortalLogin';
-import ClientPortalChangePassword from '../pages/public/ClientPortalChangePassword';
-import ClientPortalDocs from '../pages/public/ClientPortalDocs';
 import LeadSelfFillForm from '../pages/public/LeadSelfFillForm';
 import PaymentSuccess from '../pages/public/PaymentSuccess';
 import NoShowPayment from '../pages/public/NoShowPayment';
@@ -238,8 +235,7 @@ const LeadDetailsRedirect = () => {
 
 const ClientDetailsRedirect = () => {
   const { currentUser } = useAuth();
-  const { id } = useParams();
-  return <Navigate to={`/${getPrefixForRole(currentUser?.role)}/clients/details/${id}`} replace />;
+  return <Navigate to={`/${getPrefixForRole(currentUser?.role)}/leads`} replace />;
 };
 
 const ConsultationDetailsRedirect = () => {
@@ -260,24 +256,10 @@ const ConsultationsCalendarRedirect = () => {
 };
 
 const PaymentsRedirect = () => {
-  const { currentUser } = useAuth();
-  return <Navigate to={`/${getPrefixForRole(currentUser?.role)}/payments`} replace />;
+  return <Navigate to="/dashboard" replace />;
 };
 
-const ClientPortalGuard = ({ children }) => {
-  const clientData = JSON.parse(localStorage.getItem('clientData') || 'null');
-  const location = useLocation();
-
-  if (!clientData) {
-    return <Navigate to="/portal/login" replace />;
-  }
-
-  if (clientData.isTemporaryPassword && location.pathname !== '/portal/change-password') {
-    return <Navigate to="/portal/change-password" replace />;
-  }
-
-  return children;
-};
+// ClientPortalGuard removed
 
 export const AppRoutes = () => {
   return (
@@ -304,21 +286,9 @@ export const AppRoutes = () => {
       {/* Public Landing Page */}
       <Route path="/" element={<LandingPage />} />
 
-      {/* Client Portal (Protected via simple login or token in real app, keeping route structure) */}
-      <Route path="/portal/login" element={<ClientPortalLogin />} />
-      <Route path="/portal/change-password" element={
-        <ClientPortalGuard>
-          <ClientPortalChangePassword />
-        </ClientPortalGuard>
-      } />
-      <Route path="/portal/documents/:clientId" element={
-        <ClientPortalGuard>
-          <ClientPortalDocs />
-        </ClientPortalGuard>
-      } />
-      {/* Public No-Show Payment Page */}
+      {/* Client Portal Removed: Redirect any portal access to Landing Page */}
+      <Route path="/portal/*" element={<Navigate to="/" replace />} />
       <Route path="/public/no-show-payment" element={<NoShowPayment />} />
-      <Route path="/portal/no-show-payment" element={<NoShowPayment />} />
 
       {/* Main CRM Dashboard Shell Layout (Protected) */}
       <Route
@@ -337,7 +307,9 @@ export const AppRoutes = () => {
         <Route path="/consultations" element={<ProtectedRoute><ConsultationsRedirect /></ProtectedRoute>} />
         <Route path="/consultations/calendar" element={<ProtectedRoute><ConsultationsCalendarRedirect /></ProtectedRoute>} />
         <Route path="/consultations/details/:id" element={<ProtectedRoute><ConsultationDetailsRedirect /></ProtectedRoute>} />
-        <Route path="/payments" element={<ProtectedRoute><PaymentsRedirect /></ProtectedRoute>} />
+        <Route path="/payments" element={<Navigate to="/dashboard" replace />} />
+        <Route path="/documents/verify" element={<Navigate to="/dashboard" replace />} />
+        <Route path="/payments/refund-commission" element={<Navigate to="/dashboard" replace />} />
         <Route
           path="/admin/dashboard"
           element={
@@ -466,14 +438,7 @@ export const AppRoutes = () => {
             </ProtectedRoute>
           }
         />
-        <Route
-          path="/super_admin/documents/verify"
-          element={
-            <ProtectedRoute allowedRoles={['super_admin']}>
-              <SuperAdminDocumentVerificationDashboard />
-            </ProtectedRoute>
-          }
-        />
+        <Route path="/super_admin/documents/verify" element={<Navigate to="/dashboard" replace />} />
         <Route
           path="/super_admin/marketing"
           element={
@@ -482,62 +447,8 @@ export const AppRoutes = () => {
             </ProtectedRoute>
           }
         />
-        <Route
-          path="/super_admin/payments"
-          element={
-            <ProtectedRoute allowedRoles={['super_admin']}>
-              <SuperAdminPaymentDashboard />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/super_admin/payments/refund-commission"
-          element={
-            <ProtectedRoute allowedRoles={['super_admin']}>
-              <SuperAdminRefundCommissionHub />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/admin/payments/refund-commission"
-          element={
-            <ProtectedRoute allowedRoles={['admin', 'super_admin']}>
-              <SuperAdminRefundCommissionHub />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/operations/payments/refund-commission"
-          element={
-            <ProtectedRoute allowedRoles={['operations', 'super_admin']}>
-              <SuperAdminRefundCommissionHub />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/finance/payments/refund-commission"
-          element={
-            <ProtectedRoute allowedRoles={['finance', 'super_admin']}>
-              <SuperAdminRefundCommissionHub />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/agent/payments/refund-commission"
-          element={
-            <ProtectedRoute allowedRoles={['agent', 'consultant', 'finance', 'operations', 'admin', 'super_admin']}>
-              <SuperAdminRefundCommissionHub />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/:role/payments/refund-commission"
-          element={
-            <ProtectedRoute allowedRoles={['agent', 'consultant', 'finance', 'operations', 'admin', 'super_admin']}>
-              <SuperAdminRefundCommissionHub />
-            </ProtectedRoute>
-          }
-        />
+        <Route path="/super_admin/payments" element={<Navigate to="/dashboard" replace />} />
+        <Route path="/:role/payments/refund-commission" element={<Navigate to="/dashboard" replace />} />
         {/* <Route
           path="/super_admin/documents/storage"
           element={
@@ -781,91 +692,18 @@ export const AppRoutes = () => {
           }
         />
 
-        {/* Clients Module (Admins, Consultants, Operations) */}
-        <Route
-          path="/clients"
-          element={<Dashboard />}
-        />
-        <Route
-          path="/admin/clients"
-          element={
-            <ProtectedRoute allowedRoles={['admin', 'super_admin']}>
-              <AdminClientList />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/operations/clients"
-          element={
-            <ProtectedRoute allowedRoles={['operations', 'super_admin']}>
-              <OperationsClientList />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/agent/clients"
-          element={
-            <ProtectedRoute allowedRoles={['consultant', 'super_admin']}>
-              <AgentClientList />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/admin/clients/details/:id"
-          element={
-            <ProtectedRoute allowedRoles={['admin', 'super_admin']}>
-              <AdminClientDetails />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/operations/clients/details/:id"
-          element={
-            <ProtectedRoute allowedRoles={['operations', 'super_admin']}>
-              <OperationsClientDetails />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/agent/clients/details/:id"
-          element={
-            <ProtectedRoute allowedRoles={['consultant', 'super_admin']}>
-              <AgentClientDetails />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/finance/clients"
-          element={
-            <ProtectedRoute allowedRoles={['finance', 'super_admin']}>
-              <AdminClientList />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/marketing-manager/clients"
-          element={
-            <ProtectedRoute allowedRoles={['marketing', 'super_admin']}>
-              <AdminClientList />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/finance/clients/details/:id"
-          element={
-            <ProtectedRoute allowedRoles={['finance', 'super_admin']}>
-              <AdminClientDetails />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/marketing-manager/clients/details/:id"
-          element={
-            <ProtectedRoute allowedRoles={['marketing', 'super_admin']}>
-              <AdminClientDetails />
-            </ProtectedRoute>
-          }
-        />
+        {/* Clients Module Redirects to Leads (Clients module removed) */}
+        <Route path="/clients" element={<Navigate to="/leads" replace />} />
+        <Route path="/admin/clients" element={<Navigate to="/admin/leads" replace />} />
+        <Route path="/operations/clients" element={<Navigate to="/operations/leads" replace />} />
+        <Route path="/agent/clients" element={<Navigate to="/agent/leads" replace />} />
+        <Route path="/admin/clients/details/:id" element={<Navigate to="/admin/leads" replace />} />
+        <Route path="/operations/clients/details/:id" element={<Navigate to="/operations/leads" replace />} />
+        <Route path="/agent/clients/details/:id" element={<Navigate to="/agent/leads" replace />} />
+        <Route path="/finance/clients" element={<Navigate to="/finance/dashboard" replace />} />
+        <Route path="/marketing-manager/clients" element={<Navigate to="/marketing-manager/leads" replace />} />
+        <Route path="/finance/clients/details/:id" element={<Navigate to="/finance/dashboard" replace />} />
+        <Route path="/marketing-manager/clients/details/:id" element={<Navigate to="/marketing-manager/leads" replace />} />
 
         {/* Agents Module (Admins, Operations) */}
         <Route
@@ -990,22 +828,8 @@ export const AppRoutes = () => {
             </ProtectedRoute>
           }
         />
-        <Route
-          path="/admin/documents/verify"
-          element={
-            <ProtectedRoute allowedRoles={['admin', 'super_admin']}>
-              <AdminDocumentVerificationDashboard />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/operations/documents/verify"
-          element={
-            <ProtectedRoute allowedRoles={['operations', 'super_admin']}>
-              <OperationsDocumentVerificationDashboard />
-            </ProtectedRoute>
-          }
-        />
+        <Route path="/admin/documents/verify" element={<Navigate to="/dashboard" replace />} />
+        <Route path="/operations/documents/verify" element={<Navigate to="/dashboard" replace />} />
         <Route
           path="/agent/active-cases"
           element={
@@ -1054,30 +878,9 @@ export const AppRoutes = () => {
             </ProtectedRoute>
           }
         />
-        <Route
-          path="/agent/documents/verify"
-          element={
-            <ProtectedRoute allowedRoles={['consultant', 'super_admin']}>
-              <AdminDocumentVerificationDashboard />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/finance/documents/verify"
-          element={
-            <ProtectedRoute allowedRoles={['finance', 'super_admin']}>
-              <AdminDocumentVerificationDashboard />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/marketing-manager/documents/verify"
-          element={
-            <ProtectedRoute allowedRoles={['marketing', 'super_admin']}>
-              <AdminDocumentVerificationDashboard />
-            </ProtectedRoute>
-          }
-        />
+        <Route path="/agent/documents/verify" element={<Navigate to="/dashboard" replace />} />
+        <Route path="/finance/documents/verify" element={<Navigate to="/dashboard" replace />} />
+        <Route path="/marketing-manager/documents/verify" element={<Navigate to="/dashboard" replace />} />
 
         {/* Marketing Campaigns Module (Admins, Operations, Marketing) */}
         <Route
@@ -1130,62 +933,13 @@ export const AppRoutes = () => {
         />
 
         {/* Payments Module (Admins, Finance, and optionally Consultants to view status) */}
-        <Route
-          path="/admin/payments"
-          element={
-            <ProtectedRoute allowedRoles={['admin', 'super_admin']}>
-              <AdminPaymentDashboard />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/finance/payments"
-          element={
-            <ProtectedRoute allowedRoles={['finance', 'super_admin']}>
-              <FinancePaymentDashboard />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/operations/payments"
-          element={
-            <ProtectedRoute allowedRoles={['operations', 'super_admin']}>
-              <FinancePaymentDashboard />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/agent/payments"
-          element={
-            <ProtectedRoute allowedRoles={['agent', 'consultant', 'super_admin', 'admin', 'operations', 'finance']}>
-              <FinancePaymentDashboard />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/marketing-manager/payments"
-          element={
-            <ProtectedRoute allowedRoles={['marketing', 'super_admin']}>
-              <FinancePaymentDashboard />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/payments/invoices"
-          element={
-            <ProtectedRoute allowedRoles={['admin', 'finance', 'super_admin', 'operations', 'consultant', 'marketing']}>
-              <InvoiceList />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/payments/invoice-details/:id"
-          element={
-            <ProtectedRoute allowedRoles={['admin', 'finance', 'super_admin', 'operations', 'consultant', 'marketing']}>
-              <InvoiceDetails />
-            </ProtectedRoute>
-          }
-        />
+        <Route path="/admin/payments" element={<Navigate to="/dashboard" replace />} />
+        <Route path="/finance/payments" element={<Navigate to="/dashboard" replace />} />
+        <Route path="/operations/payments" element={<Navigate to="/dashboard" replace />} />
+        <Route path="/agent/payments" element={<Navigate to="/dashboard" replace />} />
+        <Route path="/marketing-manager/payments" element={<Navigate to="/dashboard" replace />} />
+        <Route path="/payments/invoices" element={<Navigate to="/dashboard" replace />} />
+        <Route path="/payments/invoice-details/:id" element={<Navigate to="/dashboard" replace />} />
 
         {/* Social Inbox (Admins, Consultants, Operations) */}
         <Route
@@ -1262,7 +1016,7 @@ export const AppRoutes = () => {
         <Route path="/:rolePrefix/agents" element={<ProtectedRoute><OperationsAgents /></ProtectedRoute>} />
         <Route path="/:rolePrefix/agents/performance" element={<ProtectedRoute><OperationsAgentsPerformance /></ProtectedRoute>} />
         <Route path="/:rolePrefix/active-cases" element={<ProtectedRoute><OperationsActiveCases /></ProtectedRoute>} />
-        <Route path="/:rolePrefix/documents/verify" element={<ProtectedRoute><OperationsDocumentVerificationDashboard /></ProtectedRoute>} />
+        <Route path="/:rolePrefix/documents/verify" element={<Navigate to="/dashboard" replace />} />
         <Route path="/:rolePrefix/clients" element={<ProtectedRoute><OperationsClientList /></ProtectedRoute>} />
         <Route path="/:rolePrefix/clients/details/:id" element={<ProtectedRoute><OperationsClientDetails /></ProtectedRoute>} />
         <Route path="/:rolePrefix/leads" element={<ProtectedRoute><SuperAdminLeadList /></ProtectedRoute>} />
@@ -1271,7 +1025,7 @@ export const AppRoutes = () => {
         <Route path="/:rolePrefix/consultations" element={<ProtectedRoute><OperationsConsultationList /></ProtectedRoute>} />
         <Route path="/:rolePrefix/consultations/details/:id" element={<ProtectedRoute><OperationsConsultationDetails /></ProtectedRoute>} />
         <Route path="/:rolePrefix/consultations/calendar" element={<ProtectedRoute><SuperAdminCalendarView /></ProtectedRoute>} />
-        <Route path="/:rolePrefix/payments" element={<ProtectedRoute><AdminPaymentDashboard /></ProtectedRoute>} />
+        <Route path="/:rolePrefix/payments" element={<Navigate to="/dashboard" replace />} />
         <Route path="/:rolePrefix/marketing" element={<ProtectedRoute><OperationsMarketing /></ProtectedRoute>} />
         <Route path="/:rolePrefix/social-inbox" element={<ProtectedRoute><OperationsSocialInbox /></ProtectedRoute>} />
 

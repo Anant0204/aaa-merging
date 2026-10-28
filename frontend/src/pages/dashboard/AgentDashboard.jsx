@@ -111,8 +111,8 @@ export const AgentDashboard = () => {
     { title: 'Completed Meetings', value: completedConsultations, icon: <CheckCircleOutlinedIcon />, color: '#10B981', onClick: () => navigate('/agent/consultations', { state: { filterStatus: 'Completed', startDate: '', endDate: '', cardInfo: { title: 'Completed Meetings', value: completedConsultations, color: '#10B981', iconType: 'CheckCircleOutlined' } } }) },
     { title: 'My Performance (%)', value: `${performancePercent}%`, icon: <TrendingUpIcon />, color: '#10B981' },
     { title: 'Commission Earned', value: `€${commissionEarned.toLocaleString()}`, icon: <PaymentsIcon />, color: '#F59E0B' },
-    { title: 'My Active Cases', value: activeCases, icon: <AssignmentIcon />, color: '#3B82F6', onClick: () => navigate('/agent/clients', { state: { filterStatus: 'Active', cardInfo: { title: 'My Active Cases', value: activeCases, color: '#3B82F6', iconType: 'Assignment' } } }) },
-    { title: 'Closed Cases', value: closedCases, icon: <CheckCircleOutlinedIcon />, color: '#22C55E', onClick: () => navigate('/agent/clients', { state: { filterStatus: 'Closed', cardInfo: { title: 'Closed Cases', value: closedCases, color: '#22C55E', iconType: 'CheckCircleOutlined' } } }) },
+    { title: 'My Active Cases', value: activeCases, icon: <AssignmentIcon />, color: '#3B82F6', onClick: () => navigate('/agent/leads', { state: { filterStatus: 'Active', cardInfo: { title: 'My Active Cases', value: activeCases, color: '#3B82F6', iconType: 'Assignment' } } }) },
+    { title: 'Closed Cases', value: closedCases, icon: <CheckCircleOutlinedIcon />, color: '#22C55E', onClick: () => navigate('/agent/leads', { state: { filterStatus: 'Closed', cardInfo: { title: 'Closed Cases', value: closedCases, color: '#22C55E', iconType: 'CheckCircleOutlined' } } }) },
     { title: 'My Assigned Leads', value: myLeads.length, icon: <WarningAmberIcon />, color: '#EF4444', onClick: () => navigate('/agent/leads', { state: { filterStatus: '', filterToday: false, cardInfo: { title: 'My Assigned Leads', value: myLeads.length, color: '#EF4444', iconType: 'WarningAmber' } } }) }
   ];
 
