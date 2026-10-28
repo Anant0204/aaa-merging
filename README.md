@@ -1,6 +1,8 @@
-# 🏛️ AAA Business Consultancy CRM & Relocation Platform
+# 🏛️ AAA Business Consultancy CRM & Legal Relocation Platform
 
-Comprehensive end-to-end CRM, Client Portal, and Legal Relocation Management System built for **AAA Business Consultancy LLC**. Specializing in Spain Digital Nomad Visas (DNV), Non-Lucrative Residency (NLV), Golden Visas, Study Visas, Sworn Translations, and administrative relocation assistance across Madrid, Barcelona, Valencia, and Malaga.
+Comprehensive, staff-driven **Leads & Relocation Management System** built for **AAA Business Consultancy LLC**. Specializing in Spain Digital Nomad Visas (DNV), Non-Lucrative Residency (NLV), Golden Visas, Study Visas, Sworn Translations, and end-to-end relocation assistance across Madrid, Barcelona, Valencia, and Malaga.
+
+> **Note on Architecture:** The platform is configured as a streamlined, **Leads-Centric CRM**. Client interactions (document submission, queries, payment links) are handled directly by dedicated consultants via WhatsApp, Email, and Phone. Self-service client logins and non-essential sub-modules (Doc Verification, Finance Dashboards, Refunds & Commissions) have been decommissioned to maintain a clean, frictionless sales and consultation workflow.
 
 ---
 
@@ -8,13 +10,13 @@ Comprehensive end-to-end CRM, Client Portal, and Legal Relocation Management Sys
 - [Architecture & Tech Stack](#-architecture--tech-stack)
 - [Key Features & Modules](#-key-features--modules)
 - [Role-Based Access Control (RBAC)](#-role-based-access-control-rbac)
+- [Third-Party Integrations & APIs](#-third-party-integrations--apis)
 - [Prerequisites](#-prerequisites)
 - [Local Installation & Setup](#-local-installation--setup)
-  - [1. Database Setup (MySQL / MariaDB)](#1-database-setup-mysql--mariadb)
+  - [1. Database Setup (XAMPP MySQL / MariaDB)](#1-database-setup-xampp-mysql--mariadb)
   - [2. Backend Setup](#2-backend-setup)
   - [3. Frontend Setup](#3-frontend-setup)
 - [Default Login Credentials](#-default-login-credentials)
-- [Integrations](#-integrations)
 - [Project Directory Structure](#-project-directory-structure)
 - [Troubleshooting & Gotchas](#-troubleshooting--gotchas)
 
@@ -23,60 +25,54 @@ Comprehensive end-to-end CRM, Client Portal, and Legal Relocation Management Sys
 ## ⚡ Architecture & Tech Stack
 
 ```
-[ Frontend: React 18 + Vite + MUI ]
+[ Frontend: React 19 + Vite + Material UI ]
                │
                ▼  REST APIs & Socket.IO (Port 5000)
-    [ Backend: Express + Prisma ORM ]
+    [ Backend: Express 5 + Prisma ORM 6 ]
                │
   ┌────────────┼────────────────┬──────────────────┐
   ▼            ▼                ▼                  ▼
 [Prisma]    [AWS S3]     [Third Parties]      [Background]
-  │         (Documents)  - Stripe (Payments)  - BullMQ
-  ▼                      - Zoho (Invoicing)   - Redis / Mock
+  │         (Documents)  - Stripe / Tabby     - BullMQ
+  ▼                      - Zoho (Invoices)    - Redis / Mock
 [MySQL]                  - Zoom (Meetings)    - Schedulers
-(aaa-db)                 - Twilio (WhatsApp)
-                         - Resend/SMTP (Mail)
+(aaa-db)                 - Twilio / Meta WA   - Socket.IO
+                         - Resend / SMTP
+                         - OpenAI / Gemini
 ```
 
-- **Frontend:** React 18, Vite, Material UI (MUI v5), TanStack React Query v5, React Hook Form, Yup, Socket.io-client, Recharts, Lucide Icons.
-- **Backend:** Node.js, Express 5, Prisma ORM 6, Socket.io, BullMQ, Bcrypt, Multer, Unpdf (PDF text word counter).
+- **Frontend:** React 19, Vite, Material UI (MUI v5/v6), TanStack React Query v5, React Hook Form, Yup, Socket.io-client, Recharts, Lucide / Material Icons.
+- **Backend:** Node.js, Express 5, Prisma ORM 6, Socket.IO, BullMQ, Bcrypt, Multer, Unpdf (PDF text word extractor).
 - **Database:** MySQL / MariaDB (via Prisma ORM).
-- **Cloud & Storage:** AWS S3 (secure pre-signed document storage).
-- **Communication:** Twilio / Meta WhatsApp Business Graph API, Resend, Nodemailer SMTP.
+- **Cloud & Storage:** AWS S3 (secure document storage).
+- **Communication:** Twilio / Meta WhatsApp Business Cloud API, Resend, Nodemailer SMTP.
+- **AI Engines:** OpenAI API (Client summary generation) & Google Gemini 1.5 Flash (WhatsApp chatbot).
 
 ---
 
 ## 🚀 Key Features & Modules
 
-### 1. Lead & Assessment Engine
-- Capture leads from Google Ads, Meta Ads, WhatsApp Click Ads, and public landing pages.
-- Dynamic slot availability calculation synchronized with consultant working hours.
-- Automatic **Zoom Meeting link generation** and instant calendar invitations.
-- Multi-channel booking confirmations via automated WhatsApp and Email templates.
+### 1. Lead & Assessment Engine (Core)
+- **Multi-channel Ingestion:** Captures leads from Google Ads, Meta Ads (Facebook/Instagram), WhatsApp click-to-chat ads, and landing page forms.
+- **Dynamic Slot Availability:** Real-time consultant availability checking based on working hours and time zones (UAE UTC+4 / Spain UTC+1).
+- **Automated Video Meetings:** Auto-creates **Zoom Meeting links** upon consultation booking with automated calendar invites.
+- **Automated Alerts:** Dual-channel (WhatsApp + Email) booking confirmations, 24h/1h/10m reminders, and reschedule alerts.
 
-### 2. Client Portal & Document Verification
-- Password-protected portal for active clients (`/#/portal/login`).
-- Document checklist (Passports, Criminal Records, Bank Statements, NIE, Insurance).
-- Direct file uploads to AWS S3 with mime-type validation and audit logging.
-- Operations review workflow: *Verified*, *Rejected*, *Re-upload Requested*.
+### 2. Active & Closed Case Management
+- Full lifecycle tracking of Spanish residency applicants across all stages (*New Lead*, *Contacted*, *Consultation Scheduled*, *Under Process*, *Completed*, *Lost*).
+- Staff can record case notes, assign cases to dedicated consultants, and track progression milestones.
 
-### 3. Sworn Translation Engine
-- Instant PDF word extraction (`unpdf`) and dynamic pricing calculation based on word counts.
-- Quotation generation and integrated Stripe checkout for translation payments.
+### 3. Omnichannel Social Inbox
+- Unified real-time chat interface powered by Socket.IO.
+- Integrates messaging from **WhatsApp**, **Facebook Messenger**, **Instagram DMs**, **LinkedIn**, **Twitter / X**, and **Telegram**.
+- AI chatbot fallback (OpenAI / Google Gemini) for automated visa queries, with instant handover to human agents (*Live Agent Mode*).
 
-### 4. Application & Resubmission Management
-- Full lifecycle tracking of Spanish residency applications.
-- Legal appeal and resubmission tracking (appeal deadlines, lawyer assignment, submission receipts).
+### 4. Sworn Translation Calculator
+- Automated word counting from uploaded PDF documents using `unpdf`.
+- Dynamic cost calculation according to Spanish official sworn translation tariffs.
 
-### 5. Finance, Payments & Invoicing
-- **Stripe Elements & Payment Intents** for booking fees, package payments, and translation invoices.
-- **Zoho Invoice Sync:** Automatic creation of customers, itemized invoices, and payment receipts.
-- **Commission Management Hub:** Dynamic agent commission tracking (fixed or percentage-based) with payout auditing.
-- Refund and dispute handling workflows.
-
-### 6. Anti-Fraud & Security
-- Device and browser fingerprinting (FingerprintJS) to prevent duplicate free consultations and fraudulent bookings.
-- Blacklisted client detection and rate-limiting safeguards.
+### 5. Marketing & Acquisition Analytics
+- Tracks campaign sources, UTM parameters, lead volumes, conversion rates, and agent-wise performance metrics.
 
 ---
 
@@ -84,37 +80,61 @@ Comprehensive end-to-end CRM, Client Portal, and Legal Relocation Management Sys
 
 | Role | Access Scope |
 |---|---|
-| **Super Admin** | Full platform authority, financial analytics, audit logs, team user management, system configurations. |
-| **Admin** | Lead allocation, daily pipeline monitoring, consultant performance tracking, reporting. |
-| **Consultant / Agent** | Assigned leads, Zoom assessments, meeting notes, client qualification, personal commission ledger. |
-| **Operations** | Document verification, translation pipelines, application submissions, appeal cycles. |
-| **Finance** | Stripe transactions, Zoho invoices, refunds, consultant payouts, billing dashboards. |
-| **Marketing** | Campaign tracking, lead sources, ad spend recording, cost-per-acquisition (CPA) analytics. |
-| **Client** | Self-service document uploading, case progress tracking, invoice downloads. |
+| **Super Admin** | Full platform control, system settings, agent allocations, integrations, audit logs. |
+| **Admin** | Daily pipeline monitoring, lead distribution, consultant schedules, marketing oversight. |
+| **Consultant / Agent** | Assigned leads, consultation calendar, client interactions, meeting follow-ups. |
+| **Operations** | Active case tracking, document collection on behalf of clients, closed case archiving. |
+| **Marketing** | Campaign performance, ad spend recording, lead generation metrics. |
+
+---
+
+## 🔌 Third-Party Integrations & APIs
+
+| Service | Category | Required `.env` Keys | Purpose |
+|---|---|---|---|
+| **Twilio WhatsApp API** | Messaging | `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_WHATSAPP_FROM` | Automated WhatsApp reminders, booking confirmations & chatbot. |
+| **Meta Graph API** | Social Inbox | `META_APP_SECRET`, `META_PAGE_ACCESS_TOKEN`, `META_VERIFY_TOKEN` | Facebook Messenger & Instagram DM sync. |
+| **Resend API** | Email | `RESEND_API_KEY`, `RESEND_FROM_EMAIL` | High-deliverability transactional emails (booking confirmations, drip emails). |
+| **Custom SMTP** | Email Fallback | `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM` | Secondary email delivery provider. |
+| **Stripe API** | Payments | `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET` | Debit/Credit cards, Apple Pay, Google Pay payments & webhooks. |
+| **Tabby API** | BNPL Payment | `TABBY_PUBLIC_KEY`, `TABBY_SECRET_KEY`, `TABBY_MERCHANT_CODE` | 4 interest-free installment payments for UAE/GCC clients. |
+| **Tamara API** | BNPL Payment | `TAMARA_TOKEN` | Split-checkout installment gateway for UAE & Saudi Arabia. |
+| **Zoho Invoicing** | Accounting | `ZOHO_CLIENT_ID`, `ZOHO_CLIENT_SECRET`, `ZOHO_ORGANIZATION_ID`, `ZOHO_REFRESH_TOKEN` | Automated invoice generation and ledger sync. |
+| **Zoom Meeting API** | Video Call | `ZOOM_ACCOUNT_ID`, `ZOOM_CLIENT_ID`, `ZOOM_CLIENT_SECRET`, `ZOOM_WEBHOOK_SECRET_TOKEN` | Server-to-Server OAuth for auto-generating consultation meetings. |
+| **AWS S3** | Cloud Storage | `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_REGION`, `AWS_BUCKET_NAME` | Secure cloud storage for client documentation. |
+| **OpenAI API** | AI Analysis | `OPENAI_API_KEY` | Client profile summarization and visa eligibility risk assessment. |
+| **Google Gemini API** | AI Chatbot | `GEMINI_API_KEY` | Real-time visa enquiry responses on WhatsApp (Gemini 1.5 Flash). |
+| **LinkedIn Marketing** | Social Inbox | `LINKEDIN_CLIENT_ID`, `LINKEDIN_CLIENT_SECRET`, `LINKEDIN_ACCESS_TOKEN`, `LINKEDIN_ORGANIZATION_ID` | Lead Gen forms & LinkedIn Direct Messages. |
+| **Twitter / X API** | Social Inbox | `TWITTER_API_KEY`, `TWITTER_API_SECRET`, `TWITTER_BEARER_TOKEN` | Twitter / X Direct Messages. |
+| **Telegram Bot API** | Alerts | `TELEGRAM_BOT_TOKEN` | Direct messaging and group notifications. |
 
 ---
 
 ## 📋 Prerequisites
 
-Before starting, make sure you have:
-- **Node.js** (v18.x or v20.x+)
-- **MySQL / MariaDB** (e.g. XAMPP, WAMP, or standalone MySQL server running on port 3306)
+Before starting, ensure you have:
+- **Node.js** (v18.x, v20.x, or v22.x+)
+- **XAMPP** (or standalone MySQL / MariaDB on port `3306`)
 - **Git**
 
 ---
 
 ## 🛠️ Local Installation & Setup
 
-### 1. Database Setup (MySQL / MariaDB)
+### 1. Database Setup (XAMPP MySQL / MariaDB)
 
-1. Start your MySQL service (e.g., click **Start** on Apache and MySQL in XAMPP).
-2. Open phpMyAdmin (`http://localhost/phpmyadmin`) or MySQL terminal.
-3. Create the database:
+1. Open **XAMPP Control Panel** and click **Start** next to **MySQL** (and Apache if using phpMyAdmin).
+2. Open your browser at `http://localhost/phpmyadmin/`.
+3. Create a new database named **`aaa-db`**:
    ```sql
    CREATE DATABASE `aaa-db` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
    ```
-4. Import the provided schema & data dump (`AAA-db-PR-creation-20-aug.sql`).
-   > **Note for MariaDB (XAMPP):** The dump uses `utf8mb4_unicode_ci`. Ensure `max_allowed_packet` is at least `64M` in your `my.ini` for large insert packets.
+4. Push the schema directly from the backend using Prisma (handles collation compatibility automatically):
+   ```bash
+   cd backend
+   npx prisma db push
+   ```
+   *This automatically generates all 24 tables in your `aaa-db` database.*
 
 ---
 
@@ -126,63 +146,44 @@ Before starting, make sure you have:
    npm install
    ```
 
-2. Configure environment variables in `backend/.env`:
+2. Verify or update `backend/.env`:
    ```env
    # Server Configuration
    PORT="5000"
    FRONTEND_URL="http://localhost:5173"
 
-   # Database (Local XAMPP default)
+   # Database (XAMPP default)
    DATABASE_URL="mysql://root:@localhost:3306/aaa-db"
    DISABLE_REDIS="true"
+   REDIS_URL="redis://default:dummy_password@localhost:6379"
 
    # Authentication & Security
-   JWT_SECRET="your_secure_jwt_secret_key"
+   JWT_SECRET="your_jwt_secret_key_here"
    JWT_EXPIRES_IN="7d"
-
-   # AWS S3 Storage (Optional for local test)
-   AWS_ACCESS_KEY_ID="your_aws_key"
-   AWS_SECRET_ACCESS_KEY="your_aws_secret"
-   AWS_REGION="eu-west-1"
-   AWS_BUCKET_NAME="aaa-consultancy-docs"
-
-   # Zoom Integration
-   ZOOM_ACCOUNT_ID="your_zoom_account_id"
-   ZOOM_CLIENT_ID="your_zoom_client_id"
-   ZOOM_CLIENT_SECRET="your_zoom_client_secret"
-
-   # Stripe
-   STRIPE_SECRET_KEY="sk_test_..."
-   STRIPE_WEBHOOK_SECRET="whsec_..."
    ```
 
-3. Generate Prisma Client:
-   ```bash
-   npx prisma generate
-   ```
-
-4. Seed default test accounts:
+3. Seed default staff accounts:
    ```bash
    node seed.js
    ```
 
-5. Start the backend development server:
+4. Start the backend development server:
    ```bash
    npm run dev
    ```
-   *Backend will run on [http://localhost:5000](http://localhost:5000).*
+   *Backend will run at [http://localhost:5000](http://localhost:5000).*
 
 ---
 
 ### 3. Frontend Setup
 
-1. Open a separate terminal in `frontend/`:
+1. Open a terminal in `frontend/`:
    ```bash
    cd frontend
    npm install
    ```
 
-2. Configure environment variables in `frontend/.env`:
+2. Ensure `frontend/.env` has:
    ```env
    VITE_API_URL=http://localhost:5000/api/v1
    ```
@@ -197,32 +198,17 @@ Before starting, make sure you have:
 
 ## 🔑 Default Login Credentials
 
-All test accounts seeded in the database:
+All test accounts seeded in the database (`password123`):
 
 | Role | Email | Password |
 |---|---|---|
-| **Super Admin** | `aaabusinessconsultancy@gmail.com` | `123456` |
-| **Super Admin (Seed)** | `superadmin@aaaconsultancy.com` | `password123` |
+| **Super Admin** | `superadmin@aaaconsultancy.com` | `password123` |
 | **Admin** | `admin@aaaconsultancy.com` | `password123` |
 | **Consultant / Agent** | `agent@aaaconsultancy.com` | `password123` |
 | **Operations** | `operations@aaaconsultancy.com` | `password123` |
-| **Finance** | `finance@aaaconsultancy.com` | `password123` |
 | **Marketing** | `marketing@aaaconsultancy.com` | `password123` |
 
-Portal Login URL: [http://localhost:5173/#/login](http://localhost:5173/#/login)
-
----
-
-## 🔌 Integrations
-
-| Provider | Purpose | Status / Mode |
-|---|---|---|
-| **Stripe** | Credit/Debit Card payments, consultation deposits, translation invoices. | Live / Test API Keys supported. |
-| **Zoho Invoicing** | Auto-invoicing, tax compliance, and client ledger synchronization. | OAuth 2.0 Client credentials. |
-| **Zoom API** | Server-to-Server OAuth for generating automatic consultation rooms. | Configurable via `.env`. |
-| **Twilio / Meta** | Instant WhatsApp booking notifications and reminder alerts. | Sandbox & Production modes. |
-| **Resend / SMTP** | Transactional emails, booking links, and password resets. | Dual-provider support with fallback. |
-| **AWS S3** | Secure, scalable storage for passports, contracts, and legal evidence. | S3 Presigned URLs. |
+**Staff Login URL:** [http://localhost:5173/#/login](http://localhost:5173/#/login)
 
 ---
 
@@ -230,41 +216,40 @@ Portal Login URL: [http://localhost:5173/#/login](http://localhost:5173/#/login)
 
 ```text
 aaa-merging/
-├── AAA-db-PR-creation-20-aug.sql  # Complete database dump
 ├── backend/
 │   ├── prisma/
-│   │   └── schema.prisma         # Prisma ORM schema definition
+│   │   └── schema.prisma         # Prisma ORM schema (24 models)
 │   ├── src/
-│   │   ├── config/               # Prisma client & DB configurations
-│   │   ├── controllers/          # Business logic handlers (auth, leads, cases, etc.)
-│   │   ├── middlewares/          # JWT auth & RBAC authorization
-│   │   ├── queues/               # BullMQ queue jobs & workers
-│   │   ├── routes/               # API endpoint definitions
-│   │   ├── services/             # Third-party wrappers (Stripe, Zoom, Zoho, etc.)
-│   │   └── app.js                # Express app initialization & Socket.IO server
-│   ├── seed.js                   # Database seed script for default users
+│   │   ├── config/               # Database & JWT configurations
+│   │   ├── controllers/          # Business logic (leads, auth, social, etc.)
+│   │   ├── middlewares/          # JWT authentication & RBAC middleware
+│   │   ├── queues/               # BullMQ queues & reminder schedulers
+│   │   ├── routes/               # Express REST routes
+│   │   ├── services/             # Integrations (Stripe, Zoom, Zoho, Twilio, Resend, AI)
+│   │   └── app.js                # Express entrypoint & Socket.IO initialization
+│   ├── seed.js                   # Seed script for staff accounts
 │   ├── package.json
-│   └── .env                      # Backend environment config
+│   └── .env                      # Backend environment configuration
 ├── frontend/
 │   ├── src/
-│   │   ├── assets/               # Branding, logos, and images
-│   │   ├── components/           # Reusable UI cards, tables, and modal components
+│   │   ├── assets/               # Brand logos & imagery
+│   │   ├── components/           # Reusable UI widgets, cards & modals
 │   │   ├── layouts/              # Main dashboard wrapper & sidebar navigation
 │   │   ├── pages/
-│   │   │   ├── leads/            # Role-specific lead views & management
-│   │   │   ├── clients/          # Client listing & profile cards
-│   │   │   ├── documents/        # Document verification dashboards
-│   │   │   ├── payments/         # Payment gateways, commissions, refunds
-│   │   │   ├── social/           # Social inbox & omnichannel messaging
-│   │   │   └── public/           # Client portal & booking landing pages
+│   │   │   ├── leads/            # Lead lists, filters, and detail cards
+│   │   │   ├── consultations/    # Consultation list & booking calendar
+│   │   │   ├── team/             # Agent rosters & active/closed cases
+│   │   │   ├── social/           # Unified Social Inbox (WhatsApp, IG, FB, etc.)
+│   │   │   ├── marketing/        # Marketing spend & campaign analytics
+│   │   │   └── public/           # Public booking & landing pages
 │   │   ├── routes/
-│   │   │   └── AppRoutes.jsx     # Route guarding & navigation rules
+│   │   │   └── AppRoutes.jsx     # Route guarding & redirection rules
 │   │   ├── services/
-│   │   │   └── dbService.js      # Unified Axios/Fetch API layer
+│   │   │   └── dbService.js      # Unified Axios API client
 │   │   ├── App.jsx
 │   │   └── main.jsx
 │   ├── package.json
-│   └── .env                      # Frontend environment config
+│   └── .env                      # Frontend environment configuration
 └── README.md
 ```
 
@@ -272,21 +257,21 @@ aaa-merging/
 
 ## 💡 Troubleshooting & Gotchas
 
-1. **Backend Port in Use (`EADDRINUSE: 5000`)**
-   - If port 5000 is occupied by an orphaned node process, run:
-     ```powershell
-     netstat -ano | findstr :5000
-     taskkill /F /PID <PID_NUMBER>
-     ```
+1. **Port Already in Use (`EADDRINUSE: 5000`):**
+   ```powershell
+   netstat -ano | findstr :5000
+   taskkill /F /PID <PID_NUMBER>
+   ```
 
-2. **MySQL "Server has gone away" during SQL import:**
-   - In XAMPP MariaDB, open `C:\xampp\mysql\bin\my.ini` and set `max_allowed_packet = 128M` under both `[mysqld]` and `[mysql]`.
+2. **XAMPP MariaDB Collation Error:**
+   - Avoid importing dumps containing `utf8mb4_0900_ai_ci` directly into MariaDB 10.4.
+   - Always run `npx prisma db push` inside `backend/` to generate 100% MariaDB-compatible tables automatically.
 
-3. **Collation Errors (`Unknown collation: 'utf8mb4_0900_ai_ci'`):**
-   - MariaDB 10.4 does not support MySQL 9's `utf8mb4_0900_ai_ci`. Always use `utf8mb4_unicode_ci` or `utf8mb4_general_ci`.
+3. **Disabled Redis in Local Development:**
+   - In `backend/.env`, set `DISABLE_REDIS="true"` to run BullMQ queues in Mock mode without needing an external Redis server.
 
 4. **Vite API Connection:**
-   - Make sure `frontend/.env` has `VITE_API_URL=http://localhost:5000/api/v1` without trailing slashes or accidental characters. Restart Vite (`npm run dev`) after changing `.env`.
+   - Ensure `frontend/.env` points to `http://localhost:5000/api/v1` without a trailing slash. Restart the Vite server (`npm run dev`) after any `.env` edits.
 
 ---
 
