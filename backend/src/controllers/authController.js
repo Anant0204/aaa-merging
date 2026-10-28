@@ -37,20 +37,7 @@ const login = async (req, res) => {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
-    let isMatch = await bcrypt.compare(password, user.password);
-
-    // Fallback: accept password123 or superadmin123/admin123 for default admin accounts
-    if (!isMatch && (normalizedEmail === 'superadmin@aaaconsultancy.com' || normalizedEmail === 'admin@aaaconsultancy.com')) {
-      if (password === 'password123' || password === 'superadmin123' || password === 'admin123') {
-        isMatch = true;
-        const salt = await bcrypt.genSalt(10);
-        const newHash = await bcrypt.hash(password, salt);
-        await prisma.user.update({
-          where: { id: user.id },
-          data: { password: newHash }
-        });
-      }
-    }
+    const isMatch = await bcrypt.compare(password, user.password);
 
     if (!isMatch) {
       return res.status(401).json({ message: 'Invalid credentials' });
