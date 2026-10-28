@@ -642,48 +642,13 @@ const respondToConsultation = async (req, res) => {
       return res.status(404).json({ message: 'Consultation not found.' });
     }
 
-<<<<<<< HEAD
     if (req.user && (req.user.role === 'consultant' || req.user.role === 'agent')) {
       if (existingConsultation.consultantId && existingConsultation.consultantId !== req.user.id) {
         return res.status(403).json({ message: 'Access denied. You can only respond to your assigned consultations.' });
       }
     }
 
-    let meetingLink = existingConsultation.meetingLink;
-    if (action === 'accept' && !meetingLink) {
-      // Always generate a fresh Zoom meeting link when agent accepts
-      if (zoomService.isConfigured) {
-        try {
-          let startTimeISO = new Date().toISOString();
-          if (existingConsultation.date) {
-            const timeStr = existingConsultation.timeSlot && existingConsultation.timeSlot.includes(':') 
-              ? existingConsultation.timeSlot 
-              : '10:00';
-            const dateObj = new Date(`${existingConsultation.date}T${timeStr}`);
-            if (!isNaN(dateObj.getTime())) {
-              startTimeISO = dateObj.toISOString();
-            }
-          }
-          const zoomMeeting = await zoomService.createZoomMeeting({
-            topic: `Eligibility Assessment for Lead ${existingConsultation.leadId || ''}`,
-            startTime: startTimeISO,
-            durationMinutes: existingConsultation.durationMinutes || 30
-          });
-          if (zoomMeeting) {
-            meetingLink = zoomMeeting.joinUrl;
-          }
-        } catch (zoomErr) {
-          console.error('Failed to create Zoom meeting on accept:', zoomErr.message);
-        }
-      }
-      // Fallback: generate a placeholder link if Zoom not configured or failed
-      if (!meetingLink) {
-        meetingLink = 'https://zoom.us/j/' + Math.floor(100000000 + Math.random() * 900000000);
-      }
-    }
-=======
-    let meetingLink = null;
->>>>>>> 94a253b0a28ced33752956c1c33c40c5f5b4c740
+    let meetingLink = existingConsultation.meetingLink || null;
 
     const consultation = await prisma.consultation.update({
       where: { id },

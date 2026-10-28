@@ -54,10 +54,6 @@ import OperationsMarketing from '../pages/marketing/OperationsMarketing';
 import AdminAgentsPerformance from '../pages/team/AdminAgentsPerformance';
 import OperationsAgentsPerformance from '../pages/team/OperationsAgentsPerformance';
 import StaffProfile from '../pages/team/StaffProfile';
-import AdminPaymentDashboard from '../pages/payments/AdminPaymentDashboard';
-import FinancePaymentDashboard from '../pages/payments/FinancePaymentDashboard';
-import InvoiceList from '../pages/payments/InvoiceList';
-import InvoiceDetails from '../pages/payments/InvoiceDetails';
 import Settings from '../pages/settings/Settings';
 import AdminSocialInbox from '../pages/social/AdminSocialInbox';
 import OperationsSocialInbox from '../pages/social/OperationsSocialInbox';
@@ -68,8 +64,6 @@ import LandingPage from '../pages/public/LandingPage';
 import LeadSelfFillForm from '../pages/public/LeadSelfFillForm';
 import PaymentSuccess from '../pages/public/PaymentSuccess';
 import NoShowPayment from '../pages/public/NoShowPayment';
-import AdminDocumentVerificationDashboard from '../pages/documents/AdminDocumentVerificationDashboard';
-import OperationsDocumentVerificationDashboard from '../pages/documents/OperationsDocumentVerificationDashboard';
 
 import Agents from '../pages/team/Agents';
 import ActiveCases from '../pages/team/ActiveCases';
@@ -90,9 +84,6 @@ import SuperAdminActiveCases from '../pages/team/SuperAdminActiveCases';
 import SuperAdminAgentsPerformance from '../pages/team/SuperAdminAgentsPerformance';
 import SuperAdminMarketing from '../pages/marketing/SuperAdminMarketing';
 import SuperAdminSocialInbox from '../pages/social/SuperAdminSocialInbox';
-import SuperAdminDocumentVerificationDashboard from '../pages/documents/SuperAdminDocumentVerificationDashboard';
-import SuperAdminPaymentDashboard from '../pages/payments/SuperAdminPaymentDashboard';
-import SuperAdminRefundCommissionHub from '../pages/payments/SuperAdminRefundCommissionHub';
 import SuperAdminStorageBackup from '../pages/documents/SuperAdminStorageBackup';
 import SuperAdminCustomization from '../pages/settings/SuperAdminCustomization';
 import Integrations from '../pages/integrations/Integrations';
@@ -104,9 +95,7 @@ const getMenuLabelForPath = (path) => {
   if (p.includes('/agents/performance')) return 'All Agents Performance';
   if (p.includes('/agents') || p.includes('/team/agents')) return 'Agents';
   if (p.includes('/active-cases')) return 'Active Cases';
-  if (p.includes('/documents/verify')) return 'Doc Verification';
 // if (p.includes('/documents/storage')) return 'AWS Cloud Backups';
-  if (p.includes('/payments/refund-commission')) return 'Refunds & Commissions';
   if (p.includes('/closed-cases')) return 'Closed Cases';
   if (p.includes('/marketing-manager/leads')) return 'Leads';
   if (p.includes('/marketing-manager/dashboard')) return 'Dashboard';
@@ -116,7 +105,6 @@ const getMenuLabelForPath = (path) => {
   if (p.includes('/marketing')) return 'Marketing';
   if (p.includes('/consultations/calendar')) return 'Calendar';
   if (p.includes('/integrations')) return 'Integrations';
-  if (p.includes('/payments') || p.includes('/finance') || p.includes('/invoice')) return 'Finance';
 
   return null;
 };
@@ -134,7 +122,6 @@ const getDynamicRedirectPath = (label, role) => {
   if (label === 'Dashboard') path = '/dashboard';
   else if (label === 'Agents') path = '/agents';
   else if (label === 'Active Cases') path = '/active-cases';
-  else if (label === 'Doc Verification') path = '/documents/verify';
   else if (label === 'Closed Cases') path = '/closed-cases';
   else if (label === 'Clients') path = '/clients';
   else if (label === 'Leads') path = '/leads';
@@ -142,7 +129,6 @@ const getDynamicRedirectPath = (label, role) => {
   else if (label === 'Marketing') path = '/marketing';
   else if (label === 'Calendar') path = '/consultations/calendar';
   else if (label === 'Integrations') path = '/integrations';
-  else if (label === 'Finance') path = '/payments';
 
   if (label === 'Integrations') return '/integrations';
   if (!prefix) return path;

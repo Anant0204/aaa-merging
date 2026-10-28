@@ -77,8 +77,6 @@ const MENU_TRANSLATIONS = {
     Dashboard: "Dashboard",
     Agents: "Agents",
     "Active Cases": "Active Cases",
-    "Doc Verification": "Doc Verification",
-    Finance: "Finance",
     "Closed Cases": "Closed Cases",
     Clients: "Clients",
     Leads: "Leads",
@@ -95,8 +93,6 @@ const MENU_TRANSLATIONS = {
     Dashboard: "لوحة القيادة",
     Agents: "الوكلاء",
     "Active Cases": "الحالات النشطة",
-    "Doc Verification": "التحقق من المستندات",
-    Finance: "المالية",
     "Closed Cases": "الحالات المغلقة",
     Clients: "العملاء",
     Leads: "العملاء المحتملون",
@@ -113,8 +109,6 @@ const MENU_TRANSLATIONS = {
     Dashboard: "Tablero",
     Agents: "Agentes",
     "Active Cases": "Casos Activos",
-    "Doc Verification": "Verificación de Docs",
-    Finance: "Finanzas",
     "Closed Cases": "Casos Cerrados",
     Clients: "Clientes",
     Leads: "Prospectos",
@@ -131,8 +125,6 @@ const MENU_TRANSLATIONS = {
     Dashboard: "Tableau de Bord",
     Agents: "Agents",
     "Active Cases": "Dossiers Actifs",
-    "Doc Verification": "Vérification des Docs",
-    Finance: "Finances",
     "Closed Cases": "Dossiers Clôturés",
     Clients: "Clients",
     Leads: "Pistes",
@@ -149,8 +141,6 @@ const MENU_TRANSLATIONS = {
     Dashboard: "Dashboard",
     Agents: "Agenten",
     "Active Cases": "Aktive Fälle",
-    "Doc Verification": "Dokumentenprüfung",
-    Finance: "Finanzen",
     "Closed Cases": "Geschlossene Fälle",
     Clients: "Kunden",
     Leads: "Interessenten",
@@ -167,8 +157,6 @@ const MENU_TRANSLATIONS = {
     Dashboard: "ڈیش بورڈ",
     Agents: "ایجنٹ",
     "Active Cases": "سرگرم کیسز",
-    "Doc Verification": "دستاویزات کی تصدیق",
-    Finance: "مالیات",
     "Closed Cases": "بند کیسز",
     Clients: "کلائنٹس",
     Leads: "ممکنہ گاہک",
@@ -240,21 +228,7 @@ export const DashboardLayout = () => {
     queryFn: dbService.getCustomizationSettings
   });
 
-  const { data: allDocuments = [] } = useQuery({
-    queryKey: ['documents'],
-    queryFn: dbService.getDocuments,
-    refetchInterval: 5000,
-    refetchOnWindowFocus: true,
-    retry: false
-  });
-
-  const pendingDocsCount = React.useMemo(() => {
-    if (!Array.isArray(allDocuments)) return 0;
-    return allDocuments.filter(doc => {
-      const statusLower = (doc.status || '').toLowerCase();
-      return statusLower === 'pending verification' || statusLower === 'under review' || statusLower === 'pending';
-    }).length;
-  }, [allDocuments]);
+  
 
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [socialMenuOpen, setSocialMenuOpen] = useState(false);
@@ -855,8 +829,7 @@ export const DashboardLayout = () => {
 
     const active = isActive(item);
     const itemPath = getDynamicPath(item);
-    const isDocVerification = item.label === 'Doc Verification';
-    const showBadgeCount = isDocVerification ? pendingDocsCount : 0;
+    const showBadgeCount = item.badgeCount || 0;
 
     return (
       <ListItemButton
@@ -1194,7 +1167,6 @@ export const DashboardLayout = () => {
                 <MenuItem value="admin">Manager 💼</MenuItem>
                 <MenuItem value="operations">Ops ⚙️</MenuItem>
                 <MenuItem value="consultant">Agent 🧑‍💼</MenuItem>
-                <MenuItem value="finance">Finance 💵</MenuItem>
                 <MenuItem value="marketing">Marketing 📣</MenuItem>
                 {customizationSettings?.rolesDefinition?.map(role => (
                   <MenuItem key={role.id} value={role.id}>{role.label.split('(')[0].trim()}</MenuItem>

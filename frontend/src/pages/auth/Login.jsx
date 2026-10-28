@@ -79,13 +79,13 @@ export const Login = () => {
     queryFn: dbService.getCustomizationSettings
   });
 
-  const dynamicRoles = customizationSettings?.rolesDefinition || [
+  const dynamicRoles = (customizationSettings?.rolesDefinition || [
     { id: 'admin', label: 'Admin', icon: 'SupervisorAccountIcon' },
     { id: 'operations', label: 'Operations', icon: 'SettingsSuggestIcon' },
     { id: 'finance', label: 'Finance', icon: 'AccountBalanceWalletIcon' },
     { id: 'consultant', label: 'Consultant', icon: 'SupportAgentIcon' },
     { id: 'marketing', label: 'Marketing', icon: 'CampaignIcon' }
-  ];
+  ]).filter(r => r.id !== 'finance');
 
   const getRoleIcon = (role) => {
     const iconName = role.icon || {

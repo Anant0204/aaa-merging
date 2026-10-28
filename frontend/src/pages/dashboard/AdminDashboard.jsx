@@ -279,7 +279,7 @@ export const AdminDashboard = () => {
       render: (row) => `${row.firstName} ${row.lastName}` },
     {
       id: 'service',
-      label: 'Visa Service',
+      label: 'Service Category',
       render: (row) => SERVICES.find((s) => s.id === row.serviceId)?.name || row.serviceId 
     },
     { id: 'status', label: 'Status' },
