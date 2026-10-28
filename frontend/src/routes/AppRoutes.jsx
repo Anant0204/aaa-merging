@@ -87,6 +87,7 @@ import SuperAdminSocialInbox from '../pages/social/SuperAdminSocialInbox';
 import SuperAdminStorageBackup from '../pages/documents/SuperAdminStorageBackup';
 import SuperAdminCustomization from '../pages/settings/SuperAdminCustomization';
 import Integrations from '../pages/integrations/Integrations';
+import ReviewsDashboard from '../pages/reviews/ReviewsDashboard';
 
 const getMenuLabelForPath = (path) => {
   const p = path.toLowerCase();
@@ -105,6 +106,7 @@ const getMenuLabelForPath = (path) => {
   if (p.includes('/marketing')) return 'Marketing';
   if (p.includes('/consultations/calendar')) return 'Calendar';
   if (p.includes('/integrations')) return 'Integrations';
+  if (p.includes('/reviews')) return 'Reviews';
 
   return null;
 };
@@ -129,8 +131,10 @@ const getDynamicRedirectPath = (label, role) => {
   else if (label === 'Marketing') path = '/marketing';
   else if (label === 'Calendar') path = '/consultations/calendar';
   else if (label === 'Integrations') path = '/integrations';
+  else if (label === 'Reviews') path = '/reviews';
 
   if (label === 'Integrations') return '/integrations';
+  if (label === 'Reviews') return '/reviews';
   if (!prefix) return path;
   return `/${prefix}${path}`;
 };
@@ -987,6 +991,48 @@ export const AppRoutes = () => {
           }
         />
 
+        {/* Reviews & Reputation (Super Admin, Admin, Operations, Marketing) */}
+        <Route
+          path="/reviews"
+          element={
+            <ProtectedRoute allowedRoles={['admin', 'super_admin', 'operations', 'marketing']}>
+              <ReviewsDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/reviews"
+          element={
+            <ProtectedRoute allowedRoles={['admin', 'super_admin']}>
+              <ReviewsDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/super_admin/reviews"
+          element={
+            <ProtectedRoute allowedRoles={['super_admin']}>
+              <ReviewsDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/operations/reviews"
+          element={
+            <ProtectedRoute allowedRoles={['operations', 'super_admin']}>
+              <ReviewsDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/marketing-manager/reviews"
+          element={
+            <ProtectedRoute allowedRoles={['marketing', 'super_admin']}>
+              <ReviewsDashboard />
+            </ProtectedRoute>
+          }
+        />
+
         {/* Settings (Admins, Finance, Operations) */}
         <Route
           path="/settings"
@@ -1014,6 +1060,7 @@ export const AppRoutes = () => {
         <Route path="/:rolePrefix/payments" element={<Navigate to="/dashboard" replace />} />
         <Route path="/:rolePrefix/marketing" element={<ProtectedRoute><OperationsMarketing /></ProtectedRoute>} />
         <Route path="/:rolePrefix/social-inbox" element={<ProtectedRoute><OperationsSocialInbox /></ProtectedRoute>} />
+        <Route path="/:rolePrefix/reviews" element={<ProtectedRoute allowedRoles={['admin', 'super_admin', 'operations', 'marketing']}><ReviewsDashboard /></ProtectedRoute>} />
 
         {/* Fallback */}
         <Route path="*" element={<Navigate to="/dashboard" replace />} />

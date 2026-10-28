@@ -80,7 +80,8 @@ const AVAILABLE_MENUS = [
   'Marketing',
   'Calendar',
   'All Agents Performance',
-  'Integrations'
+  'Integrations',
+  'Reviews'
 ];
 
 const AVAILABLE_CARDS = [

@@ -58,6 +58,7 @@ import CableIcon from '@mui/icons-material/Cable';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
 import TwitterIcon from '@mui/icons-material/Twitter';
 import PinterestIcon from '@mui/icons-material/Pinterest';
+import RateReviewIcon from '@mui/icons-material/RateReview';
 import ChatIcon from '@mui/icons-material/Chat';
 import { io } from 'socket.io-client';
 
@@ -85,6 +86,7 @@ const MENU_TRANSLATIONS = {
     Calendar: "Calendar",
     "All Agents Performance": "Agents Performance",
     Integrations: "Integrations",
+    Reviews: "Reviews",
     Logout: "Logout",
     "Search...": "Search...",
     "Global CRM search...": "Global CRM search..."
@@ -101,6 +103,7 @@ const MENU_TRANSLATIONS = {
     Calendar: "التقويم",
     "All Agents Performance": "أداء الوكلاء",
     Integrations: "التكاملات",
+    Reviews: "التقييمات",
     Logout: "تسجيل الخروج",
     "Search...": "بحث...",
     "Global CRM search...": "بحث عام في CRM..."
@@ -117,6 +120,7 @@ const MENU_TRANSLATIONS = {
     Calendar: "Calendario",
     "All Agents Performance": "Rendimiento de Agentes",
     Integrations: "Integraciones",
+    Reviews: "Reseñas",
     Logout: "Cerrar Sesión",
     "Search...": "Buscar...",
     "Global CRM search...": "Búsqueda global..."
@@ -133,6 +137,7 @@ const MENU_TRANSLATIONS = {
     Calendar: "Calendrier",
     "All Agents Performance": "Performance des Agents",
     Integrations: "Intégrations",
+    Reviews: "Avis",
     Logout: "Se Déconnecter",
     "Search...": "Rechercher...",
     "Global CRM search...": "Recherche globale..."
@@ -149,6 +154,7 @@ const MENU_TRANSLATIONS = {
     Calendar: "Kalender",
     "All Agents Performance": "Agentenleistung",
     Integrations: "Integrationen",
+    Reviews: "Bewertungen",
     Logout: "Abmelden",
     "Search...": "Suchen...",
     "Global CRM search...": "Globale CRM-Suche..."
@@ -428,6 +434,7 @@ export const DashboardLayout = () => {
     // Special override: Integrations and Settings are shared pages — do not prefix them
     if (item.path === '/integrations') return '/integrations';
     if (item.path === '/settings') return '/settings';
+    if (item.path === '/reviews') return '/reviews';
 
     if (item.path.startsWith(`/${prefix}`)) return item.path;
 
@@ -505,6 +512,12 @@ export const DashboardLayout = () => {
       icon: <CableIcon />,
       path: '/integrations',
       roles: ['admin', 'super_admin'],
+    },
+    {
+      label: 'Reviews',
+      icon: <RateReviewIcon />,
+      path: '/reviews',
+      roles: ['admin', 'operations', 'super_admin', 'marketing'],
     },
     {
       label: 'Calendar',

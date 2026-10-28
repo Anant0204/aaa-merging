@@ -821,4 +821,56 @@ export const dbService = {
     const res = await apiClient.get(`/payments/revenue-analytics${queryStr ? `?${queryStr}` : ''}`);
     return res.data;
   },
+
+  // ─── Reviews & Reputation ──────────────────────────────────────────────
+  getReviews: async (params = {}) => {
+    const query = new URLSearchParams();
+    if (params.page) query.append('page', params.page);
+    if (params.limit) query.append('limit', params.limit);
+    if (params.provider) query.append('provider', params.provider);
+    if (params.rating) query.append('rating', params.rating);
+    if (params.sentiment) query.append('sentiment', params.sentiment);
+    if (params.responseStatus) query.append('responseStatus', params.responseStatus);
+    if (params.status) query.append('status', params.status);
+    if (params.isDemo !== undefined && params.isDemo !== null) query.append('isDemo', params.isDemo);
+    if (params.search) query.append('search', params.search);
+    const queryStr = query.toString();
+    const res = await apiClient.get(`/reviews${queryStr ? `?${queryStr}` : ''}`);
+    return res.data;
+  },
+
+  getReviewStats: async (includeDemo = false) => {
+    const res = await apiClient.get(`/reviews/stats?includeDemo=${includeDemo}`);
+    return res.data;
+  },
+
+  createReview: async (reviewData) => {
+    const res = await apiClient.post('/reviews', reviewData);
+    return res.data;
+  },
+
+  respondToReview: async (id, responseText) => {
+    const res = await apiClient.post(`/reviews/${id}/respond`, { responseText });
+    return res.data;
+  },
+
+  updateReviewStatus: async (id, status) => {
+    const res = await apiClient.patch(`/reviews/${id}/status`, { status });
+    return res.data;
+  },
+
+  getReviewProviders: async () => {
+    const res = await apiClient.get('/reviews/providers');
+    return res.data;
+  },
+
+  syncReviewProvider: async (provider) => {
+    const res = await apiClient.post(`/reviews/providers/${provider}/sync`);
+    return res.data;
+  },
+
+  updateReviewProviderConfig: async (provider, config) => {
+    const res = await apiClient.post(`/reviews/providers/${provider}/config`, config);
+    return res.data;
+  },
 };

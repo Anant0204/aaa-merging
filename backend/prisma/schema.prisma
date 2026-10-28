@@ -43,6 +43,7 @@ model User {
   rateChangesMade    CommissionRateHistory[] @relation("RateChangesMade")
   reviewedDocuments  Document[]         @relation("DocumentReviewer")
   createdCoupons     DiscountCode[]     @relation("CouponCreator")
+  respondedReviews  Review[]           @relation("ReviewResponder")
 
   @@map("users")
 }
@@ -593,3 +594,90 @@ model CommissionRateHistory {
   @@map("commission_rate_histories")
 }
 
+
+// ==========================================
+// REVIEWS & REPUTATION MANAGEMENT (PHASE 3)
+// ==========================================
+
+enum ReviewProvider {
+  GOOGLE
+  META
+  CLUTCH
+  TRUSTPILOT
+  MANUAL
+}
+
+enum ReviewSentiment {
+  POSITIVE
+  NEUTRAL
+  NEGATIVE
+}
+
+enum ReviewResponseStatus {
+  UNRESPONDED
+  RESPONDED
+  NOT_REQUIRED
+}
+
+enum ReviewStatus {
+  PUBLISHED
+  HIDDEN
+  FLAGGED
+}
+
+enum ProviderConnectionStatus {
+  CONNECTED
+  DISCONNECTED
+  ERROR
+  CONFIG_REQUIRED
+  MANUAL_ONLY
+}
+
+model Review {
+  id               String               @id @default(uuid())
+  provider         ReviewProvider
+  externalReviewId String?              @db.VarChar(191)
+  authorName       String               @default("Anonymous") @db.VarChar(191)
+  authorEmail      String?              @db.VarChar(191)
+  authorPhotoUrl   String?              @db.Text
+  projectType      String?              @db.VarChar(191)
+  rating           Int
+  reviewText       String?              @db.Text
+  reviewDate       DateTime             @default(now())
+  sentiment        ReviewSentiment      @default(POSITIVE)
+  responseStatus   ReviewResponseStatus @default(UNRESPONDED)
+  responseText     String?              @db.Text
+  respondedAt      DateTime?
+  respondedById    String?              @db.VarChar(191)
+  respondedBy      User?                @relation("ReviewResponder", fields: [respondedById], references: [id], onDelete: SetNull)
+  status           ReviewStatus         @default(PUBLISHED)
+  isDemo           Boolean              @default(false)
+  originalUrl      String?              @db.Text
+  createdAt        DateTime             @default(now())
+  updatedAt        DateTime             @updatedAt
+
+  @@unique([provider, externalReviewId], name: "provider_external_id")
+  @@index([provider])
+  @@index([rating])
+  @@index([sentiment])
+  @@index([responseStatus])
+  @@index([isDemo])
+  @@map("reviews")
+}
+
+model ReviewProviderConfig {
+  id                 String                   @id @default(uuid())
+  provider           ReviewProvider           @unique
+  status             ProviderConnectionStatus @default(CONFIG_REQUIRED)
+  accountIdentifier  String?                  @db.VarChar(191)
+  encryptedApiKey    String?                  @db.Text
+  encryptedApiSecret String?                  @db.Text
+  autoSyncEnabled    Boolean                  @default(false)
+  lastSyncAt         DateTime?
+  lastSyncStatus     String?                  @db.VarChar(191)
+  lastErrorMessage   String?                  @db.Text
+  createdAt          DateTime                 @default(now())
+  updatedAt          DateTime                 @updatedAt
+
+  @@map("review_provider_configs")
+}
