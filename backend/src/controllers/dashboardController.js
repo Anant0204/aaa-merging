@@ -161,7 +161,7 @@ exports.getDashboardMetrics = async (req, res) => {
 
     // 6. REPUTATION & REVIEWS
     const reviews = await prisma.review.findMany({
-      select: { rating: true, sentiment: true, source: true }
+      select: { rating: true, sentiment: true, provider: true }
     });
 
     const reviewStats = {
@@ -233,7 +233,7 @@ exports.getRecentActivity = async (req, res) => {
     const recentReviews = await prisma.review.findMany({
       take: 5,
       orderBy: { createdAt: 'desc' },
-      select: { id: true, source: true, authorName: true, rating: true, sentiment: true, createdAt: true }
+      select: { id: true, provider: true, authorName: true, rating: true, sentiment: true, createdAt: true }
     });
 
     res.json({
