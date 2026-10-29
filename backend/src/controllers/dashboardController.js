@@ -116,14 +116,24 @@ exports.getDashboardMetrics = async (req, res) => {
 
     const leads = await prisma.lead.findMany({
       where: leadWhere,
-      select: { id: true, status: true, source: true, serviceType: true, createdAt: true }
+      select: { id: true, status: true, source: true, serviceType: true, dealValue: true, currency: true, createdAt: true }
     });
+
+    const openStages = ['New Lead', 'New Inquiry', 'Contacted', 'Qualified', 'In Discussion', 'Assessment Scheduled', 'Discovery Scheduled', 'Requirement Analysis', 'Proposal Sent', 'Negotiation'];
+    const wonStages = ['Deal Won', 'Won', 'Completed', 'Client Created', 'Payment Received', 'Converted'];
 
     const leadCounts = {
       total: leads.length,
-      newLeads: leads.filter(l => l.status === 'New Lead').length,
-      inProgress: leads.filter(l => ['Contacted', 'Qualified', 'In Discussion', 'Assessment Scheduled'].includes(l.status)).length,
-      converted: leads.filter(l => ['Client Created', 'Payment Received', 'Converted'].includes(l.status)).length
+      newLeads: leads.filter(l => l.status === 'New Lead' || l.status === 'New Inquiry').length,
+      inProgress: leads.filter(l => openStages.includes(l.status) && l.status !== 'New Lead' && l.status !== 'New Inquiry').length,
+      converted: leads.filter(l => wonStages.includes(l.status)).length,
+      // Sales Pipeline KPIs (Deal Value)
+      openPipelineValue: leads.filter(l => openStages.includes(l.status)).reduce((sum, l) => sum + (Number(l.dealValue) || 0), 0),
+      wonContractValue: leads.filter(l => wonStages.includes(l.status)).reduce((sum, l) => sum + (Number(l.dealValue) || 0), 0),
+      averageDealSize: (() => {
+        const wonWithValues = leads.filter(l => wonStages.includes(l.status) && Number(l.dealValue) > 0);
+        return wonWithValues.length > 0 ? (wonWithValues.reduce((sum, l) => sum + Number(l.dealValue), 0) / wonWithValues.length) : 0;
+      })()
     };
 
     // Group leads by IT Service Type
