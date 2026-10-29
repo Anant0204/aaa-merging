@@ -1,0 +1,23 @@
+{
+  "backupName": "phase_b_leads_pre_migration_backup",
+  "createdAt": "2026-10-29T12:15:42.000Z",
+  "database": "aaa-db",
+  "engine": "10.4.32-MariaDB",
+  "table": "leads",
+  "sqlBackupFile": "leads-pre-phase-b-backup.sql",
+  "sqlBackupSize": 4069,
+  "verified": true,
+  "columnsBefore": 36,
+  "indexesBefore": [
+    "PRIMARY",
+    "leads_clientId_key",
+    "leads_createdAt_idx",
+    "leads_assignedToId_fkey"
+  ],
+  "columnsToAdd": [
+    "companyName VARCHAR(191) NULL",
+    "dealValue DECIMAL(12,2) NULL",
+    "currency VARCHAR(10) NOT NULL DEFAULT 'USD'"
+  ],
+  "indexToAdd": "leads_companyName_idx (companyName)"
+}
