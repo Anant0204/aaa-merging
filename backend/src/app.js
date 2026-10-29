@@ -84,6 +84,7 @@ app.use('/api/v1/audit-logs', require('./routes/auditLogRoutes'));
 app.use('/api/v1/social', require('./routes/socialRoutes'));
 app.use('/api/v1/communications', require('./routes/communicationRoutes'));
 app.use('/api/v1/coupons', require('./routes/couponRoutes'));
+app.use('/api/v1/reviews', require('./routes/reviewRoutes'));
 app.use('/api/v1/templates', require('./routes/templateRoutes'));
 app.use('/api/templates', require('./routes/templateRoutes'));
 app.use('/api/v1/projects', require('./routes/projectRoutes'));

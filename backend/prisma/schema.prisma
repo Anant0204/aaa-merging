@@ -48,7 +48,7 @@ model User {
   assignedTasks      ProjectTask[]      @relation("AssignedTasks")
   timeLogs           ProjectTimeLog[]   @relation("UserTimeLogs")
   handoverSignoffs   ProjectHandover[]  @relation("HandoverSignoffs")
-  reviewResponses    Review[]           @relation("ReviewResponses")
+  respondedReviews   Review[]           @relation("ReviewResponder")
 
   @@map("users")
 }
@@ -160,7 +160,6 @@ model Client {
   discountCodes    DiscountCode[]
   consultations    Consultation[]
   projects         Project[]
-  reviews          Review[]
 
   @@map("clients")
   @@index([createdAt])
@@ -641,7 +640,6 @@ model Project {
   tasks             ProjectTask[]
   handovers         ProjectHandover[]
   timeLogs          ProjectTimeLog[]
-  reviews           Review[]
 
   createdAt         DateTime          @default(now())
   updatedAt         DateTime          @updatedAt
@@ -754,38 +752,89 @@ model ProjectHandover {
   @@index([projectId])
 }
 
-model Review {
-  id               String    @id @default(uuid())
-  source           String    // GOOGLE, CLUTCH, TRUSTPILOT, WEBSITE
-  externalReviewId String?
-  authorName       String
-  authorEmail      String?
-  authorCompany    String?
-  rating           Float     // 1.0 to 5.0
-  reviewText       String    @db.Text
-  sentiment        String    @default("NEUTRAL") // POSITIVE, NEUTRAL, NEGATIVE
-  
-  responseDraft    String?   @db.Text
-  publishedResponse String?  @db.Text
-  respondedAt      DateTime?
-  respondedById    String?
-  respondedBy      User?     @relation("ReviewResponses", fields: [respondedById], references: [id])
-  
-  status           String    @default("PENDING_REPLY") // PENDING_REPLY, REPLIED, IGNORED
-  
-  projectId        String?
-  project          Project?  @relation(fields: [projectId], references: [id], onDelete: SetNull)
-  
-  clientId         String?
-  client           Client?   @relation(fields: [clientId], references: [id], onDelete: SetNull)
+// ==========================================
+// REVIEWS & REPUTATION MANAGEMENT (PHASE 3)
+// ==========================================
 
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
-
-  @@unique([source, externalReviewId])
-  @@map("reviews")
-  @@index([source])
-  @@index([rating])
-  @@index([sentiment])
+enum ReviewProvider {
+  GOOGLE
+  META
+  CLUTCH
+  TRUSTPILOT
+  MANUAL
 }
 
+enum ReviewSentiment {
+  POSITIVE
+  NEUTRAL
+  NEGATIVE
+}
+
+enum ReviewResponseStatus {
+  UNRESPONDED
+  RESPONDED
+  NOT_REQUIRED
+}
+
+enum ReviewStatus {
+  PUBLISHED
+  HIDDEN
+  FLAGGED
+}
+
+enum ProviderConnectionStatus {
+  CONNECTED
+  DISCONNECTED
+  ERROR
+  CONFIG_REQUIRED
+  MANUAL_ONLY
+}
+
+model Review {
+  id               String               @id @default(uuid())
+  provider         ReviewProvider
+  externalReviewId String?              @db.VarChar(191)
+  authorName       String               @default("Anonymous") @db.VarChar(191)
+  authorEmail      String?              @db.VarChar(191)
+  authorPhotoUrl   String?              @db.Text
+  projectType      String?              @db.VarChar(191)
+  rating           Int
+  reviewText       String?              @db.Text
+  reviewDate       DateTime             @default(now())
+  sentiment        ReviewSentiment      @default(POSITIVE)
+  responseStatus   ReviewResponseStatus @default(UNRESPONDED)
+  responseText     String?              @db.Text
+  respondedAt      DateTime?
+  respondedById    String?              @db.VarChar(191)
+  respondedBy      User?                @relation("ReviewResponder", fields: [respondedById], references: [id], onDelete: SetNull)
+  status           ReviewStatus         @default(PUBLISHED)
+  isDemo           Boolean              @default(false)
+  originalUrl      String?              @db.Text
+  createdAt        DateTime             @default(now())
+  updatedAt        DateTime             @updatedAt
+
+  @@unique([provider, externalReviewId], name: "provider_external_id")
+  @@index([provider])
+  @@index([rating])
+  @@index([sentiment])
+  @@index([responseStatus])
+  @@index([isDemo])
+  @@map("reviews")
+}
+
+model ReviewProviderConfig {
+  id                 String                   @id @default(uuid())
+  provider           ReviewProvider           @unique
+  status             ProviderConnectionStatus @default(CONFIG_REQUIRED)
+  accountIdentifier  String?                  @db.VarChar(191)
+  encryptedApiKey    String?                  @db.Text
+  encryptedApiSecret String?                  @db.Text
+  autoSyncEnabled    Boolean                  @default(false)
+  lastSyncAt         DateTime?
+  lastSyncStatus     String?                  @db.VarChar(191)
+  lastErrorMessage   String?                  @db.Text
+  createdAt          DateTime                 @default(now())
+  updatedAt          DateTime                 @updatedAt
+
+  @@map("review_provider_configs")
+}

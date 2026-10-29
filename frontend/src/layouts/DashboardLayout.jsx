@@ -58,6 +58,7 @@ import CableIcon from '@mui/icons-material/Cable';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
 import TwitterIcon from '@mui/icons-material/Twitter';
 import PinterestIcon from '@mui/icons-material/Pinterest';
+import RateReviewIcon from '@mui/icons-material/RateReview';
 import ChatIcon from '@mui/icons-material/Chat';
 import { io } from 'socket.io-client';
 
@@ -77,8 +78,6 @@ const MENU_TRANSLATIONS = {
     Dashboard: "Dashboard",
     Agents: "Agents",
     "Active Cases": "Active Cases",
-    "Doc Verification": "Doc Verification",
-    Finance: "Finance",
     "Closed Cases": "Closed Cases",
     Clients: "Clients",
     Leads: "Leads",
@@ -87,6 +86,7 @@ const MENU_TRANSLATIONS = {
     Calendar: "Calendar",
     "All Agents Performance": "Agents Performance",
     Integrations: "Integrations",
+    Reviews: "Reviews",
     Logout: "Logout",
     "Search...": "Search...",
     "Global CRM search...": "Global CRM search..."
@@ -95,8 +95,6 @@ const MENU_TRANSLATIONS = {
     Dashboard: "لوحة القيادة",
     Agents: "الوكلاء",
     "Active Cases": "الحالات النشطة",
-    "Doc Verification": "التحقق من المستندات",
-    Finance: "المالية",
     "Closed Cases": "الحالات المغلقة",
     Clients: "العملاء",
     Leads: "العملاء المحتملون",
@@ -105,6 +103,7 @@ const MENU_TRANSLATIONS = {
     Calendar: "التقويم",
     "All Agents Performance": "أداء الوكلاء",
     Integrations: "التكاملات",
+    Reviews: "التقييمات",
     Logout: "تسجيل الخروج",
     "Search...": "بحث...",
     "Global CRM search...": "بحث عام في CRM..."
@@ -113,8 +112,6 @@ const MENU_TRANSLATIONS = {
     Dashboard: "Tablero",
     Agents: "Agentes",
     "Active Cases": "Casos Activos",
-    "Doc Verification": "Verificación de Docs",
-    Finance: "Finanzas",
     "Closed Cases": "Casos Cerrados",
     Clients: "Clientes",
     Leads: "Prospectos",
@@ -123,6 +120,7 @@ const MENU_TRANSLATIONS = {
     Calendar: "Calendario",
     "All Agents Performance": "Rendimiento de Agentes",
     Integrations: "Integraciones",
+    Reviews: "Reseñas",
     Logout: "Cerrar Sesión",
     "Search...": "Buscar...",
     "Global CRM search...": "Búsqueda global..."
@@ -131,8 +129,6 @@ const MENU_TRANSLATIONS = {
     Dashboard: "Tableau de Bord",
     Agents: "Agents",
     "Active Cases": "Dossiers Actifs",
-    "Doc Verification": "Vérification des Docs",
-    Finance: "Finances",
     "Closed Cases": "Dossiers Clôturés",
     Clients: "Clients",
     Leads: "Pistes",
@@ -141,6 +137,7 @@ const MENU_TRANSLATIONS = {
     Calendar: "Calendrier",
     "All Agents Performance": "Performance des Agents",
     Integrations: "Intégrations",
+    Reviews: "Avis",
     Logout: "Se Déconnecter",
     "Search...": "Rechercher...",
     "Global CRM search...": "Recherche globale..."
@@ -149,8 +146,6 @@ const MENU_TRANSLATIONS = {
     Dashboard: "Dashboard",
     Agents: "Agenten",
     "Active Cases": "Aktive Fälle",
-    "Doc Verification": "Dokumentenprüfung",
-    Finance: "Finanzen",
     "Closed Cases": "Geschlossene Fälle",
     Clients: "Kunden",
     Leads: "Interessenten",
@@ -159,6 +154,7 @@ const MENU_TRANSLATIONS = {
     Calendar: "Kalender",
     "All Agents Performance": "Agentenleistung",
     Integrations: "Integrationen",
+    Reviews: "Bewertungen",
     Logout: "Abmelden",
     "Search...": "Suchen...",
     "Global CRM search...": "Globale CRM-Suche..."
@@ -167,8 +163,6 @@ const MENU_TRANSLATIONS = {
     Dashboard: "ڈیش بورڈ",
     Agents: "ایجنٹ",
     "Active Cases": "سرگرم کیسز",
-    "Doc Verification": "دستاویزات کی تصدیق",
-    Finance: "مالیات",
     "Closed Cases": "بند کیسز",
     Clients: "کلائنٹس",
     Leads: "ممکنہ گاہک",
@@ -240,21 +234,7 @@ export const DashboardLayout = () => {
     queryFn: dbService.getCustomizationSettings
   });
 
-  const { data: allDocuments = [] } = useQuery({
-    queryKey: ['documents'],
-    queryFn: dbService.getDocuments,
-    refetchInterval: 5000,
-    refetchOnWindowFocus: true,
-    retry: false
-  });
-
-  const pendingDocsCount = React.useMemo(() => {
-    if (!Array.isArray(allDocuments)) return 0;
-    return allDocuments.filter(doc => {
-      const statusLower = (doc.status || '').toLowerCase();
-      return statusLower === 'pending verification' || statusLower === 'under review' || statusLower === 'pending';
-    }).length;
-  }, [allDocuments]);
+  
 
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [socialMenuOpen, setSocialMenuOpen] = useState(false);
@@ -458,6 +438,7 @@ export const DashboardLayout = () => {
     // Special override: Integrations and Settings are shared pages — do not prefix them
     if (item.path === '/integrations') return '/integrations';
     if (item.path === '/settings') return '/settings';
+    if (item.path === '/reviews') return '/reviews';
 
     if (item.path.startsWith(`/${prefix}`)) return item.path;
 
@@ -535,6 +516,12 @@ export const DashboardLayout = () => {
       icon: <CableIcon />,
       path: '/integrations',
       roles: ['admin', 'super_admin'],
+    },
+    {
+      label: 'Reviews',
+      icon: <RateReviewIcon />,
+      path: '/reviews',
+      roles: ['admin', 'operations', 'super_admin', 'marketing'],
     },
     {
       label: 'Calendar',
@@ -859,8 +846,7 @@ export const DashboardLayout = () => {
 
     const active = isActive(item);
     const itemPath = getDynamicPath(item);
-    const isDocVerification = item.label === 'Doc Verification';
-    const showBadgeCount = isDocVerification ? pendingDocsCount : 0;
+    const showBadgeCount = item.badgeCount || 0;
 
     return (
       <ListItemButton
@@ -1177,34 +1163,7 @@ export const DashboardLayout = () => {
               </Select>
             </FormControl>
 
-            {/* Quick Role Switcher Dropdown (for testing and verification) */}
-            <FormControl size="small" sx={{ minWidth: 105 }}>
-              <Select
-                value={currentUser?.role || 'super_admin'}
-                onChange={handleRoleChange}
-                sx={{
-                  borderRadius: 2,
-                  height: 32,
-                  bgcolor: 'background.paper',
-                  fontSize: '0.78rem',
-                  fontWeight: 800,
-                  border: '1px solid',
-                  borderColor: 'secondary.main',
-                  color: 'secondary.main',
-                  '& .MuiSelect-select': { py: 0.5 }
-                }}
-              >
-                <MenuItem value="super_admin">CEO 👑</MenuItem>
-                <MenuItem value="admin">Manager 💼</MenuItem>
-                <MenuItem value="operations">Ops ⚙️</MenuItem>
-                <MenuItem value="consultant">Agent 🧑‍💼</MenuItem>
-                <MenuItem value="finance">Finance 💵</MenuItem>
-                <MenuItem value="marketing">Marketing 📣</MenuItem>
-                {customizationSettings?.rolesDefinition?.map(role => (
-                  <MenuItem key={role.id} value={role.id}>{role.label.split('(')[0].trim()}</MenuItem>
-                ))}
-              </Select>
-            </FormControl>
+            {/* Quick Role Switcher removed from header - available on Login page */}
 
             {/* Social Inbox Shortcut */}
             <Tooltip title="Social Inbox">

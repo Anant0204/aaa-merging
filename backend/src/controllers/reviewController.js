@@ -1,190 +1,188 @@
-const prisma = require('../config/db');
-const {
-  ingestReview,
-  ingestBatchReviews,
-  getReviewAnalytics,
-  generateReplyDraft
-} = require('../services/reviewService');
+const reviewService = require('../services/reviewService');
 
 /**
  * GET /api/v1/reviews
- * List reviews with filtering and pagination
+ * Fetches paginated reviews with filters.
  */
-exports.getReviews = async (req, res) => {
+const getReviews = async (req, res) => {
   try {
-    const { source, sentiment, rating, status, search } = req.query;
+    const data = await reviewService.getReviews(req.query);
+    res.json(data);
+  } catch (err) {
+    console.error('Error fetching reviews:', err.message);
+    res.status(500).json({ message: 'Failed to retrieve reviews.' });
+  }
+};
 
-    const where = {};
-    if (source && source !== 'ALL') where.source = source.toUpperCase();
-    if (sentiment && sentiment !== 'ALL') where.sentiment = sentiment.toUpperCase();
-    if (status && status !== 'ALL') where.status = status.toUpperCase();
-    if (rating && !isNaN(rating)) where.rating = parseFloat(rating);
+/**
+ * GET /api/v1/reviews/stats
+ * Fetches aggregated review metrics (rating, sentiment, platform, response rate).
+ */
+const getReviewStats = async (req, res) => {
+  try {
+    const includeDemo = req.query.includeDemo === 'true' || req.query.includeDemo === true;
+    const stats = await reviewService.getReviewStats(includeDemo);
+    res.json(stats);
+  } catch (err) {
+    console.error('Error fetching review stats:', err.message);
+    res.status(500).json({ message: 'Failed to retrieve review statistics.' });
+  }
+};
 
-    if (search) {
-      where.OR = [
-        { authorName: { contains: search } },
-        { reviewText: { contains: search } },
-        { authorCompany: { contains: search } }
-      ];
-    }
-
-    const reviews = await prisma.review.findMany({
-      where,
-      include: {
-        project: { select: { id: true, name: true, projectCode: true } },
-        client: { select: { id: true, firstName: true, lastName: true, email: true } },
-        respondedBy: { select: { id: true, fullName: true, email: true } }
-      },
-      orderBy: { createdAt: 'desc' }
+/**
+ * POST /api/v1/reviews
+ * Creates a verified manual review or imported review.
+ */
+const createReview = async (req, res) => {
+  try {
+    const review = await reviewService.createReview(req.body, req.user?.id);
+    res.status(201).json({
+      message: 'Review created successfully.',
+      review
     });
-
-    res.json({ success: true, count: reviews.length, data: reviews });
-  } catch (error) {
-    console.error('[ReviewController: getReviews] Error:', error);
-    res.status(500).json({ success: false, message: 'Failed to retrieve reviews.', error: error.message });
-  }
-};
-
-/**
- * GET /api/v1/reviews/analytics
- * Retrieve review reputation analytics
- */
-exports.getAnalytics = async (req, res) => {
-  try {
-    const analytics = await getReviewAnalytics();
-    res.json({ success: true, data: analytics });
-  } catch (error) {
-    console.error('[ReviewController: getAnalytics] Error:', error);
-    res.status(500).json({ success: false, message: 'Failed to calculate review analytics.', error: error.message });
-  }
-};
-
-/**
- * POST /api/v1/reviews/ingest
- * Ingest a single review (manual or webhook)
- */
-exports.ingestSingleReview = async (req, res) => {
-  try {
-    const result = await ingestReview(req.body);
-    res.status(result.skipped ? 200 : 201).json({
-      success: true,
-      message: result.skipped ? 'Duplicate review skipped.' : 'Review ingested successfully.',
-      data: result.review,
-      skipped: result.skipped
-    });
-  } catch (error) {
-    console.error('[ReviewController: ingestSingleReview] Error:', error);
-    res.status(400).json({ success: false, message: error.message });
-  }
-};
-
-/**
- * POST /api/v1/reviews/batch-sync
- * Ingest batch reviews from third-party sync (Clutch, Google Places, Trustpilot)
- */
-exports.batchSyncReviews = async (req, res) => {
-  try {
-    const { reviews } = req.body;
-    if (!Array.isArray(reviews)) {
-      return res.status(400).json({ success: false, message: 'reviews must be an array of review objects.' });
+  } catch (err) {
+    if (err.code === 'CONFLICT') {
+      return res.status(409).json({ message: err.message });
     }
-
-    const result = await ingestBatchReviews(reviews);
-    res.json({ success: true, message: `Batch sync complete: ${result.ingested} ingested, ${result.skipped} skipped.`, data: result });
-  } catch (error) {
-    console.error('[ReviewController: batchSyncReviews] Error:', error);
-    res.status(500).json({ success: false, message: 'Failed to sync batch reviews.', error: error.message });
+    if (err.message && err.message.includes('Rating') || err.message.includes('provider')) {
+      return res.status(400).json({ message: err.message });
+    }
+    console.error('Error creating review:', err.message);
+    res.status(500).json({ message: 'Failed to create review.' });
   }
 };
 
 /**
- * PUT /api/v1/reviews/:id/draft-reply
- * Update or regenerate draft reply
+ * POST /api/v1/reviews/:id/respond
+ * Submits an official company reply to a review.
  */
-exports.updateDraftReply = async (req, res) => {
+const respondToReview = async (req, res) => {
   try {
     const { id } = req.params;
-    const { responseDraft, regenerate } = req.body;
+    const { responseText } = req.body;
 
-    const review = await prisma.review.findUnique({ where: { id } });
-    if (!review) {
-      return res.status(404).json({ success: false, message: 'Review not found.' });
+    if (!responseText || typeof responseText !== 'string' || !responseText.trim()) {
+      return res.status(400).json({ message: 'Response text is required and cannot be empty.' });
     }
 
-    let updatedDraft = responseDraft;
-    if (regenerate) {
-      updatedDraft = generateReplyDraft({
-        authorName: review.authorName,
-        rating: review.rating,
-        sentiment: review.sentiment,
-        source: review.source
+    const updated = await reviewService.respondToReview(id, responseText, req.user?.id);
+    res.json({
+      message: 'Response posted successfully.',
+      review: updated
+    });
+  } catch (err) {
+    if (err.code === 'NOT_FOUND') {
+      return res.status(404).json({ message: err.message });
+    }
+    console.error('Error responding to review:', err.message);
+    res.status(500).json({ message: 'Failed to post review response.' });
+  }
+};
+
+/**
+ * PATCH /api/v1/reviews/:id/status
+ * Moderates review visibility (PUBLISHED, HIDDEN, FLAGGED).
+ */
+const updateReviewStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    if (!status || !['PUBLISHED', 'HIDDEN', 'FLAGGED'].includes(status)) {
+      return res.status(400).json({ message: 'Status must be one of: PUBLISHED, HIDDEN, FLAGGED' });
+    }
+
+    const updated = await reviewService.updateReviewStatus(id, status);
+    res.json({
+      message: `Review status updated to ${status}.`,
+      review: updated
+    });
+  } catch (err) {
+    if (err.code === 'NOT_FOUND') {
+      return res.status(404).json({ message: err.message });
+    }
+    console.error('Error updating review status:', err.message);
+    res.status(500).json({ message: 'Failed to update review status.' });
+  }
+};
+
+/**
+ * GET /api/v1/reviews/providers
+ * Returns all provider connection statuses (secrets masked).
+ */
+const getProviderStatuses = async (req, res) => {
+  try {
+    const statuses = await reviewService.getProviderStatuses();
+    res.json(statuses);
+  } catch (err) {
+    console.error('Error fetching provider statuses:', err.message);
+    res.status(500).json({ message: 'Failed to retrieve provider connection statuses.' });
+  }
+};
+
+/**
+ * POST /api/v1/reviews/providers/:provider/sync
+ * Triggers a synchronization attempt for a given provider.
+ */
+const syncProviderReviews = async (req, res) => {
+  try {
+    const provider = req.params.provider?.toUpperCase();
+    const adapter = reviewService.providerAdapters[provider];
+
+    if (!adapter) {
+      return res.status(400).json({ message: `Unknown provider: ${provider}` });
+    }
+
+    // Clutch is manual only
+    if (provider === 'CLUTCH') {
+      return res.status(200).json({
+        provider,
+        status: 'MANUAL_ONLY',
+        message: 'Clutch REST API is restricted to Enterprise partners. Please import reviews via CSV or manual entry.'
       });
     }
 
-    const updated = await prisma.review.update({
-      where: { id },
-      data: { responseDraft: updatedDraft }
+    const syncResult = await adapter.syncReviews();
+    res.json({
+      provider,
+      ...syncResult
     });
-
-    res.json({ success: true, message: 'Draft reply updated.', data: updated });
-  } catch (error) {
-    console.error('[ReviewController: updateDraftReply] Error:', error);
-    res.status(500).json({ success: false, message: 'Failed to update draft reply.', error: error.message });
+  } catch (err) {
+    console.error('Error syncing provider reviews:', err.message);
+    res.status(500).json({ message: 'Failed to synchronize provider reviews.' });
   }
 };
 
 /**
- * POST /api/v1/reviews/:id/publish-reply
- * Authorize and publish reply
+ * POST /api/v1/reviews/providers/:provider/config
+ * Sets encrypted API credentials for a review provider (SuperAdmin only).
  */
-exports.publishReply = async (req, res) => {
+const updateProviderConfig = async (req, res) => {
   try {
-    const { id } = req.params;
-    const { publishedResponse } = req.body;
-    const userId = req.user?.id;
-
-    const review = await prisma.review.findUnique({ where: { id } });
-    if (!review) {
-      return res.status(404).json({ success: false, message: 'Review not found.' });
+    const provider = req.params.provider?.toUpperCase();
+    if (!['GOOGLE', 'META', 'CLUTCH', 'TRUSTPILOT'].includes(provider)) {
+      return res.status(400).json({ message: 'Invalid provider name.' });
     }
 
-    const finalResponse = publishedResponse || review.responseDraft;
-    if (!finalResponse || !finalResponse.trim()) {
-      return res.status(400).json({ success: false, message: 'Reply content cannot be empty.' });
-    }
-
-    const updated = await prisma.review.update({
-      where: { id },
-      data: {
-        publishedResponse: finalResponse,
-        status: 'REPLIED',
-        respondedAt: new Date(),
-        respondedById: userId || null
-      },
-      include: {
-        respondedBy: { select: { id: true, fullName: true, email: true } }
-      }
+    const result = await reviewService.updateProviderConfig(provider, req.body);
+    res.json({
+      message: `${provider} provider configuration updated successfully.`,
+      config: result
     });
-
-    console.log(`[ReviewController] Published authorized reply to review #${id} (${review.source})`);
-    res.json({ success: true, message: 'Reply successfully published and logged.', data: updated });
-  } catch (error) {
-    console.error('[ReviewController: publishReply] Error:', error);
-    res.status(500).json({ success: false, message: 'Failed to publish review reply.', error: error.message });
+  } catch (err) {
+    console.error('Error updating provider configuration:', err.message);
+    res.status(500).json({ message: 'Failed to update provider configuration: ' + err.message });
   }
 };
 
-/**
- * DELETE /api/v1/reviews/:id
- * Delete a review (Admin / Super Admin only)
- */
-exports.deleteReview = async (req, res) => {
-  try {
-    const { id } = req.params;
-    await prisma.review.delete({ where: { id } });
-    res.json({ success: true, message: 'Review deleted successfully.' });
-  } catch (error) {
-    console.error('[ReviewController: deleteReview] Error:', error);
-    res.status(500).json({ success: false, message: 'Failed to delete review.', error: error.message });
-  }
+module.exports = {
+  getReviews,
+  getReviewStats,
+  createReview,
+  respondToReview,
+  updateReviewStatus,
+  getProviderStatuses,
+  syncProviderReviews,
+  updateProviderConfig
 };
+

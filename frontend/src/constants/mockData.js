@@ -1,19 +1,33 @@
 export const SERVICES = [
-  { id: 'visa', name: 'Spain Visa & Residency Services', category: 'Residency', basePrice: 2000 },
-  { id: 'property', name: 'Property Investment Guidance Service', category: 'Investment', basePrice: 3000 },
-  { id: 'sworn_translation', name: 'Spanish Sworn Translation Service', category: 'Translation', basePrice: 150 },
-  { id: 'dnv', name: 'Digital Nomad Visa (DNV)', category: 'Residency', basePrice: 2000 },
-  { id: 'nlv', name: 'Non-Lucrative Visa (NLV)', category: 'Residency', basePrice: 1800 },
-  { id: 'self_employed', name: 'Self-Employed / Business Residency', category: 'Residency', basePrice: 2500 },
-  { id: 'study', name: 'Study Visa', category: 'Study', basePrice: 1200 },
-  { id: 'family', name: 'Partner & Family Reunification', category: 'Residency', basePrice: 1500 },
-  { id: 'tourism', name: 'Tourism Visa & Schengen Guidance', category: 'Schengen', basePrice: 400 },
+  { id: 'web_dev', name: 'Web Development', category: 'Engineering', basePrice: 3000 },
+  { id: 'mobile_dev', name: 'Mobile App Development', category: 'Engineering', basePrice: 5000 },
+  { id: 'saas_dev', name: 'SaaS Development', category: 'Engineering', basePrice: 8000 },
+  { id: 'ai_automation', name: 'AI & Workflow Automation', category: 'AI / ML', basePrice: 2500 },
+  { id: 'crm_erp', name: 'CRM / ERP Development', category: 'Enterprise', basePrice: 6000 },
+  { id: 'ui_ux', name: 'UI/UX Design', category: 'Design', basePrice: 1500 },
+  { id: 'api_integration', name: 'API Integration', category: 'Engineering', basePrice: 2000 },
+  { id: 'maintenance', name: 'Maintenance & Support', category: 'Support', basePrice: 1000 },
+  // Backward compatibility mappings for legacy seeded data
+  { id: 'visa', name: 'Custom Software Development', category: 'Engineering', basePrice: 2000 },
+  { id: 'property', name: 'Cloud Infrastructure', category: 'Enterprise', basePrice: 3000 },
+  { id: 'sworn_translation', name: 'Technical Documentation', category: 'Support', basePrice: 150 },
+  { id: 'dnv', name: 'Full-Stack Web App', category: 'Engineering', basePrice: 2000 },
+  { id: 'nlv', name: 'Mobile Application', category: 'Engineering', basePrice: 1800 },
+  { id: 'self_employed', name: 'SaaS Product MVP', category: 'Engineering', basePrice: 2500 },
+  { id: 'study', name: 'AI Chatbot Solution', category: 'AI / ML', basePrice: 1200 },
+  { id: 'family', name: 'Internal Business Portal', category: 'Enterprise', basePrice: 1500 },
+  { id: 'tourism', name: 'API Integration Connector', category: 'Engineering', basePrice: 400 },
 ];
 
 export const MAIN_SERVICES = [
-  { id: 'visa', name: 'Spain Visa & Residency Services' },
-  { id: 'property', name: 'Property Investment Guidance Service' },
-  { id: 'sworn_translation', name: 'Spanish Sworn Translation Service' }
+  { id: 'web_dev', name: 'Web Development' },
+  { id: 'mobile_dev', name: 'Mobile App Development' },
+  { id: 'saas_dev', name: 'SaaS Development' },
+  { id: 'ai_automation', name: 'AI & Workflow Automation' },
+  { id: 'crm_erp', name: 'CRM / ERP Development' },
+  { id: 'ui_ux', name: 'UI/UX Design' },
+  { id: 'api_integration', name: 'API Integration' },
+  { id: 'maintenance', name: 'Maintenance & Support' },
 ];
 
 export const matchesServiceCategory = (item, targetServiceId) => {

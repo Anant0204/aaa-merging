@@ -2,8 +2,12 @@ const prisma = require('../config/db');
 
 const getLeads = async (req, res) => {
   try {
+    const isConsultant = req.user && (req.user.role === 'consultant' || req.user.role === 'agent');
+    const whereClause = isConsultant ? { assignedToId: req.user.id } : {};
+
     // 1. Fetch lightweight sorted lead IDs (sorts only UUIDs to prevent MySQL sort_buffer_size overflow code 1038)
     const leadIds = await prisma.lead.findMany({
+      where: whereClause,
       select: { id: true },
       orderBy: { createdAt: 'desc' }
     });
@@ -389,6 +393,9 @@ const createLead = async (req, res) => {
 
 const assignLead = async (req, res) => {
   try {
+    if (req.user && (req.user.role === 'consultant' || req.user.role === 'agent')) {
+      return res.status(403).json({ message: 'Access denied. Only administrators and operations managers can assign leads.' });
+    }
     const { leadId, agentId } = req.body;
     const lead = await prisma.lead.update({
       where: { id: leadId },
@@ -430,6 +437,21 @@ const assignLead = async (req, res) => {
 const updateLeadStatus = async (req, res) => {
   try {
     const { leadId, status } = req.body;
+    if (!leadId) {
+      return res.status(400).json({ message: 'leadId is required' });
+    }
+    const existingLead = await prisma.lead.findUnique({
+      where: { id: leadId },
+      select: { id: true, assignedToId: true }
+    });
+    if (!existingLead) {
+      return res.status(404).json({ message: 'Lead not found' });
+    }
+    if (req.user && (req.user.role === 'consultant' || req.user.role === 'agent')) {
+      if (existingLead.assignedToId !== req.user.id) {
+        return res.status(403).json({ message: 'Access denied. You can only update status for your assigned leads.' });
+      }
+    }
     const lead = await prisma.lead.update({
       where: { id: leadId },
       data: { status },
@@ -610,6 +632,12 @@ const getLeadById = async (req, res) => {
       return res.status(404).json({ message: 'Lead not found' });
     }
 
+    if (req.user && (req.user.role === 'consultant' || req.user.role === 'agent')) {
+      if (lead.assignedToId !== req.user.id) {
+        return res.status(403).json({ message: 'Access denied. You can only view your assigned leads.' });
+      }
+    }
+
     const autoCode = lead.client?.clientCode || `CID-12001`;
     const mapped = {
       ...lead,
@@ -631,6 +659,17 @@ const getLeadById = async (req, res) => {
 const updateLead = async (req, res) => {
   try {
     const { id } = req.params;
+    const existingLead = await prisma.lead.findUnique({
+      where: { id },
+      select: { id: true, assignedToId: true }
+    });
+    if (!existingLead) {
+      return res.status(404).json({ message: 'Lead not found' });
+    }
+    const isConsultant = req.user && (req.user.role === 'consultant' || req.user.role === 'agent');
+    if (isConsultant && existingLead.assignedToId !== req.user.id) {
+      return res.status(403).json({ message: 'Access denied. You can only update your assigned leads.' });
+    }
     const { 
       firstName, 
       lastName, 
@@ -672,8 +711,8 @@ const updateLead = async (req, res) => {
         notes,
         timeline,
         qualificationData,
-        assignedToId: assignedConsultantId,
-        ...(assignedConsultantId ? { assignedAt: new Date() } : {}),
+        assignedToId: isConsultant ? existingLead.assignedToId : assignedConsultantId,
+        ...((!isConsultant && assignedConsultantId) ? { assignedAt: new Date() } : {}),
         nextFollowUpDate: nextFollowUpDate !== undefined ? (nextFollowUpDate ? new Date(nextFollowUpDate) : null) : undefined,
         preferableArea: preferableArea !== undefined ? preferableArea : undefined,
         budget: budget !== undefined ? budget : undefined,

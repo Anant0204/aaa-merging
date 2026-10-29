@@ -64,8 +64,6 @@ const AVAILABLE_MENUS = [
   'Dashboard',
   'Agents',
   'Active Cases',
-  'Doc Verification',
-  'Finance',
   'Closed Cases',
   'Clients',
   'Leads',
@@ -93,15 +91,15 @@ const AVAILABLE_CARDS = [
 
 const ROLE_DEFAULTS = {
   admin: {
-    menus: ['Dashboard', 'Agents', 'Active Cases', 'Doc Verification', 'Finance', 'Closed Cases', 'Clients', 'Leads', 'Social Inbox', 'Marketing', 'Calendar', 'All Agents Performance', 'Integrations'],
-    cards: ['Total Clients', 'Today\'s Clients', 'Total Consultations', 'Today\'s Consultations', 'Pending Payments', 'Total Revenue', 'Active Cases', 'Completed Cases', 'Lost Consultations', 'Revenue Today', 'Outstanding Revenue', 'Refunded (Guarantee Claims)']
+    menus: ['Dashboard', 'Agents', 'Active Cases', 'Doc Verification', 'Finance', 'Closed Cases', 'Clients', 'Leads', 'Social Inbox', 'Marketing', 'Reviews', 'Calendar', 'All Agents Performance', 'Integrations'],
+    cards: ['Total Clients', 'Today\'s Clients', 'Total Consultations', 'Today\'s Consultations', 'Upcoming Meetings', 'Pending Payments', 'Total Revenue', 'Active Cases', 'Completed Cases', 'Lost Consultations', 'Revenue Today', 'Outstanding Revenue', 'Refunded (Guarantee Claims)']
   },
   operations: {
-    menus: ['Dashboard', 'Agents', 'Active Cases', 'Doc Verification', 'Closed Cases', 'Clients', 'Leads', 'Social Inbox', 'Marketing', 'Calendar', 'All Agents Performance'],
-    cards: ['Total Clients', 'Today\'s Clients', 'Total Consultations', 'Today\'s Consultations', 'Active Cases', 'Completed Cases']
+    menus: ['Dashboard', 'Agents', 'Active Cases', 'Doc Verification', 'Closed Cases', 'Clients', 'Leads', 'Social Inbox', 'Marketing', 'Reviews', 'Calendar', 'All Agents Performance'],
+    cards: ['Total Clients', 'Today\'s Clients', 'Total Consultations', 'Today\'s Consultations', 'Upcoming Meetings', 'Active Cases', 'Completed Cases']
   },
   finance: {
-    menus: ['Dashboard', 'Finance'],
+    menus: ['Dashboard'],
     cards: ['Total Revenue', 'Pending Payments']
   },
   consultant: {

@@ -61,6 +61,10 @@ const getConsultations = async (req, res) => {
           ...(lead ? [{ leadId: lead.id }] : [])
         ]
       };
+    } else if (req.user && (req.user.role === 'consultant' || req.user.role === 'agent')) {
+      whereClause = {
+        consultantId: req.user.id
+      };
     }
 
     const consultations = await prisma.consultation.findMany({
@@ -390,6 +394,12 @@ const updateOutcome = async (req, res) => {
       return res.status(404).json({ message: 'Consultation not found' });
     }
 
+    if (req.user && (req.user.role === 'consultant' || req.user.role === 'agent')) {
+      if (existingConsultation.consultantId && existingConsultation.consultantId !== req.user.id) {
+        return res.status(403).json({ message: 'Access denied. You can only update outcomes for your assigned consultations.' });
+      }
+    }
+
     status = status || existingConsultation.status || 'Scheduled';
 
     internalNotes = internalNotes || notes || (typeof outcome === 'object' && outcome !== null ? outcome?.notes : '') || '';
@@ -632,7 +642,13 @@ const respondToConsultation = async (req, res) => {
       return res.status(404).json({ message: 'Consultation not found.' });
     }
 
-    let meetingLink = null;
+    if (req.user && (req.user.role === 'consultant' || req.user.role === 'agent')) {
+      if (existingConsultation.consultantId && existingConsultation.consultantId !== req.user.id) {
+        return res.status(403).json({ message: 'Access denied. You can only respond to your assigned consultations.' });
+      }
+    }
+
+    let meetingLink = existingConsultation.meetingLink || null;
 
     const consultation = await prisma.consultation.update({
       where: { id },

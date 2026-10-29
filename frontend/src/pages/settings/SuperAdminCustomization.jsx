@@ -73,9 +73,6 @@ const AVAILABLE_MENUS = [
   'Dashboard',
   'Agents',
   'Active Cases',
-  'Doc Verification',
-  'Finance',
-  'Refunds & Commissions',
   'Closed Cases',
   'Clients',
   'Leads',
@@ -83,7 +80,8 @@ const AVAILABLE_MENUS = [
   'Marketing',
   'Calendar',
   'All Agents Performance',
-  'Integrations'
+  'Integrations',
+  'Reviews'
 ];
 
 const AVAILABLE_CARDS = [
@@ -168,7 +166,7 @@ const DEFAULT_COLUMNS = {
 
 const DEFAULT_CUSTOMIZATION = {
   admin: {
-    menus: ['Dashboard', 'Agents', 'Active Cases', 'Doc Verification', 'Finance', 'Refunds & Commissions', 'Closed Cases', 'Clients', 'Leads', 'Social Inbox', 'Marketing', 'Calendar', 'Customization', 'General Settings'],
+    menus: ['Dashboard', 'Agents', 'Active Cases', 'Closed Cases', 'Clients', 'Leads', 'Social Inbox', 'Marketing', 'Calendar', 'Customization', 'General Settings'],
     cards: ['Total Consultations', 'Today\'s Consultations', 'Pending Payments', 'Revenue Closed'],
     viewOnlyMenus: [],
     features: ['canEditTranslationRates', 'canManagePaymentSettings'],
@@ -176,7 +174,7 @@ const DEFAULT_CUSTOMIZATION = {
     columns: JSON.parse(JSON.stringify(DEFAULT_COLUMNS))
   },
   operations: {
-    menus: ['Dashboard', 'Active Cases', 'Doc Verification', 'Closed Cases', 'Clients', 'Calendar', 'General Settings'],
+    menus: ['Dashboard', 'Active Cases', 'Closed Cases', 'Clients', 'Calendar', 'General Settings'],
     cards: ['Active Cases', 'Closed Cases'],
     viewOnlyMenus: [],
     features: [],
@@ -184,7 +182,7 @@ const DEFAULT_CUSTOMIZATION = {
     columns: JSON.parse(JSON.stringify(DEFAULT_COLUMNS))
   },
   finance: {
-    menus: ['Dashboard', 'Finance', 'Refunds & Commissions', 'General Settings'],
+    menus: ['Dashboard', 'General Settings'],
     cards: ['Pending Payments', 'Revenue Closed'],
     viewOnlyMenus: [],
     features: [],
@@ -257,13 +255,13 @@ export const SuperAdminCustomization = () => {
   // Local state for modified customization
   const [localSettings, setLocalSettings] = useState(null);
 
-  const dynamicRoles = localSettings?.rolesDefinition || customizationSettings?.rolesDefinition || [
+  const dynamicRoles = (localSettings?.rolesDefinition || customizationSettings?.rolesDefinition || [
     { id: 'admin', label: 'Admin (General Manager)' },
     { id: 'operations', label: 'Operations Admin' },
     { id: 'finance', label: 'Finance Officer' },
     { id: 'consultant', label: 'Consultant / Visa Agent' },
     { id: 'marketing', label: 'Marketing Executive' }
-  ];
+  ]).filter(r => r.id !== 'finance');
 
   // Top level tabs: 0 = Role Permissions, 1 = Stage Manager, 2 = Visa Document Checklists
   const [topTab, setTopTab] = useState(0);
@@ -951,7 +949,7 @@ export const SuperAdminCustomization = () => {
     );
   }
 
-  const roleMenus = localSettings[currentTargetKey]?.menus || [];
+  const roleMenus = (localSettings[currentTargetKey]?.menus || []).filter(m => !['Doc Verification', 'Finance', 'Refunds & Commissions'].includes(m));
   const roleCards = localSettings[currentTargetKey]?.cards || [];
   const roleFeatures = localSettings[currentTargetKey]?.features || [];
   const roleActions = localSettings[currentTargetKey]?.actions || JSON.parse(JSON.stringify(DEFAULT_ACTIONS));
@@ -1196,138 +1194,6 @@ export const SuperAdminCustomization = () => {
                   />
                 }
                 label={<Typography sx={{ fontSize: '0.8rem', fontWeight: 600 }}>Assign Host</Typography>}
-              />
-            </Box>
-            {renderMenuActionButtons()}
-          </Box>
-        );
-
-      case 'Finance':
-        return (
-          <Box sx={{ mt: 1, p: 1.5, borderRadius: 1.5, bgcolor: 'action.hover', border: '1px solid', borderColor: 'divider' }}>
-            <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.secondary', display: 'block', mb: 0.5 }}>
-              💳 Finance Action Permissions
-            </Typography>
-            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5 }}>
-              <FormControlLabel
-                control={
-                  <Switch
-                    size="small"
-                    checked={roleActions.finance?.canGeneratePaymentLink !== false}
-                    onChange={() => handleToggleAction('finance', 'canGeneratePaymentLink')}
-                  />
-                }
-                label={<Typography sx={{ fontSize: '0.8rem', fontWeight: 600 }}>Invoicing / Links</Typography>}
-              />
-              <FormControlLabel
-                control={
-                  <Switch
-                    size="small"
-                    checked={roleActions.finance?.canUpdatePaymentStatus !== false}
-                    onChange={() => handleToggleAction('finance', 'canUpdatePaymentStatus')}
-                  />
-                }
-                label={<Typography sx={{ fontSize: '0.8rem', fontWeight: 600 }}>Mark Paid</Typography>}
-              />
-            </Box>
-            {renderMenuActionButtons()}
-          </Box>
-        );
-
-      case 'Refunds & Commissions':
-        return (
-          <Box sx={{ mt: 1, p: 1.5, borderRadius: 1.5, bgcolor: '#FAF6ED', border: '1px solid rgba(197, 155, 39, 0.4)' }}>
-            <Typography variant="caption" sx={{ fontWeight: 800, color: '#A37E1C', display: 'block', mb: 1 }}>
-              🛡️ Master Financial & Refund Guarantee Rules
-            </Typography>
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-              <TextField
-                size="small"
-                type="number"
-                label="Visa Rejection Auto-Refund Rate (%)"
-                value={localSettings.refundGuaranteePercentage ?? 100}
-                onChange={(e) => setLocalSettings(prev => ({ ...prev, refundGuaranteePercentage: Number(e.target.value) }))}
-                inputProps={{ min: 0, max: 100 }}
-                sx={{ bgcolor: 'white', borderRadius: 1, maxWidth: 280 }}
-              />
-              <FormControlLabel
-                control={
-                  <Switch
-                    size="small"
-                    checked={localSettings.lockClientRefundTab !== false}
-                    onChange={(e) => setLocalSettings(prev => ({ ...prev, lockClientRefundTab: e.target.checked }))}
-                    color="warning"
-                  />
-                }
-                label={<Typography sx={{ fontSize: '0.8rem', fontWeight: 600 }}>Lock Client Portal Refund Tab Until Paid</Typography>}
-              />
-              <Divider sx={{ my: 0.5 }} />
-              <FormControlLabel
-                control={
-                  <Switch
-                    size="small"
-                    checked={roleActions?.refunds?.canProcessStripeRefund !== false}
-                    onChange={() => handleToggleAction('refunds', 'canProcessStripeRefund')}
-                  />
-                }
-                label={<Typography sx={{ fontSize: '0.8rem', fontWeight: 600 }}>Enable 1-Click Stripe Auto-Pay</Typography>}
-              />
-              <FormControlLabel
-                control={
-                  <Switch
-                    size="small"
-                    checked={roleActions?.refunds?.canProcessBankPayout !== false}
-                    onChange={() => handleToggleAction('refunds', 'canProcessBankPayout')}
-                  />
-                }
-                label={<Typography sx={{ fontSize: '0.8rem', fontWeight: 600 }}>Enable Manual Bank Wire Payout Form</Typography>}
-              />
-              <FormControlLabel
-                control={
-                  <Switch
-                    size="small"
-                    checked={roleActions?.refunds?.requireDoubleConfirmation !== false}
-                    onChange={() => handleToggleAction('refunds', 'requireDoubleConfirmation')}
-                  />
-                }
-                label={<Typography sx={{ fontSize: '0.8rem', fontWeight: 600 }}>Require Security Double Confirmation Dialog</Typography>}
-              />
-
-              <Divider sx={{ my: 1 }} />
-
-              <Typography variant="caption" sx={{ fontWeight: 800, color: '#A37E1C', display: 'block', mb: 0.5 }}>
-                💼 Agent Commission Management Rules
-              </Typography>
-              <TextField
-                size="small"
-                type="number"
-                label="Default Agent Commission Rate (%)"
-                value={localSettings.defaultCommissionRate ?? 10}
-                onChange={(e) => setLocalSettings(prev => ({ ...prev, defaultCommissionRate: Number(e.target.value) }))}
-                inputProps={{ min: 0, max: 100 }}
-                sx={{ bgcolor: 'white', borderRadius: 1, maxWidth: 280 }}
-              />
-              <FormControlLabel
-                control={
-                  <Switch
-                    size="small"
-                    checked={roleActions?.commissions?.canEditCommissionRates !== false}
-                    onChange={() => handleToggleAction('commissions', 'canEditCommissionRates')}
-                    color="primary"
-                  />
-                }
-                label={<Typography sx={{ fontSize: '0.8rem', fontWeight: 600 }}>Allow Editing Agent Commission Percentages</Typography>}
-              />
-              <FormControlLabel
-                control={
-                  <Switch
-                    size="small"
-                    checked={roleActions?.commissions?.canGeneratePayoutReports !== false}
-                    onChange={() => handleToggleAction('commissions', 'canGeneratePayoutReports')}
-                    color="primary"
-                  />
-                }
-                label={<Typography sx={{ fontSize: '0.8rem', fontWeight: 600 }}>Allow Generating Monthly Payout & Commission Reports</Typography>}
               />
             </Box>
             {renderMenuActionButtons()}
@@ -1615,7 +1481,7 @@ export const SuperAdminCustomization = () => {
                   <Box className="col-span-12 md:col-span-6 flex flex-col gap-2">
                     {AVAILABLE_MENUS.filter((_, idx) => idx % 2 === 0).map((menu) => {
                       const isExpanded = !!expandedMenus[menu];
-                      const hasSubsettings = ['Dashboard', 'Leads', 'Clients', 'Calendar', 'Finance', 'Refunds & Commissions', 'Marketing', 'Agents'].includes(menu);
+                      const hasSubsettings = ['Dashboard', 'Leads', 'Clients', 'Calendar', 'Marketing', 'Agents'].includes(menu);
 
                       return (
                         <Box
@@ -1685,7 +1551,7 @@ export const SuperAdminCustomization = () => {
                   <Box className="col-span-12 md:col-span-6 flex flex-col gap-2">
                     {AVAILABLE_MENUS.filter((_, idx) => idx % 2 === 1).map((menu) => {
                       const isExpanded = !!expandedMenus[menu];
-                      const hasSubsettings = ['Dashboard', 'Leads', 'Clients', 'Calendar', 'Finance', 'Refunds & Commissions', 'Marketing', 'Agents'].includes(menu);
+                      const hasSubsettings = ['Dashboard', 'Leads', 'Clients', 'Calendar', 'Marketing', 'Agents'].includes(menu);
 
                       return (
                         <Box

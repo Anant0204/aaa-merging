@@ -177,33 +177,19 @@ const updateCustomizationSettings = async (req, res) => {
 
 let CURRENT_LEAD_STAGES = [
   { id: 'stage_new_lead', name: 'New Lead', type: 'lead', color: '#2196F3', emoji: '🆕' },
-  { id: 'stage_payment_not_completed', name: 'Payment Not Completed', type: 'lead', color: '#FF9800', emoji: '⏳' },
+  { id: 'stage_contacted', name: 'Contacted', type: 'lead', color: '#00BCD4', emoji: '📞' },
+  { id: 'stage_discovery_scheduled', name: 'Discovery Scheduled', type: 'lead', color: '#3F51B5', emoji: '📅' },
+  { id: 'stage_proposal_sent', name: 'Proposal Sent', type: 'lead', color: '#9C27B0', emoji: '📑' },
+  { id: 'stage_negotiation', name: 'Negotiation', type: 'lead', color: '#FF9800', emoji: '🤝' },
+  { id: 'stage_won', name: 'Won', type: 'client', color: '#4CAF50', emoji: '🏆' },
+  { id: 'stage_lost', name: 'Lost', type: 'lead', color: '#F44336', emoji: '❌' },
+  // Secondary compatibility stages for existing records
   { id: 'stage_meeting_scheduled', name: 'Meeting Scheduled', type: 'lead', color: '#3F51B5', emoji: '📅' },
   { id: 'stage_meeting_completed', name: 'Meeting Completed', type: 'lead', color: '#4CAF50', emoji: '✅' },
-  { id: 'stage_meeting_cancelled', name: 'Meeting Cancelled', type: 'lead', color: '#F44336', emoji: '❌' },
   { id: 'stage_hot_lead', name: 'Hot Lead', type: 'lead', color: '#FF9800', emoji: '🔥' },
   { id: 'stage_processing', name: 'Processing', type: 'lead', color: '#3F51B5', emoji: '⚙️' },
-  { id: 'stage_under_consultation', name: 'Under Consultation', type: 'lead', color: '#9C27B0', emoji: '📅' },
-  { id: 'stage_waiting_payment', name: 'Waiting for Payment', type: 'client', color: '#FF5722', emoji: '💳' },
-  { id: 'stage_documents_pending', name: 'Documents Pending', type: 'client', color: '#E91E63', emoji: '📎' },
-  { id: 'stage_under_process', name: 'Under Process', type: 'client', color: '#03A9F4', emoji: '📂' },
-  { id: 'stage_visa_refused', name: 'Visa Refused', type: 'client', color: '#F44336', emoji: '🚫' },
-  { id: 'stage_resubmission_in_progress', name: 'Resubmission in Progress', type: 'client', color: '#FF9800', emoji: '🔄' },
-  { id: 'stage_ready_for_resubmission', name: 'Ready for Resubmission', type: 'client', color: '#00BCD4', emoji: '📋' },
-  { id: 'stage_resubmitted', name: 'Resubmitted', type: 'client', color: '#673AB7', emoji: '📤' },
-  { id: 'stage_appeal_in_progress', name: 'Appeal in Progress', type: 'client', color: '#9C27B0', emoji: '⚖️' },
-  { id: 'stage_appeal_approved', name: 'Appeal Approved', type: 'client', color: '#4CAF50', emoji: '🎉' },
-  { id: 'stage_appeal_refused', name: 'Appeal Refused', type: 'client', color: '#F44336', emoji: '💔' },
-  { id: 'stage_refund_eligible', name: 'Refund Eligible', type: 'client', color: '#FF9800', emoji: '💵' },
-  { id: 'stage_refund_under_review', name: 'Refund Under Review', type: 'client', color: '#FFC107', emoji: '🔍' },
-  { id: 'stage_refund_approved', name: 'Refund Approved', type: 'client', color: '#8BC34A', emoji: '👍' },
-  { id: 'stage_refund_completed', name: 'Refund Completed', type: 'client', color: '#4CAF50', emoji: '💰' },
-  { id: 'stage_refund_rejected', name: 'Refund Rejected', type: 'client', color: '#F44336', emoji: '🙅' },
   { id: 'stage_completed', name: 'Completed', type: 'client', color: '#4CAF50', emoji: '✅' },
-  { id: 'stage_case_closed', name: 'Case Closed', type: 'client', color: '#607D8B', emoji: '🔒' },
-  { id: 'stage_closed', name: 'Closed', type: 'client', color: '#9E9E9E', emoji: '🔒' },
-  { id: 'stage_cold_lead', name: 'Cold Lead', type: 'lead', color: '#009688', emoji: '❄️' },
-  { id: 'stage_lost_lead', name: 'Lost Lead', type: 'lead', color: '#F44336', emoji: '❌' }
+  { id: 'stage_cold_lead', name: 'Cold Lead', type: 'lead', color: '#009688', emoji: '❄️' }
 ];
 
 const getLeadStages = async (req, res) => {
@@ -347,12 +333,26 @@ const saveIntegrations = async (req, res) => {
   }
 };
 
+const DEFAULT_IT_SERVICES = [
+  { id: 'srv_web_dev', name: 'Web Development', category: 'Engineering', basePrice: 3000, active: true },
+  { id: 'srv_mobile_dev', name: 'Mobile App Development', category: 'Engineering', basePrice: 5000, active: true },
+  { id: 'srv_saas_dev', name: 'SaaS Development', category: 'Engineering', basePrice: 8000, active: true },
+  { id: 'srv_ai_automation', name: 'AI & Workflow Automation', category: 'AI / ML', basePrice: 2500, active: true },
+  { id: 'srv_crm_erp', name: 'CRM / ERP Development', category: 'Enterprise', basePrice: 6000, active: true },
+  { id: 'srv_ui_ux', name: 'UI/UX Design', category: 'Design', basePrice: 1500, active: true },
+  { id: 'srv_api_integration', name: 'API Integration', category: 'Engineering', basePrice: 2000, active: true },
+  { id: 'srv_maintenance', name: 'Maintenance & Support', category: 'Support', basePrice: 1000, active: true }
+];
+
 const getVisaServices = async (req, res) => {
   try {
     const services = await prisma.visaService.findMany();
-    res.json(services);
+    if (services && services.length > 0) {
+      return res.json(services);
+    }
+    res.json(DEFAULT_IT_SERVICES);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.json(DEFAULT_IT_SERVICES);
   }
 };
 
