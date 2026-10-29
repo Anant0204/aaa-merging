@@ -35,6 +35,9 @@ exports.getDashboardMetrics = async (req, res) => {
         completedAt: true,
         createdAt: true
       }
+    }).catch(err => {
+      console.warn('[Dashboard] Project table not migrated or unavailable:', err.message);
+      return [];
     });
 
     const projectCounts = {
@@ -70,7 +73,7 @@ exports.getDashboardMetrics = async (req, res) => {
     const tasks = await prisma.projectTask.findMany({
       where: taskWhere,
       select: { id: true, status: true, priority: true, actualHours: true, estimatedHours: true }
-    });
+    }).catch(() => []);
 
     const taskCounts = {
       total: tasks.length,
@@ -88,7 +91,7 @@ exports.getDashboardMetrics = async (req, res) => {
     const timeLogs = await prisma.projectTimeLog.findMany({
       where: timeLogWhere,
       select: { hours: true, workDate: true }
-    });
+    }).catch(() => []);
 
     const now = new Date();
     const startOfWeek = new Date(now);
@@ -157,7 +160,7 @@ exports.getDashboardMetrics = async (req, res) => {
 
     const payments = await prisma.payment.findMany({
       select: { amount: true, totalPaid: true, status: true }
-    });
+    }).catch(() => []);
 
     let totalRevenuePaid = 0;
     let totalPendingInvoices = 0;
@@ -172,7 +175,7 @@ exports.getDashboardMetrics = async (req, res) => {
     // 6. REPUTATION & REVIEWS
     const reviews = await prisma.review.findMany({
       select: { rating: true, sentiment: true, provider: true }
-    });
+    }).catch(() => []);
 
     const reviewStats = {
       total: reviews.length,
@@ -229,7 +232,7 @@ exports.getRecentActivity = async (req, res) => {
       take: 5,
       orderBy: { updatedAt: 'desc' },
       select: { id: true, name: true, projectCode: true, status: true, updatedAt: true }
-    });
+    }).catch(() => []);
 
     const recentTimeLogs = await prisma.projectTimeLog.findMany({
       take: 5,
@@ -238,13 +241,13 @@ exports.getRecentActivity = async (req, res) => {
         user: { select: { fullName: true } },
         project: { select: { name: true, projectCode: true } }
       }
-    });
+    }).catch(() => []);
 
     const recentReviews = await prisma.review.findMany({
       take: 5,
       orderBy: { createdAt: 'desc' },
       select: { id: true, provider: true, authorName: true, rating: true, sentiment: true, createdAt: true }
-    });
+    }).catch(() => []);
 
     res.json({
       success: true,
