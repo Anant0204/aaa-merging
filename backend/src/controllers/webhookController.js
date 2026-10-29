@@ -301,7 +301,90 @@ exports.handleMetaWebhook = async (req, res) => {
         const val = chg.value;
         const field = chg.field;
         
-        if (field === 'feed' || field === 'comments' || field === 'comment') {
+        if (field === 'leadgen') {
+          const leadgenId = val.leadgen_id;
+          const formId = val.form_id;
+          const adId = val.ad_id;
+          const platform = payload.object === 'instagram' ? 'Instagram Lead Ads' : 'Facebook Lead Ads';
+
+          if (leadgenId && await isDuplicateMessage(leadgenId)) {
+            console.log(`[Meta Webhook] Leadgen event ${leadgenId} is duplicate. Ignoring.`);
+            continue;
+          }
+
+          console.log(`[Meta Webhook] Ingesting Lead Ad submission ${leadgenId} from ${platform} (Form: ${formId})`);
+
+          let leadName = 'Lead Ad Prospect';
+          let leadEmail = '';
+          let leadPhone = '';
+          let leadService = 'IT Consulting & Software Development';
+          let leadNotes = `Captured via ${platform} (Form ID: ${formId || 'N/A'}, Ad ID: ${adId || 'N/A'})`;
+
+          try {
+            const pageToken = process.env.META_PAGE_ACCESS_TOKEN;
+            if (pageToken && leadgenId) {
+              const graphRes = await axios.get(`https://graph.facebook.com/v19.0/${leadgenId}`, {
+                params: { access_token: pageToken }
+              });
+
+              if (graphRes.data?.field_data) {
+                for (const item of graphRes.data.field_data) {
+                  const fName = (item.name || '').toLowerCase();
+                  const fVal = item.values?.[0] || '';
+                  if (fName.includes('name')) leadName = fVal;
+                  else if (fName.includes('email')) leadEmail = fVal;
+                  else if (fName.includes('phone')) leadPhone = fVal;
+                  else if (fName.includes('service') || fName.includes('requirement')) leadService = fVal;
+                  else leadNotes += `\n${item.name}: ${fVal}`;
+                }
+              }
+            }
+          } catch (graphErr) {
+            console.warn('[Meta Leadgen Graph API Warning]:', graphErr.response?.data || graphErr.message);
+          }
+
+          const nameParts = (leadName || '').trim().split(' ');
+          const firstName = nameParts[0] || 'Valued';
+          const lastName = nameParts.slice(1).join(' ') || 'Prospect';
+
+          try {
+            const newLead = await prisma.lead.create({
+              data: {
+                firstName,
+                lastName,
+                email: leadEmail || `meta_lead_${leadgenId || Date.now()}@prospect.crm`,
+                phone: leadPhone || `+00${Date.now().toString().slice(-9)}`,
+                source: platform,
+                serviceType: leadService,
+                nationality: 'Not Specified',
+                countryOfResidence: 'International',
+                campaignId: adId || formId || null,
+                notes: leadNotes,
+                status: 'New Lead'
+              }
+            });
+
+            await prisma.communicationLog.create({
+              data: {
+                phone: newLead.phone,
+                name: `${firstName} ${lastName}`,
+                channel: payload.object === 'instagram' ? 'INSTAGRAM' : 'FACEBOOK',
+                direction: 'INBOUND',
+                content: `🎯 [${platform} Form Submission]: Service requested: "${leadService}". ${leadNotes}`,
+                messageId: leadgenId || `meta_lead_${Date.now()}`,
+                externalProviderId: formId || null,
+                deliveryStatus: 'DELIVERED'
+              }
+            });
+
+            const io = req.app.get('io');
+            if (io) {
+              io.to('role:admin').to('role:consultant').to('role:marketing').emit('new-lead', newLead);
+            }
+          } catch (dbErr) {
+            console.error('[Meta Leadgen DB Error]:', dbErr.message);
+          }
+        } else if (field === 'feed' || field === 'comments' || field === 'comment') {
           const commentText = val.message || val.text || '';
           const commentId = val.comment_id || val.id;
           const senderName = val.from?.name || 'Social User';

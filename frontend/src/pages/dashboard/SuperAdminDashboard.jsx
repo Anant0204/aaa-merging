@@ -388,13 +388,7 @@ export const SuperAdminDashboard = () => {
     return toUAEDateStr(dateVal) === yesterdayDateStr;
   });
 
-  // 5. Upcoming Meetings
-  const meetingsInRange = consultations.filter(c => (c.status === 'Scheduled' || c.status === 'Meeting Scheduled') && filterByDate(c.meetingDate || c.date, period.start, period.end));
-  const meetingsInPrevRange = period.prevStart ? consultations.filter(c => (c.status === 'Scheduled' || c.status === 'Meeting Scheduled') && filterByDate(c.meetingDate || c.date, period.prevStart, period.prevEnd)) : [];
 
-  // 5b. Completed Meetings
-  const completedMeetingsInRange = consultations.filter(c => (c.status === 'Completed' || c.status === 'Meeting Completed') && filterByDate(c.meetingDate || c.date, period.start, period.end));
-  const completedMeetingsInPrevRange = period.prevStart ? consultations.filter(c => (c.status === 'Completed' || c.status === 'Meeting Completed') && filterByDate(c.meetingDate || c.date, period.prevStart, period.prevEnd)) : [];
 
   // 6. Pending Payments
   const pendingPaymentsInRange = payments.filter(p => p.status === 'Pending' && filterByDate(getDateStr(p.billingDate || p.createdAt || p.dueDate), period.start, period.end));
@@ -462,24 +456,6 @@ export const SuperAdminDashboard = () => {
       trend: getTrend(leadsToday.length, leadsYesterday.length),
       trendLabel: 'vs yesterday',
       onClick: () => navigate('/super_admin/leads', { state: { filterToday: true, filterStatus: '', startDate: todayDateStr, endDate: todayDateStr, cardInfo: { title: "Today's Consultations", value: leadsToday.length, color: '#EC4899', trend: getTrend(leadsToday.length, leadsYesterday.length), iconType: 'CalendarToday' } } })
-    },
-    {
-      title: 'Upcoming Meetings',
-      value: meetingsInRange.length,
-      icon: <CalendarMonthIcon />,
-      color: '#2563EB',
-      trend: getTrend(meetingsInRange.length, meetingsInPrevRange.length),
-      trendLabel: period.trendLabel,
-      onClick: () => navigate('/super_admin/consultations', { state: { filterStatus: 'Scheduled', startDate: '', endDate: '', cardInfo: { title: 'Upcoming Meetings', value: meetingsInRange.length, color: '#2563EB', trend: getTrend(meetingsInRange.length, meetingsInPrevRange.length), iconType: 'CalendarMonth' } } })
-    },
-    {
-      title: 'Completed Meetings',
-      value: completedMeetingsInRange.length,
-      icon: <CheckCircleOutlinedIcon />,
-      color: '#10B981',
-      trend: getTrend(completedMeetingsInRange.length, completedMeetingsInPrevRange.length),
-      trendLabel: period.trendLabel,
-      onClick: () => navigate('/super_admin/consultations', { state: { filterStatus: 'Completed', startDate: '', endDate: '', cardInfo: { title: 'Completed Meetings', value: completedMeetingsInRange.length, color: '#10B981', trend: getTrend(completedMeetingsInRange.length, completedMeetingsInPrevRange.length), iconType: 'CheckCircleOutlined' } } })
     },
     {
       title: 'Pending Payments',
@@ -659,10 +635,7 @@ export const SuperAdminDashboard = () => {
     { id: 'status', label: 'Status' },
   ];
 
-  // Upcoming meetings configuration
-  const upcomingMeetings = consultations
-    .filter((c) => c.status === 'Scheduled')
-    .slice(0, 4);
+
 
   return (
     <Box>
@@ -1177,69 +1150,9 @@ export const SuperAdminDashboard = () => {
         </Box>
 
         {/* Sidebar widgets */}
-        <Box className="col-span-12 grid grid-cols-1 md:grid-cols-2 gap-3">
-          {/* Upcoming Meetings widget */}
-          <Box className="col-span-1">
-              <AppCard title="Upcoming Meetings" subheader="Scheduled assessment meetings">
-                {upcomingMeetings.length === 0 ? (
-                  <Typography variant="body2" color="text.secondary" sx={{ py: 3, textAlign: 'center' }}>
-                    No meetings scheduled today.
-                  </Typography>
-                ) : (
-                  <List disablePadding>
-                    {upcomingMeetings.map((mt, idx) => {
-                      const consName = agentsList.find(c => c.id === mt.assignedConsultantId)?.name || 'Agent';
-                      return (
-                        <React.Fragment key={mt.id}>
-                          <ListItem sx={{ py: 1.5, px: 0 }}>
-                            <ListItemText
-                              slotProps={{
-                                primary: { component: 'div' },
-                                secondary: { component: 'div' }
-                              }}
-                              primary={
-                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                  <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
-                                    {mt.clientName}
-                                  </Typography>
-                                  <Typography variant="caption" sx={{ color: 'secondary.main', fontWeight: 600 }}>
-                                    {mt.meetingTime}
-                                  </Typography>
-                                </Box>
-                              }
-                              secondary={
-                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 0.5 }}>
-                                  <Typography variant="caption" color="text.secondary">
-                                    Host: {consName}
-                                  </Typography>
-                                  <Typography variant="caption" color="text.secondary">
-                                    {mt.meetingDate}
-                                  </Typography>
-                                </Box>
-                              }
-                            />
-                          </ListItem>
-                          {idx < upcomingMeetings.length - 1 && <Divider />}
-                        </React.Fragment>
-                      );
-                    })}
-                  </List>
-                )}
-                <Button
-                  variant="outlined"
-                  size="small"
-                  color="secondary"
-                  fullWidth
-                  sx={{ mt: 2 }}
-                  onClick={() => navigate('/super_admin/consultations/calendar')}
-                >
-                  Open Calendar Scheduler
-                </Button>
-              </AppCard>
-            </Box>
-
+        <Box className="col-span-12">
             {/* Recent activity timeline log */}
-            <Box className="col-span-1">
+            <Box>
               <AppCard title="Recent Live Activities" subheader="System audit log tracking">
                 <List disablePadding>
                   {notifications.slice(0, 4).map((notif, idx) => (

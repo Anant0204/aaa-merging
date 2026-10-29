@@ -123,7 +123,7 @@ exports.sendAutomatedFacebookGreeting = async (senderId, senderName) => {
     const clientName = (senderName && !senderName.includes('Meta User')) ? senderName : 'Valued Client';
     const leadFormUrl = `https://aaa-crm-service.netlify.app/#/public/lead-form?source=Facebook&fbId=${encodeURIComponent(cleanId)}`;
 
-    const greetingText = `Greetings from AAA Business Consultancy LLC! ✈️🇪🇸\n\nDear ${clientName},\nThank you for reaching out to us on Facebook Messenger regarding Spain Visa & Residency Services.\n\nTo book your FREE 20-Minute Eligibility Assessment & Verification, please click the link below to complete your initial details:\n\n👉 ${leadFormUrl}\n\nOnce submitted, our dedicated consultant will immediately reach out to assist you.`;
+    const greetingText = `Greetings from AAA Technology Consultancy! 💻🚀\n\nDear ${clientName},\nThank you for reaching out to us regarding our IT Services & Software Solutions.\n\nTo schedule your FREE 20-Minute Technical Discovery & Project Scoping Session, please click the link below to share your requirements:\n\n👉 ${leadFormUrl}\n\nOur engineering lead will immediately review your project needs and get in touch.`;
 
     // 1. Send FB Messenger DM via Graph API
     await exports.sendMessengerMessage(cleanId, greetingText);

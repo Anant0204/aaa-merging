@@ -163,6 +163,18 @@ export const SuperAdminSocialInbox = () => {
     queryFn: dbService.getLeadStages
   });
 
+  const { data: integrationsData } = useQuery({
+    queryKey: ['integrations'],
+    queryFn: dbService.getIntegrations,
+    staleTime: 30000
+  });
+
+  const isWhatsAppConnected = Boolean(
+    integrationsData?.isWhatsAppConnected ||
+    (integrationsData?.socialPlatforms?.whatsapp?.accessToken &&
+     integrationsData?.socialPlatforms?.whatsapp?.accessToken !== 'placeholder')
+  );
+
   const [stageFilter, setStageFilter] = useState('');
 
   const addConversationMutation = useMutation({
@@ -513,6 +525,11 @@ export const SuperAdminSocialInbox = () => {
     const selectedPlatform = SOCIAL_PLATFORMS[activeTab];
 
     return conversations.filter(c => {
+      // If WhatsApp is not connected, hide WhatsApp conversations
+      if (!isWhatsAppConnected && c.platform === 'whatsapp') {
+        return false;
+      }
+
       const matchesSearch = c.name.toLowerCase().includes(searchText.toLowerCase()) ||
         c.messages.some(m => m.text.toLowerCase().includes(searchText.toLowerCase()));
 
@@ -583,17 +600,20 @@ export const SuperAdminSocialInbox = () => {
                       )
                     }}
                   />
-                  <Tooltip title="Start New WhatsApp Chat">
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      size="small"
-                      onClick={() => setNewChatOpen(true)}
-                      sx={{ minWidth: 'auto', px: 1.5, whiteSpace: 'nowrap', textTransform: 'none', fontWeight: 600 }}
-                      startIcon={<AddIcon />}
-                    >
-                      New
-                    </Button>
+                  <Tooltip title={isWhatsAppConnected ? "Start New WhatsApp Chat" : "WhatsApp is not connected"}>
+                    <span>
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        size="small"
+                        disabled={!isWhatsAppConnected}
+                        onClick={() => setNewChatOpen(true)}
+                        sx={{ minWidth: 'auto', px: 1.5, whiteSpace: 'nowrap', textTransform: 'none', fontWeight: 600 }}
+                        startIcon={<AddIcon />}
+                      >
+                        New
+                      </Button>
+                    </span>
                   </Tooltip>
                 </Box>
 
@@ -611,7 +631,7 @@ export const SuperAdminSocialInbox = () => {
                     }}
                   >
                     <Tab label="All" icon={<ForumIcon fontSize="small" />} iconPosition="start" />
-                    <Tab label="WhatsApp" icon={<WhatsAppIcon fontSize="small" sx={{ color: '#25D366' }} />} iconPosition="start" />
+                    <Tab label="WhatsApp" icon={<WhatsAppIcon fontSize="small" sx={{ color: isWhatsAppConnected ? '#25D366' : '#9ca3af' }} />} iconPosition="start" />
                     <Tab label="Facebook" icon={<FacebookIcon fontSize="small" sx={{ color: '#1877F2' }} />} iconPosition="start" />
                     <Tab label="Instagram" icon={<InstagramIcon fontSize="small" sx={{ color: '#E4405F' }} />} iconPosition="start" />
                     <Tab label="Telegram" icon={<TelegramIcon fontSize="small" sx={{ color: '#0088cc' }} />} iconPosition="start" />
@@ -627,6 +647,28 @@ export const SuperAdminSocialInbox = () => {
                     <Tab label="Discord" icon={<ChatIcon fontSize="small" sx={{ color: '#5865F2' }} />} iconPosition="start" />
                     <Tab label="Snapchat" icon={<ChatIcon fontSize="small" sx={{ color: '#FFFC00' }} />} iconPosition="start" />
                   </Tabs>
+                )}
+
+                {!isWhatsAppConnected && (SOCIAL_PLATFORMS[activeTab] === 'whatsapp' || searchParams.get('channel') === 'whatsapp') && (
+                  <Box sx={{ p: 2, m: 1.5, borderRadius: 2, bgcolor: '#fef2f2', border: '1px solid #fecaca' }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
+                      <WhatsAppIcon sx={{ color: '#25D366', fontSize: 20 }} />
+                      <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#991b1b', fontSize: '0.85rem' }}>
+                        WhatsApp Not Connected
+                      </Typography>
+                    </Box>
+                    <Typography variant="caption" sx={{ color: '#7f1d1d', display: 'block', mb: 1.2, lineHeight: 1.4 }}>
+                      Connect your WhatsApp Business account in Integrations to view chats and send messages.
+                    </Typography>
+                    <Button
+                      variant="contained"
+                      size="small"
+                      onClick={() => navigate('/integrations')}
+                      sx={{ bgcolor: '#25D366', '&:hover': { bgcolor: '#1eb854' }, textTransform: 'none', fontWeight: 600, fontSize: '0.75rem', py: 0.5, px: 1.5 }}
+                    >
+                      Connect WhatsApp
+                    </Button>
+                  </Box>
                 )}
 
                 <List sx={{ flexGrow: 1, overflowY: 'auto', p: 0 }}>
@@ -1124,10 +1166,31 @@ export const SuperAdminSocialInbox = () => {
                   </Box>
                 </Paper>
               ) : (
-                <Paper sx={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid', borderColor: 'divider' }}>
-                  <Typography variant="body1" color="text.secondary">
-                    Select a conversation to start chatting
-                  </Typography>
+                <Paper sx={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid', borderColor: 'divider', p: 3, textAlign: 'center' }}>
+                  {!isWhatsAppConnected && (SOCIAL_PLATFORMS[activeTab] === 'whatsapp' || searchParams.get('channel') === 'whatsapp') ? (
+                    <Box sx={{ maxWidth: 420, mx: 'auto', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                      <Box sx={{ width: 64, height: 64, borderRadius: '50%', bgcolor: '#fef2f2', display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 2 }}>
+                        <WhatsAppIcon sx={{ fontSize: 36, color: '#25D366' }} />
+                      </Box>
+                      <Typography variant="h6" sx={{ fontWeight: 700, mb: 1, color: 'text.primary' }}>
+                        WhatsApp is Not Connected
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary" sx={{ mb: 2.5, lineHeight: 1.5 }}>
+                        WhatsApp Business is currently not connected. To start receiving client inquiries and replying to WhatsApp chats, please connect WhatsApp in Integrations.
+                      </Typography>
+                      <Button
+                        variant="contained"
+                        onClick={() => navigate('/integrations')}
+                        sx={{ bgcolor: '#25D366', '&:hover': { bgcolor: '#1eb854' }, textTransform: 'none', fontWeight: 600, px: 3, py: 1 }}
+                      >
+                        Go to Integrations
+                      </Button>
+                    </Box>
+                  ) : (
+                    <Typography variant="body1" color="text.secondary">
+                      Select a conversation to start chatting
+                    </Typography>
+                  )}
                 </Paper>
               )}
             </Box>

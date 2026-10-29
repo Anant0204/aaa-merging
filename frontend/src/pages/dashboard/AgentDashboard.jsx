@@ -69,7 +69,7 @@ export const AgentDashboard = () => {
     return toUAEDateStr(dateVal) === todayStr;
   }).length;
 
-  const upcomingConsultations = myConsultations.filter((c) => c.status === 'Scheduled').length;
+
 
   // Revenue & commission calculations
   const clientIds = myClients.map((cl) => cl.id);
@@ -97,18 +97,11 @@ export const AgentDashboard = () => {
     (cl) => cl.visaStatus === 'Approved' || cl.status === 'Completed'
   ).length;
 
-  const completedConsultations = myConsultations.filter(
-    (c) => c.status === 'Completed' || c.status === 'Meeting Completed'
-  ).length;
-
   const performancePercent = totalConsultations > 0 ? Math.round((closedCases / totalConsultations) * 100) : 0;
 
   // Render stats list
   const statsList = [
     { title: 'My Total Consultations', value: totalConsultations, icon: <AssignmentIcon />, color: '#3F51B5', onClick: () => navigate('/agent/consultations', { state: { filterStatus: '', cardInfo: { title: 'My Total Consultations', value: totalConsultations, color: '#3F51B5', iconType: 'Assignment' } } }) },
-    { title: "Today's Meetings", value: todayConsultations, icon: <CalendarMonthIcon />, color: '#14B8A6', onClick: () => navigate('/agent/consultations', { state: { filterStatus: 'Scheduled', startDate: todayStr, endDate: todayStr, cardInfo: { title: "Today's Meetings", value: todayConsultations, color: '#14B8A6', iconType: 'CalendarMonth' } } }) },
-    { title: 'Upcoming Calls', value: upcomingConsultations, icon: <CalendarMonthIcon />, color: '#2563EB', onClick: () => navigate('/agent/consultations', { state: { filterStatus: 'Scheduled', startDate: '', endDate: '', cardInfo: { title: 'Upcoming Calls', value: upcomingConsultations, color: '#2563EB', iconType: 'CalendarMonth' } } }) },
-    { title: 'Completed Meetings', value: completedConsultations, icon: <CheckCircleOutlinedIcon />, color: '#10B981', onClick: () => navigate('/agent/consultations', { state: { filterStatus: 'Completed', startDate: '', endDate: '', cardInfo: { title: 'Completed Meetings', value: completedConsultations, color: '#10B981', iconType: 'CheckCircleOutlined' } } }) },
     { title: 'My Performance (%)', value: `${performancePercent}%`, icon: <TrendingUpIcon />, color: '#10B981' },
     { title: 'Commission Earned', value: `€${commissionEarned.toLocaleString()}`, icon: <PaymentsIcon />, color: '#F59E0B' },
     { title: 'My Active Cases', value: activeCases, icon: <AssignmentIcon />, color: '#3B82F6', onClick: () => navigate('/agent/leads', { state: { filterStatus: 'Active', cardInfo: { title: 'My Active Cases', value: activeCases, color: '#3B82F6', iconType: 'Assignment' } } }) },
@@ -137,16 +130,11 @@ export const AgentDashboard = () => {
     { id: 'status', label: 'Status' }
   ];
 
-  // Personal upcoming meetings list
-  const nextMeetings = myConsultations
-    .filter((c) => c.status === 'Scheduled')
-    .slice(0, 5);
-
   return (
     <Box>
       <PageHeader
         title={`Welcome Back, ${agentName}`}
-        subtitle="Review your assigned leads, upcoming assessment calls, and dynamic commission performance."
+        subtitle="Review your assigned leads, client cases, and dynamic commission performance."
       />
 
       {/* Grid of Statistical Cards */}
@@ -156,11 +144,9 @@ export const AgentDashboard = () => {
         {statsList
           .filter(stat => {
             const cardTitle = stat.title === 'My Total Consultations' ? 'Total Consultations' :
-              stat.title === "Today's Meetings" ? "Today's Consultations" :
-                stat.title === 'Upcoming Calls' ? 'Upcoming Meetings' :
-                  stat.title === 'My Active Cases' ? 'Active Cases' :
-                    stat.title === 'Closed Cases' ? 'Completed Cases' :
-                      stat.title;
+              stat.title === 'My Active Cases' ? 'Active Cases' :
+                stat.title === 'Closed Cases' ? 'Completed Cases' :
+                  stat.title;
 
             // If it's a personal/performance metric not present in the customizable cards catalog, always show it
             const customizableKeys = [
@@ -168,7 +154,6 @@ export const AgentDashboard = () => {
               'Today\'s Clients',
               'Total Consultations',
               'Today\'s Consultations',
-              'Upcoming Meetings',
               'Pending Payments',
               'Total Revenue',
               'Active Cases',
@@ -241,9 +226,9 @@ export const AgentDashboard = () => {
       </Paper>
 
       {/* Tables and Lists */}
-      <Box className="grid grid-cols-1 lg:grid-cols-12 gap-2">
+      <Box className="grid grid-cols-1 gap-2">
         {/* My Leads Table */}
-        <Box className="col-span-12 lg:col-span-8">
+        <Box className="col-span-1">
           <AppCard
             title="My Assigned Leads Center"
             subheader="Overview of your active qualified client files"
@@ -259,63 +244,6 @@ export const AgentDashboard = () => {
               data={recentLeads}
               onRowClick={(row) => navigate(`/leads/details/${row.id}`)}
             />
-          </AppCard>
-        </Box>
-
-        {/* My Calendar calls */}
-        <Box className="col-span-12 lg:col-span-4">
-          <AppCard title="My Scheduled Meetings" subheader="Your upcoming zoom consultation calls">
-            {nextMeetings.length === 0 ? (
-              <Typography variant="body2" color="text.secondary" sx={{ py: 4, textAlign: 'center' }}>
-                No scheduled calls found.
-              </Typography>
-            ) : (
-              <List disablePadding>
-                {nextMeetings.map((mt, idx) => (
-                  <React.Fragment key={mt.id}>
-                    <ListItem sx={{ py: 1.5, px: 0 }}>
-                      <ListItemText
-                        slotProps={{
-                          primary: { component: 'div' },
-                          secondary: { component: 'div' }
-                        }}
-                        primary={
-                          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
-                              {mt.clientName}
-                            </Typography>
-                            <Typography variant="caption" sx={{ color: 'secondary.main', fontWeight: 600 }}>
-                              {mt.meetingTime}
-                            </Typography>
-                          </Box>
-                        }
-                        secondary={
-                          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 0.5 }}>
-                            <Typography variant="caption" color="text.secondary">
-                              Visa: {SERVICES.find(s => s.id === mt.serviceId)?.name || 'Spain Visa'}
-                            </Typography>
-                            <Typography variant="caption" color="text.secondary">
-                              {mt.meetingDate}
-                            </Typography>
-                          </Box>
-                        }
-                      />
-                    </ListItem>
-                    {idx < nextMeetings.length - 1 && <Divider />}
-                  </React.Fragment>
-                ))}
-              </List>
-            )}
-            <Button
-              variant="outlined"
-              size="small"
-              color="secondary"
-              fullWidth
-              sx={{ mt: 2 }}
-              onClick={() => navigate('/consultations/calendar')}
-            >
-              View My Calendar Scheduler
-            </Button>
           </AppCard>
         </Box>
       </Box>

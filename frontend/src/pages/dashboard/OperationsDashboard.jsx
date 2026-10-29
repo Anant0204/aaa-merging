@@ -168,8 +168,7 @@ export const OperationsDashboard = () => {
     const dateVal = l.meetingPreferredDate || l.createdAt || l.createdDate;
     return toUAEDateStr(dateVal) === todayDateStr;
   }).length;
-  const upcomingMeetingsCount = consultations.filter((c) => c.status === 'Scheduled' || c.status === 'Meeting Scheduled').length;
-  const completedMeetingsCount = consultations.filter((c) => c.status === 'Completed' || c.status === 'Meeting Completed').length;
+
   const pendingPaymentsCount = payments.filter((p) => p.status === 'Pending' || p.status === 'Pending Payment').length;
 
   const processedRefundsList = (Array.isArray(refundRequests) ? refundRequests : []).filter(
@@ -213,8 +212,6 @@ export const OperationsDashboard = () => {
     { title: "Today's Clients", value: clientsTodayCount, icon: <AddIcon />, color: '#14B8A6', trend: '24%', onClick: () => navigate('/operations/leads', { state: { filterStatus: '', cardInfo: { title: "Today's Clients", value: clientsTodayCount, color: '#14B8A6', trend: '24%', iconType: 'Add' } } }) },
     { title: 'Total Consultations', value: totalLeads, icon: <PeopleAltIcon />, color: '#8B5CF6', trend: '12%', onClick: () => navigate('/operations/leads', { state: { filterToday: false, filterStatus: '', cardInfo: { title: 'Total Consultations', value: totalLeads, color: '#8B5CF6', trend: '12%', iconType: 'PeopleAlt' } } }) },
     { title: "Today's Consultations", value: todayLeadsCount, icon: <AddIcon />, color: '#EC4899', trend: '24%', onClick: () => navigate('/operations/leads', { state: { filterToday: true, filterStatus: '', cardInfo: { title: "Today's Consultations", value: todayLeadsCount, color: '#EC4899', trend: '24%', iconType: 'Add' } } }) },
-    { title: 'Upcoming Meetings', value: upcomingMeetingsCount, icon: <CalendarMonthIcon />, color: '#2563EB', trend: '8%', onClick: () => navigate('/operations/consultations', { state: { filterStatus: 'Scheduled', startDate: '', endDate: '', cardInfo: { title: 'Upcoming Meetings', value: upcomingMeetingsCount, color: '#2563EB', trend: '8%', iconType: 'CalendarMonth' } } }) },
-    { title: 'Completed Meetings', value: completedMeetingsCount, icon: <CheckCircleOutlinedIcon />, color: '#10B981', trend: '15%', onClick: () => navigate('/operations/consultations', { state: { filterStatus: 'Completed', startDate: '', endDate: '', cardInfo: { title: 'Completed Meetings', value: completedMeetingsCount, color: '#10B981', trend: '15%', iconType: 'CheckCircleOutlined' } } }) },
     { title: 'Pending Payments', value: pendingPaymentsCount, icon: <PaymentsIcon />, color: '#F59E0B', trend: '-5%' },
     { title: 'Total Revenue', value: `€${revenueTotal.toLocaleString()}`, icon: <TrendingUpIcon />, color: '#22C55E', trend: '18%' },
     { title: 'Active Cases', value: activeCasesCount, icon: <AssignmentIcon />, color: '#3B82F6', trend: '14%', onClick: () => navigate('/operations/leads', { state: { filterStatus: 'Under Process', cardInfo: { title: 'Active Cases', value: activeCasesCount, color: '#3B82F6', trend: '14%', iconType: 'Assignment' } } }) },
@@ -285,10 +282,7 @@ export const OperationsDashboard = () => {
     { id: 'status', label: 'Status' },
   ];
 
-  // Upcoming meetings configuration
-  const upcomingMeetings = consultations
-    .filter((c) => c.status === 'Scheduled')
-    .slice(0, 4);
+
 
   return (
     <Box>
@@ -464,70 +458,10 @@ export const OperationsDashboard = () => {
         </Box>
 
         {/* Sidebar widgets */}
-        <Box className="col-span-12 grid grid-cols-1 md:grid-cols-2 gap-3">
-          {/* Upcoming Meetings widget */}
-          <Box className="col-span-1">
-              <AppCard title="Upcoming Meetings" subheader="Scheduled assessment meetings">
-                {upcomingMeetings.length === 0 ? (
-                  <Typography variant="body2" color="text.secondary" sx={{ py: 3, textAlign: 'center' }}>
-                    No meetings scheduled today.
-                  </Typography>
-                ) : (
-                  <List disablePadding>
-                    {upcomingMeetings.map((mt, idx) => {
-                      const consName = agentsList.find(c => c.id === mt.assignedConsultantId)?.name || 'Agent';
-                      return (
-                        <React.Fragment key={mt.id}>
-                          <ListItem sx={{ py: 1.5, px: 0 }}>
-                            <ListItemText
-                              slotProps={{
-                                primary: { component: 'div' },
-                                secondary: { component: 'div' }
-                              }}
-                              primary={
-                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                  <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
-                                    {mt.clientName}
-                                  </Typography>
-                                  <Typography variant="caption" sx={{ color: 'secondary.main', fontWeight: 600 }}>
-                                    {mt.meetingTime}
-                                  </Typography>
-                                </Box>
-                              }
-                              secondary={
-                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 0.5 }}>
-                                  <Typography variant="caption" color="text.secondary">
-                                    Host: {consName}
-                                  </Typography>
-                                  <Typography variant="caption" color="text.secondary">
-                                    {mt.meetingDate}
-                                  </Typography>
-                                </Box>
-                              }
-                            />
-                          </ListItem>
-                          {idx < upcomingMeetings.length - 1 && <Divider />}
-                        </React.Fragment>
-                      );
-                    })}
-                  </List>
-                )}
-                <Button
-                variant="outlined"
-                size="small"
-                color="secondary"
-                fullWidth
-                sx={{ mt: 2 }}
-                onClick={() => navigate('/operations/consultations/calendar')}
-              >
-                Open Calendar Scheduler
-              </Button>
-              </AppCard>
-            </Box>
-
-            {/* Recent activity timeline log */}
-            <Box className="col-span-1">
-              <AppCard title="Recent Live Activities" subheader="System audit log tracking">
+        <Box className="col-span-12">
+          {/* Recent activity timeline log */}
+          <Box>
+            <AppCard title="Recent Live Activities" subheader="System audit log tracking">
                 <List disablePadding>
                   {notifications.slice(0, 4).map((notif, idx) => (
                     <React.Fragment key={notif.id}>

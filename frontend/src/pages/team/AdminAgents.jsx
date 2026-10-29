@@ -79,7 +79,6 @@ const AVAILABLE_CARDS = [
   'Today\'s Clients',
   'Total Consultations',
   'Today\'s Consultations',
-  'Upcoming Meetings',
   'Pending Payments',
   'Total Revenue',
   'Active Cases',
@@ -92,11 +91,11 @@ const AVAILABLE_CARDS = [
 
 const ROLE_DEFAULTS = {
   admin: {
-    menus: ['Dashboard', 'Agents', 'Active Cases', 'Closed Cases', 'Clients', 'Leads', 'Social Inbox', 'Marketing', 'Calendar', 'All Agents Performance', 'Integrations'],
+    menus: ['Dashboard', 'Agents', 'Active Cases', 'Doc Verification', 'Finance', 'Closed Cases', 'Clients', 'Leads', 'Social Inbox', 'Marketing', 'Reviews', 'Calendar', 'All Agents Performance', 'Integrations'],
     cards: ['Total Clients', 'Today\'s Clients', 'Total Consultations', 'Today\'s Consultations', 'Upcoming Meetings', 'Pending Payments', 'Total Revenue', 'Active Cases', 'Completed Cases', 'Lost Consultations', 'Revenue Today', 'Outstanding Revenue', 'Refunded (Guarantee Claims)']
   },
   operations: {
-    menus: ['Dashboard', 'Agents', 'Active Cases', 'Closed Cases', 'Clients', 'Leads', 'Social Inbox', 'Marketing', 'Calendar', 'All Agents Performance'],
+    menus: ['Dashboard', 'Agents', 'Active Cases', 'Doc Verification', 'Closed Cases', 'Clients', 'Leads', 'Social Inbox', 'Marketing', 'Reviews', 'Calendar', 'All Agents Performance'],
     cards: ['Total Clients', 'Today\'s Clients', 'Total Consultations', 'Today\'s Consultations', 'Upcoming Meetings', 'Active Cases', 'Completed Cases']
   },
   finance: {
@@ -105,7 +104,7 @@ const ROLE_DEFAULTS = {
   },
   consultant: {
     menus: ['Dashboard', 'Clients', 'Leads', 'Social Inbox', 'Calendar'],
-    cards: ['Upcoming Meetings', 'Active Cases']
+    cards: ['Active Cases']
   },
   marketing: {
     menus: ['Dashboard', 'Leads', 'Marketing'],
