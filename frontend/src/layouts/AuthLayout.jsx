@@ -61,10 +61,10 @@ export const AuthLayout = () => {
                 fontSize: '1.25rem',
               }}
             >
-              A³
+              K
             </Box>
             <Typography variant="h5" sx={{ fontWeight: 800, letterSpacing: '-0.02em', color: 'white' }}>
-              AAA Technologies
+              Kiaan Technologies
             </Typography>
           </Box>
         </Box>
@@ -79,7 +79,7 @@ export const AuthLayout = () => {
         </Box>
 
         <Typography variant="caption" sx={{ zIndex: 2, color: 'rgba(255,255,255,0.5)', textAlign: 'left' }}>
-          © {new Date().getFullYear()} AAA Technologies LLC. Innovate • Build • Scale.
+          © {new Date().getFullYear()} Kiaan Technologies LLC. Innovate • Build • Scale.
         </Typography>
       </Box>
 
@@ -140,11 +140,11 @@ export const AuthLayout = () => {
                 fontSize: '1.25rem',
               }}
             >
-              A³
+              K
             </Box>
             <Box sx={{ textAlign: 'left' }}>
               <Typography variant="h5" sx={{ fontWeight: 800, lineHeight: 1.1, letterSpacing: '-0.02em', color: theme.palette.mode === 'light' ? 'primary.main' : 'white' }}>
-                AAA Technologies
+                Kiaan Technologies
               </Typography>
               <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>
                 IT Services & Enterprise Software Portal
