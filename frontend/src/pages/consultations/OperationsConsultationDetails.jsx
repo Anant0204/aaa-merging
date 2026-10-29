@@ -233,11 +233,11 @@ export const OperationsConsultationDetails = () => {
         id: cons.id,
         outcome: {
           eligibility: eligibilityStatus,
-          clientRequestedService: requestedObj ? requestedObj.name : 'Digital Nomad Visa (DNV)',
-          aaaRecommendedService: recommendedObj ? recommendedObj.name : 'Digital Nomad Visa (DNV)'
+          clientRequestedService: requestedObj ? requestedObj.name : 'Custom Software Development',
+          aaaRecommendedService: recommendedObj ? recommendedObj.name : 'Custom Software Development'
         },
         notes: outcomeNotes,
-        recommendedService: eligibilityStatus === 'Eligible' ? (recommendedObj ? recommendedObj.name : 'Digital Nomad Visa (DNV)') : null,
+        recommendedService: eligibilityStatus === 'Eligible' ? (recommendedObj ? recommendedObj.name : 'Custom Software Development') : null,
         recommendedPackageId: eligibilityStatus === 'Eligible' ? recommendedPackage : null
       });
       setCompleteModalOpen(false);
@@ -469,7 +469,7 @@ export const OperationsConsultationDetails = () => {
                   )}
                   {cons.outcome?.aaaRecommendedService && (
                     <Box>
-                      <Typography variant="caption" color="text.secondary">AAA Recommended Visa Pathway</Typography>
+                      <Typography variant="caption" color="text.secondary">Recommended IT Solution / Architecture</Typography>
                       <Typography variant="body1" sx={{ fontWeight: 600, color: 'secondary.main' }}>
                         {cons.outcome.aaaRecommendedService}
                       </Typography>
@@ -509,7 +509,7 @@ export const OperationsConsultationDetails = () => {
 
         {/* Right pane: Host profile */}
         <Box className="col-span-12 md:col-span-5 flex flex-col">
-          <AppCard title="Assigned Spain Visa Expert" sx={{ height: 'auto' }}>
+          <AppCard title="Assigned Solutions Consultant" sx={{ height: 'auto' }}>
             {consultant ? (
               <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', py: 2, minWidth: 0, width: '100%' }}>
                 <Avatar src={consultant.avatar} sx={{ width: 72, height: 72, mb: 2, flexShrink: 0 }} />
@@ -597,13 +597,13 @@ export const OperationsConsultationDetails = () => {
                 multiline
                 rows={4}
                 fullWidth
-                placeholder="Enter details discussed during the follow-up meeting (e.g. document preparation status, visa appointment updates)."
+                placeholder="Enter details discussed during the follow-up session (e.g. sprint deliverables, architecture reviews, client feedback)."
               />
             </>
           ) : (
             <>
               <Typography variant="body2">
-                Log the final results of the visa consultation. This updates the Lead qualification state and enables package invoice generation.
+                Log the final results of the discovery session. This updates the Lead qualification state and enables proposal dispatch.
               </Typography>
 
               <TextField
@@ -639,7 +639,7 @@ export const OperationsConsultationDetails = () => {
                     select
                     value={aaaRecommended}
                     onChange={(e) => setAaaRecommended(e.target.value)}
-                    label="Recommended Spain Visa Pathway"
+                    label="Recommended IT Solution / Architecture"
                     fullWidth
                     sx={{ mb: 2 }}
                   >
@@ -654,15 +654,15 @@ export const OperationsConsultationDetails = () => {
                     select
                     value={recommendedPackage}
                     onChange={(e) => setRecommendedPackage(e.target.value)}
-                    label="Recommended Relocation Package *"
+                    label="Recommended Engagement Model *"
                     fullWidth
                     sx={{ mb: 2 }}
                   >
-                    <MenuItem value="OPTION_A">Option A: Professional Case Assessment (€250)</MenuItem>
-                    <MenuItem value="OPTION_B">Option B: Full Processing Package (€3,500)</MenuItem>
-                    <MenuItem value="OPTION_C">Option C: Administrative Relocation Package (€1,750)</MenuItem>
-                    <MenuItem value="OPTION_D">Option D: Premium Package (€4,750)</MenuItem>
-                    <MenuItem value="Tourist Visa">Schengen Tourist Visa (€500)</MenuItem>
+                    <MenuItem value="OPTION_A">Option A: Technical Architecture Discovery & Scoping</MenuItem>
+                    <MenuItem value="OPTION_B">Option B: Full-Cycle Custom Software Development</MenuItem>
+                    <MenuItem value="OPTION_C">Option C: Cloud Infrastructure & DevOps Setup</MenuItem>
+                    <MenuItem value="OPTION_D">Option D: Enterprise Dedicated Engineering Team Retainer</MenuItem>
+                    <MenuItem value="Tourist Visa">Dedicated UI/UX Design Sprint</MenuItem>
                   </TextField>
                 </>
               )}
@@ -670,12 +670,12 @@ export const OperationsConsultationDetails = () => {
               <TextField
                 value={outcomeNotes}
                 onChange={(e) => setOutcomeNotes(e.target.value)}
-                label="Eligibility Notes & Relocation Recommendations"
+                label="Discovery Outcome & Technical Recommendations"
                 multiline
                 rows={4}
                 fullWidth
                 required
-                placeholder="Document client's passport status, income statements audited, and recommended translations checklist."
+                placeholder="Document project architecture, recommended tech stack (e.g. React/Node/AWS), estimated timeline, and agreed next steps for proposal dispatch."
               />
             </>
           )}
