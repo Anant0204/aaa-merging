@@ -28,8 +28,8 @@ async function columnExists(table, column) {
       column
     );
     return Number(rows[0].cnt) > 0;
-  } catch (e) {
-    return false;
+  } catch (err) {
+    throw new Error(`Failed to check column existence for \`${table}.${column}\`: ${err.message}`);
   }
 }
 
@@ -43,8 +43,8 @@ async function tableExists(table) {
       table
     );
     return Number(rows[0].cnt) > 0;
-  } catch (e) {
-    return false;
+  } catch (err) {
+    throw new Error(`Failed to check table existence for \`${table}\`: ${err.message}`);
   }
 }
 
@@ -60,8 +60,8 @@ async function indexExists(table, indexName) {
       indexName
     );
     return Number(rows[0].cnt) > 0;
-  } catch (e) {
-    return false;
+  } catch (err) {
+    throw new Error(`Failed to check index existence for \`${indexName}\` on \`${table}\`: ${err.message}`);
   }
 }
 
