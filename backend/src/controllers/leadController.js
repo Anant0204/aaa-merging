@@ -150,12 +150,9 @@ const createLead = async (req, res) => {
       wordCount
     } = req.body;
 
-    if (!req.user && (!nationality || !countryOfResidence)) {
-      return res.status(400).json({
-        success: false,
-        message: 'Nationality and Country of Residence are required.'
-      });
-    }
+    // Graceful fallback for IT service leads where nationality/residence may not be mandatory
+    const safeNationality = nationality || 'Not Specified';
+    const safeCountry = countryOfResidence || 'International';
 
     // Same-Day Booking Restriction
     if (meetingPreferredDate) {
@@ -329,8 +326,8 @@ const createLead = async (req, res) => {
           source: source || 'Website',
           campaignId,
           serviceType: serviceType || serviceId,
-          nationality,
-          countryOfResidence: countryOfResidence || null,
+          nationality: safeNationality,
+          countryOfResidence: safeCountry,
           preferredLanguage: preferredLanguage || 'English',
           applicantsCount: applicantsCount ? String(applicantsCount) : undefined,
           dependentsDetails: dependentsDetails || undefined,

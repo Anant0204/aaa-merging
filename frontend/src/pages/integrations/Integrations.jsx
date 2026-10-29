@@ -272,30 +272,18 @@ const Integrations = () => {
   const [connectedPlatforms, setConnectedPlatforms] = useState(() => {
     try {
       const saved = localStorage.getItem('crm-connected-platforms');
-      return saved ? JSON.parse(saved) : {
-        whatsapp: { connectedAt: new Date().toLocaleString() },
-        facebook: { connectedAt: new Date().toLocaleString() },
-        instagram: { connectedAt: new Date().toLocaleString() },
-        telegram: { connectedAt: new Date().toLocaleString() }
-      };
+      return saved ? JSON.parse(saved) : {};
     } catch (e) {
-      return {
-        whatsapp: { connectedAt: new Date().toLocaleString() },
-        facebook: { connectedAt: new Date().toLocaleString() },
-        instagram: { connectedAt: new Date().toLocaleString() },
-        telegram: { connectedAt: new Date().toLocaleString() }
-      };
+      return {};
     }
   });
 
   const [connectedEmails, setConnectedEmails] = useState(() => {
     try {
       const saved = localStorage.getItem('crm-connected-emails');
-      return saved ? JSON.parse(saved) : {
-        gmail: { connectedAt: new Date().toLocaleString() }
-      };
+      return saved ? JSON.parse(saved) : {};
     } catch (e) {
-      return { gmail: { connectedAt: new Date().toLocaleString() } };
+      return {};
     }
   });
 
@@ -311,11 +299,14 @@ const Integrations = () => {
   useEffect(() => {
     dbService.getIntegrations()
       .then((data) => {
-        if (data && data.socialPlatforms) {
-          setConnectedPlatforms(prev => ({ ...prev, ...data.socialPlatforms }));
-        }
-        if (data && data.emailProviders) {
-          setConnectedEmails(prev => ({ ...prev, ...data.emailProviders }));
+        if (data) {
+          const platforms = data.socialPlatforms || {};
+          const emails = data.emailProviders || {};
+          setConnectedPlatforms(platforms);
+          setConnectedEmails(emails);
+          localStorage.setItem('crm-connected-platforms', JSON.stringify(platforms));
+          localStorage.setItem('crm-connected-emails', JSON.stringify(emails));
+          window.dispatchEvent(new Event('storage'));
         }
       })
       .catch((err) => console.warn('Could not fetch saved integrations:', err.message));

@@ -86,6 +86,9 @@ app.use('/api/v1/communications', require('./routes/communicationRoutes'));
 app.use('/api/v1/coupons', require('./routes/couponRoutes'));
 app.use('/api/v1/templates', require('./routes/templateRoutes'));
 app.use('/api/templates', require('./routes/templateRoutes'));
+app.use('/api/v1/projects', require('./routes/projectRoutes'));
+app.use('/api/v1/reviews', require('./routes/reviewRoutes'));
+app.use('/api/v1/dashboard', require('./routes/dashboardRoutes'));
 
 // Start Server
 const PORT = Number(process.env.PORT) || 5000;

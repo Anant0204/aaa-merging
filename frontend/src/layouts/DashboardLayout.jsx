@@ -324,14 +324,10 @@ export const DashboardLayout = () => {
     try {
       const saved = localStorage.getItem('crm-connected-platforms');
       const parsed = saved ? JSON.parse(saved) : null;
-      if (parsed && Object.keys(parsed).length > 0) return parsed;
-      return {
-        whatsapp: { connectedAt: 'Default' },
-        facebook: { connectedAt: 'Default' },
-        instagram: { connectedAt: 'Default' }
-      };
+      if (parsed && typeof parsed === 'object') return parsed;
+      return {};
     } catch (e) {
-      return { whatsapp: { connectedAt: 'Default' }, facebook: { connectedAt: 'Default' }, instagram: { connectedAt: 'Default' } };
+      return {};
     }
   });
 
@@ -342,12 +338,7 @@ export const DashboardLayout = () => {
         if (saved) {
           setConnectedPlatforms(JSON.parse(saved));
         } else {
-          setConnectedPlatforms({
-            whatsapp: {},
-            facebook: {},
-            instagram: {},
-            telegram: {}
-          });
+          setConnectedPlatforms({});
         }
       } catch (e) {
         console.error(e);
@@ -355,6 +346,19 @@ export const DashboardLayout = () => {
     };
     window.addEventListener('storage', handleStorageChange);
     handleStorageChange();
+
+    dbService.getIntegrations()
+      .then((data) => {
+        if (data && data.socialPlatforms) {
+          setConnectedPlatforms(data.socialPlatforms);
+          localStorage.setItem('crm-connected-platforms', JSON.stringify(data.socialPlatforms));
+        } else if (data) {
+          setConnectedPlatforms({});
+          localStorage.setItem('crm-connected-platforms', JSON.stringify({}));
+        }
+      })
+      .catch((e) => console.warn('Could not sync integrations in layout:', e.message));
+
     return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 

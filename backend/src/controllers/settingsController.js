@@ -282,7 +282,28 @@ const getIntegrations = async (req, res) => {
   try {
     let settings = await prisma.companySetting.findFirst();
     const integrations = settings?.customizationSettings?.integrations || {};
-    res.json(integrations);
+
+    const TWILIO_ACCOUNT_SID = process.env.TWILIO_ACCOUNT_SID;
+    const TWILIO_AUTH_TOKEN = process.env.TWILIO_AUTH_TOKEN;
+    const TWILIO_WHATSAPP_FROM = process.env.TWILIO_WHATSAPP_FROM;
+    const isTwilioConfigured = !!(
+      TWILIO_ACCOUNT_SID &&
+      TWILIO_ACCOUNT_SID.startsWith('AC') &&
+      TWILIO_AUTH_TOKEN &&
+      TWILIO_AUTH_TOKEN !== 'your_twilio_auth_token_here' &&
+      TWILIO_WHATSAPP_FROM
+    );
+
+    const isMetaWaConfigured = !!(
+      integrations.socialPlatforms?.whatsapp?.accessToken &&
+      integrations.socialPlatforms?.whatsapp?.accessToken.length >= 15 &&
+      integrations.socialPlatforms?.whatsapp?.accessToken !== 'placeholder'
+    );
+
+    res.json({
+      ...integrations,
+      isWhatsAppConnected: isTwilioConfigured || isMetaWaConfigured
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -304,8 +325,8 @@ const saveIntegrations = async (req, res) => {
     const updatedCustomization = {
       ...currentCustomization,
       integrations: {
-        socialPlatforms: { ...currentSocial, ...(socialPlatforms || {}) },
-        emailProviders: { ...currentEmail, ...(emailProviders || {}) }
+        socialPlatforms: socialPlatforms !== undefined ? socialPlatforms : currentSocial,
+        emailProviders: emailProviders !== undefined ? emailProviders : currentEmail
       }
     };
 

@@ -10,8 +10,43 @@ const isTwilioConfigured = !!(
   TWILIO_ACCOUNT_SID &&
   TWILIO_ACCOUNT_SID.startsWith('AC') &&
   TWILIO_AUTH_TOKEN &&
+  TWILIO_AUTH_TOKEN !== 'your_twilio_auth_token_here' &&
   TWILIO_WHATSAPP_FROM
 );
+
+const checkIsWhatsAppConnected = async () => {
+  if (isTwilioConfigured) return true;
+  try {
+    const setting = await prisma.companySetting.findFirst({ select: { customizationSettings: true } });
+    const wa = setting?.customizationSettings?.integrations?.socialPlatforms?.whatsapp;
+    if (
+      wa &&
+      wa.accessToken &&
+      wa.accessToken.length >= 15 &&
+      wa.accessToken !== 'placeholder' &&
+      !wa.disconnected &&
+      (wa.phoneNumberId || wa.businessAccountId)
+    ) {
+      return true;
+    }
+  } catch (e) {}
+  return false;
+};
+
+const VALID_SOCIAL_CHANNELS = [
+  'WHATSAPP',
+  'FACEBOOK',
+  'INSTAGRAM',
+  'TELEGRAM',
+  'TWITTER',
+  'LINKEDIN',
+  'TIKTOK',
+  'WECHAT',
+  'LINE',
+  'VIBER',
+  'DISCORD',
+  'SNAPCHAT'
+];
 
 /**
  * Clean phone number or social handle function
@@ -53,6 +88,8 @@ const parseMessageContent = (content) => {
  */
 exports.getConversations = async (req, res) => {
   try {
+    const waConnected = await checkIsWhatsAppConnected();
+
     // 1. Parallel fetch of all clients, leads, and logs with respondedByUser included
     const [allClients, allLeads, logs] = await Promise.all([
       prisma.client.findMany({
@@ -62,6 +99,13 @@ exports.getConversations = async (req, res) => {
         select: { id: true, phone: true, firstName: true, lastName: true, status: true, email: true, clientId: true }
       }),
       prisma.communicationLog.findMany({
+        where: {
+          channel: {
+            in: waConnected 
+              ? VALID_SOCIAL_CHANNELS 
+              : VALID_SOCIAL_CHANNELS.filter(ch => ch !== 'WHATSAPP')
+          }
+        },
         orderBy: { createdAt: 'asc' },
         include: {
           respondedByUser: {
@@ -77,7 +121,7 @@ exports.getConversations = async (req, res) => {
     const uniqueItems = [];
 
     for (const log of logs) {
-      if (!log.phone) continue;
+      if (!log.phone || !VALID_SOCIAL_CHANNELS.includes(log.channel?.toUpperCase())) continue;
       const isSocialHandle = log.channel === 'TWITTER' || log.channel === 'LINKEDIN' || String(log.phone).startsWith('@') || String(log.phone).startsWith('urn:li:');
       const cleanPh = cleanPhoneNumber(log.phone, log.channel);
       const key = isSocialHandle ? `${log.channel || 'SOCIAL'}:${cleanPh}` : (cleanPh.replace(/\D/g, '') || cleanPh);
@@ -264,6 +308,14 @@ exports.getConversations = async (req, res) => {
         ? `conv_${conversationChannel.toLowerCase()}_${cleanPh.replace(/[^a-zA-Z0-9_]/g, '')}`
         : `conv_phone_${numberPart || cleanPh.replace(/[^\d]/g, '') || Math.random().toString(36).substring(2, 9)}`;
 
+      if (!VALID_SOCIAL_CHANNELS.includes(conversationChannel)) {
+        return null;
+      }
+
+      if (!waConnected && conversationChannel === 'WHATSAPP') {
+        return null;
+      }
+
       return {
         id: convId,
         phone: cleanPh,
@@ -284,7 +336,7 @@ exports.getConversations = async (req, res) => {
         windowExpiresAt: windowExpiresAt,
         remainingMinutes: remainingMinutes,
       };
-    });
+    }).filter(Boolean);
 
     return res.status(200).json(conversations);
   } catch (error) {
@@ -374,6 +426,7 @@ exports.getMessagesByPhone = async (req, res) => {
     // 1. Fetch all logs for this phone number (matching with or without + prefix)
     const logs = await prisma.communicationLog.findMany({
       where: {
+        channel: { in: VALID_SOCIAL_CHANNELS },
         OR: [
           { phone: cleanPh },
           { phone: numberPart },
@@ -392,6 +445,7 @@ exports.getMessagesByPhone = async (req, res) => {
     // 2. Mark incoming messages as read
     await prisma.communicationLog.updateMany({
       where: {
+        channel: { in: VALID_SOCIAL_CHANNELS },
         OR: [
           { phone: cleanPh },
           { phone: numberPart },
@@ -467,6 +521,16 @@ exports.sendSocialMessage = async (req, res) => {
     const staffUserId = req.user?.id || null;
     const staffName = req.user?.fullName || 'Agent';
     const staffRole = req.user?.role || 'consultant';
+
+    if (channel === 'WHATSAPP') {
+      const waConnected = await checkIsWhatsAppConnected();
+      if (!waConnected) {
+        return res.status(400).json({
+          success: false,
+          message: 'WhatsApp is not connected. Please connect WhatsApp in Integrations settings.'
+        });
+      }
+    }
 
     // If templateId or templateName is provided, load template from DB and send exact static body
     const targetTemplateId = templateId || templateName;

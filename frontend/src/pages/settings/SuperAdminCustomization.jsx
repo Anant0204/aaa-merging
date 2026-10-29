@@ -91,7 +91,6 @@ const AVAILABLE_CARDS = [
   'Today\'s Clients',
   'Total Consultations',
   'Today\'s Consultations',
-  'Upcoming Meetings',
   'Pending Payments',
   'Total Revenue',
   'Active Cases',
