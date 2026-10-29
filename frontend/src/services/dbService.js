@@ -873,4 +873,85 @@ export const dbService = {
     const res = await apiClient.post(`/reviews/providers/${provider}/config`, config);
     return res.data;
   },
+
+  // ─── Smart QR Review & Complaint Hub (Phase 2 & 3) ──────────────────────
+  getQrCodes: async (params = {}) => {
+    const res = await apiClient.get('/reviews/qr-hub/qr-codes', { params });
+    return res.data;
+  },
+
+  getQrCodeById: async (id) => {
+    const res = await apiClient.get(`/reviews/qr-hub/qr-codes/${id}`);
+    return res.data;
+  },
+
+  createQrCode: async (data) => {
+    const res = await apiClient.post('/reviews/qr-hub/qr-codes', data);
+    return res.data;
+  },
+
+  updateQrCode: async (id, data) => {
+    const res = await apiClient.patch(`/reviews/qr-hub/qr-codes/${id}`, data);
+    return res.data;
+  },
+
+  deleteQrCode: async (id) => {
+    const res = await apiClient.delete(`/reviews/qr-hub/qr-codes/${id}`);
+    return res.data;
+  },
+
+  downloadQrSvg: (id) => {
+    return `${API_URL}/reviews/qr-hub/qr-codes/${id}/download-svg`;
+  },
+
+  getQrFeedbacks: async (params = {}) => {
+    const res = await apiClient.get('/reviews/qr-hub/feedbacks', { params });
+    return res.data;
+  },
+
+  getQrComplaints: async (params = {}) => {
+    const res = await apiClient.get('/reviews/qr-hub/complaints', { params });
+    return res.data;
+  },
+
+  updateQrComplaint: async (id, data) => {
+    const res = await apiClient.patch(`/reviews/qr-hub/complaints/${id}`, data);
+    return res.data;
+  },
+
+  addQrComplaintNote: async (id, text) => {
+    const res = await apiClient.post(`/reviews/qr-hub/complaints/${id}/notes`, { text });
+    return res.data;
+  },
+
+  getQrAnalyticsSummary: async () => {
+    const res = await apiClient.get('/reviews/qr-hub/analytics/summary');
+    return res.data;
+  },
+
+  getQrSettings: async () => {
+    const res = await apiClient.get('/reviews/qr-hub/settings');
+    return res.data;
+  },
+
+  updateQrSettings: async (data) => {
+    const res = await apiClient.put('/reviews/qr-hub/settings', data);
+    return res.data;
+  },
+
+  // Public unauthenticated QR calls
+  resolvePublicQr: async (slug) => {
+    const res = await axios.get(`${API_URL}/reviews/qr-hub/public/qr/${encodeURIComponent(slug)}`);
+    return res.data;
+  },
+
+  trackPublicQrClick: async (slug, deviceType = 'mobile') => {
+    const res = await axios.post(`${API_URL}/reviews/qr-hub/public/track-click`, { slug, deviceType });
+    return res.data;
+  },
+
+  submitPublicFeedback: async (data) => {
+    const res = await axios.post(`${API_URL}/reviews/qr-hub/public/feedback`, data);
+    return res.data;
+  },
 };

@@ -64,6 +64,7 @@ import LandingPage from '../pages/public/LandingPage';
 import LeadSelfFillForm from '../pages/public/LeadSelfFillForm';
 import PaymentSuccess from '../pages/public/PaymentSuccess';
 import NoShowPayment from '../pages/public/NoShowPayment';
+import PublicReviewLanding from '../pages/public/PublicReviewLanding';
 
 import Agents from '../pages/team/Agents';
 import ActiveCases from '../pages/team/ActiveCases';
@@ -275,6 +276,7 @@ export const AppRoutes = () => {
 
       {/* Public Landing Page */}
       <Route path="/" element={<LandingPage />} />
+      <Route path="/r/:slug" element={<PublicReviewLanding />} />
 
       {/* Client Portal Removed: Redirect any portal access to Landing Page */}
       <Route path="/portal/*" element={<Navigate to="/" replace />} />

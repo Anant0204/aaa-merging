@@ -22,6 +22,8 @@ import Tooltip from '@mui/material/Tooltip';
 import CircularProgress from '@mui/material/CircularProgress';
 import Menu from '@mui/material/Menu';
 import InputAdornment from '@mui/material/InputAdornment';
+import Tabs from '@mui/material/Tabs';
+import Tab from '@mui/material/Tab';
 import dayjs from 'dayjs';
 
 // Icons
@@ -45,6 +47,18 @@ import SentimentNeutralIcon from '@mui/icons-material/SentimentNeutral';
 import SentimentVeryDissatisfiedIcon from '@mui/icons-material/SentimentVeryDissatisfied';
 import LockIcon from '@mui/icons-material/Lock';
 import ClearIcon from '@mui/icons-material/Clear';
+import QrCode2Icon from '@mui/icons-material/QrCode2';
+import FeedbackIcon from '@mui/icons-material/Feedback';
+import ReportProblemIcon from '@mui/icons-material/ReportProblem';
+import BarChartIcon from '@mui/icons-material/BarChart';
+import TuneIcon from '@mui/icons-material/Tune';
+
+// Smart QR Subcomponents
+import QrCodeManagementTab from './components/QrCodeManagementTab';
+import CustomerFeedbackTab from './components/CustomerFeedbackTab';
+import ComplaintsTab from './components/ComplaintsTab';
+import QrAnalyticsTab from './components/QrAnalyticsTab';
+import QrBrandingSettingsTab from './components/QrBrandingSettingsTab';
 
 // Project imports
 import PageHeader from '../../components/PageHeader';
@@ -161,6 +175,9 @@ export const ReviewsDashboard = () => {
   const { currentUser, isSuperAdmin, isAdmin, isOperations, isMarketing } = useAuth();
   const { showAlert } = useAlert();
 
+  // Navigation Tabs: 0: Reviews, 1: Smart QR, 2: Feedback, 3: Complaints, 4: Analytics, 5: Branding
+  const [activeTab, setActiveTab] = useState(0);
+
   // Mode and Filters
   const [showDemo, setShowDemo] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -202,6 +219,12 @@ export const ReviewsDashboard = () => {
   const [activeReviewForModeration, setActiveReviewForModeration] = useState(null);
 
   // Queries
+  const { data: qrSettingsData } = useQuery({
+    queryKey: ['qr-settings'],
+    queryFn: () => dbService.getQrSettings(),
+    staleTime: 60000
+  });
+
   const {
     data: statsData,
     isLoading: isStatsLoading,
@@ -436,52 +459,102 @@ export const ReviewsDashboard = () => {
         ]}
         action={
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, flexWrap: 'wrap' }}>
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={showDemo}
-                  onChange={(e) => setShowDemo(e.target.checked)}
-                  color="warning"
-                  size="small"
+            {activeTab === 0 && (
+              <>
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={showDemo}
+                      onChange={(e) => setShowDemo(e.target.checked)}
+                      color="warning"
+                      size="small"
+                    />
+                  }
+                  label={
+                    <Typography variant="body2" sx={{ fontWeight: 600, display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                      Demo Mode
+                      {showDemo && <Chip label="ON" size="small" color="warning" sx={{ height: 18, fontSize: '0.65rem', fontWeight: 700 }} />}
+                    </Typography>
+                  }
                 />
-              }
-              label={
-                <Typography variant="body2" sx={{ fontWeight: 600, display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                  Demo Mode
-                  {showDemo && <Chip label="ON" size="small" color="warning" sx={{ height: 18, fontSize: '0.65rem', fontWeight: 700 }} />}
-                </Typography>
-              }
-            />
 
-            {(isAdmin || isSuperAdmin || isOperations) && (
-              <Button
-                variant="contained"
-                color="primary"
-                startIcon={<AddIcon />}
-                onClick={() => setManualDialogOpen(true)}
-                sx={{ textTransform: 'none', fontWeight: 600 }}
-              >
-                + Add Verified Review
-              </Button>
+                {(isAdmin || isSuperAdmin || isOperations) && (
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    startIcon={<AddIcon />}
+                    onClick={() => setManualDialogOpen(true)}
+                    sx={{ textTransform: 'none', fontWeight: 600 }}
+                  >
+                    + Add Verified Review
+                  </Button>
+                )}
+
+                <Tooltip title="Refresh data">
+                  <IconButton
+                    onClick={() => {
+                      refetchStats();
+                      refetchReviews();
+                      refetchProviders();
+                      showAlert('Review metrics refreshed.', 'info');
+                    }}
+                    color="inherit"
+                    sx={{ border: '1px solid', borderColor: 'divider' }}
+                  >
+                    <RefreshIcon fontSize="small" />
+                  </IconButton>
+                </Tooltip>
+              </>
             )}
-
-            <Tooltip title="Refresh data">
-              <IconButton
-                onClick={() => {
-                  refetchStats();
-                  refetchReviews();
-                  refetchProviders();
-                  showAlert('Review metrics refreshed.', 'info');
-                }}
-                color="inherit"
-                sx={{ border: '1px solid', borderColor: 'divider' }}
-              >
-                <RefreshIcon fontSize="small" />
-              </IconButton>
-            </Tooltip>
           </Box>
         }
       />
+
+      {/* Smart QR & Review Tabs Navigation */}
+      <Paper
+        elevation={0}
+        sx={{
+          mb: 3,
+          borderRadius: 2,
+          border: '1px solid',
+          borderColor: 'divider',
+          backgroundColor: 'background.paper'
+        }}
+      >
+        <Tabs
+          value={activeTab}
+          onChange={(e, val) => setActiveTab(val)}
+          variant="scrollable"
+          scrollButtons="auto"
+          aria-label="Reviews and Smart QR navigation tabs"
+          sx={{
+            px: 2,
+            '& .MuiTab-root': {
+              textTransform: 'none',
+              fontWeight: 600,
+              fontSize: '0.875rem',
+              minHeight: 52,
+              py: 1,
+              px: 2,
+              display: 'flex',
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: 1
+            }
+          }}
+        >
+          <Tab icon={<RateReviewIcon fontSize="small" />} iconPosition="start" label="Existing Reviews" />
+          <Tab icon={<QrCode2Icon fontSize="small" />} iconPosition="start" label="Smart QR Codes" />
+          <Tab icon={<FeedbackIcon fontSize="small" />} iconPosition="start" label="Customer Feedback" />
+          <Tab icon={<ReportProblemIcon fontSize="small" />} iconPosition="start" label="Complaints & Issues" />
+          <Tab icon={<BarChartIcon fontSize="small" />} iconPosition="start" label="QR Analytics" />
+          <Tab icon={<TuneIcon fontSize="small" />} iconPosition="start" label="Branding & Settings" />
+        </Tabs>
+      </Paper>
+
+      {/* TAB 0: Existing Reviews & Feed */}
+      {activeTab === 0 && (
+        <Box>
 
       {/* 2. Banner: Demo Mode Active */}
       {showDemo && (
@@ -1161,6 +1234,33 @@ export const ReviewsDashboard = () => {
           })
         )}
       </Box>
+        </Box>
+      )}
+
+      {/* TAB 1: Smart QR Codes */}
+      {activeTab === 1 && (
+        <QrCodeManagementTab businessSettings={qrSettingsData?.settings} />
+      )}
+
+      {/* TAB 2: Customer Feedback */}
+      {activeTab === 2 && (
+        <CustomerFeedbackTab />
+      )}
+
+      {/* TAB 3: Complaints & Issues */}
+      {activeTab === 3 && (
+        <ComplaintsTab />
+      )}
+
+      {/* TAB 4: QR Analytics */}
+      {activeTab === 4 && (
+        <QrAnalyticsTab />
+      )}
+
+      {/* TAB 5: Branding & Settings */}
+      {activeTab === 5 && (
+        <QrBrandingSettingsTab />
+      )}
 
       {/* 8. Dialog: Post / Edit Official Reply */}
       <Dialog
