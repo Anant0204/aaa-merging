@@ -637,7 +637,7 @@ const navigate = useNavigate();
       <AppModal
         open={scheduleModalOpen}
         onClose={() => setScheduleModalOpen(false)}
-        title={`Book Assessment Consultation for ${dayjs(selectedDate).format('DD/MM/YYYY')}`}
+        title={`Schedule IT Discovery / Technical Consultation for ${dayjs(selectedDate).format('DD/MM/YYYY')}`}
         actions={
           <>
             <Button onClick={() => setScheduleModalOpen(false)} variant="outlined">
@@ -706,12 +706,12 @@ const navigate = useNavigate();
           </Box>
 
           <FormControl fullWidth size="small" disabled={isConsultant}>
-            <InputLabel id="agent-host-select-label">Select Agent Host</InputLabel>
+            <InputLabel id="agent-host-select-label">Select Solutions Architect / Host</InputLabel>
             <Select
               labelId="agent-host-select-label"
               value={agentId}
               onChange={(e) => setAgentId(e.target.value)}
-              label="Select Agent Host"
+              label="Select Solutions Architect / Host"
             >
               {agents.filter(a => a.role === 'consultant').map((c) => (
                 <MenuItem key={c.id} value={c.id}>
@@ -728,7 +728,7 @@ const navigate = useNavigate();
             multiline
             rows={3}
             fullWidth
-            placeholder="Inquire passive income proofs or check remote work details..."
+            placeholder="Discussion topics: technical stack, product scope, milestone timeline, or discovery agenda..."
           />
         </Box>
       </AppModal>

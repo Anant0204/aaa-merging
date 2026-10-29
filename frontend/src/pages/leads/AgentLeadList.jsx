@@ -77,11 +77,54 @@ const leadSchema = yup.object().shape({
   meetingPreferredTime: yup.string().required('Meeting Time Slot is required')
 });
 
+const FollowUpDatePickerInput = ({ value, onChange, isDue, style = {} }) => {
+  const displayStr = value ? dayjs(value).format('DD/MM/YYYY') : 'dd/mm/yyyy';
+  const isoVal = value ? dayjs(value).format('YYYY-MM-DD') : '';
+
+  return (
+    <Box sx={{ position: 'relative', display: 'inline-flex', alignItems: 'center', cursor: 'pointer', py: 0.25, px: 0.5, ...style }}>
+      <Typography variant="caption" sx={{ fontWeight: 700, fontSize: '0.78rem', color: isDue ? '#B45309' : '#1E293B', pr: 0.5 }}>
+        {displayStr}
+      </Typography>
+      <span style={{ fontSize: '0.8rem', opacity: 0.65 }}>📅</span>
+      <input
+        type="date"
+        value={isoVal}
+        onClick={(e) => e.stopPropagation()}
+        onChange={(evt) => {
+          evt.stopPropagation();
+          onChange(evt.target.value);
+        }}
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          opacity: 0,
+          cursor: 'pointer'
+        }}
+      />
+    </Box>
+  );
+};
+
 export const AgentLeadList = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const queryClient = useQueryClient();
   const { showAlert } = useAlert();
+  const updateLeadMutation = useMutation({
+    mutationFn: ({ id, nextFollowUpDate }) => dbService.updateLead({ id, nextFollowUpDate }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['leads'] });
+      showAlert('Next follow-up date updated', 'success');
+    },
+    onError: (err) => {
+      showAlert(err.response?.data?.message || 'Failed to update follow-up date', 'error');
+    }
+  });
+
   const { isAdmin, isOperations, currentUser, isViewOnlyMenu } = useAuth();
 
   const { data: customizationSettings } = useQuery({
@@ -485,23 +528,40 @@ export const AgentLeadList = () => {
         const agent = agents.find((c) => c.id === row.assignedToId);
         return agent ? agent.name : <Typography variant="caption" color="text.secondary">Unassigned</Typography>;
       }
+    },,
+    {
+      id: 'nextFollowUpDate',
+      label: 'Next Follow-Up',
+      sortable: true,
+      render: (row) => {
+        const todayStr = dayjs().format('YYYY-MM-DD');
+        const isFollowUpDue = row.nextFollowUpDate && (row.nextFollowUpDate.split('T')[0] <= todayStr);
+        return (
+          <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5, bgcolor: isFollowUpDue ? '#FEF3C7' : '#F1F5F9', p: '2px 6px', borderRadius: 1.5, border: '1px solid', borderColor: isFollowUpDue ? '#F59E0B' : '#CBD5E1' }}>
+            <FollowUpDatePickerInput
+              value={row.nextFollowUpDate}
+              isDue={isFollowUpDue}
+              onChange={(newDate) => {
+                updateLeadMutation.mutate({ id: row.id, nextFollowUpDate: newDate });
+              }}
+            />
+          </Box>
+        );
+      }
     },
   ];
 
   const standardStatuses = [
-    'New Lead',
-    'Assessment Booked',
+    'New Inquiry',
+    'Discovery Scheduled',
+    'Requirement Analysis',
+    'Proposal Sent',
+    'Negotiation',
+    'Deal Won',
+    'Deal Lost',
     'Meeting Scheduled',
     'Meeting Completed',
-    'Eligible - Pending Payment',
-    'Not Eligible',
-    'No Show',
-    'Lost Lead',
-    'Spam',
-    'Cold Lead',
-    'Refused',
-    'Converted Client',
-    'Cancelled'
+    'No Show'
   ];
   const leadStatuses = Array.from(new Set([...standardStatuses, ...leadStages.map(s => s.name), ...SWORN_TRANSLATION_STATUSES]));
 

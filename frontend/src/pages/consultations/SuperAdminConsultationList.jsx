@@ -339,10 +339,10 @@ export const SuperAdminConsultationList = () => {
   const columns = [
     {
       id: 'visaType',
-      label: 'Visa Type',
+      label: 'IT Service / Project Scope',
       render: (row) => (
         <Chip
-          label={row.visaType || row.serviceType || 'Spain Visa'}
+          label={row.visaType || row.serviceType || 'IT Discovery'}
           size="small"
           color="primary"
           variant="outlined"
@@ -432,7 +432,7 @@ export const SuperAdminConsultationList = () => {
           <Link href={row.meetingLink} target="_blank" rel="noopener noreferrer" sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5, fontWeight: 600 }}>
             <VideoCallIcon fontSize="small" /> Join Call
           </Link>
-        ) : '-';
+        ) : <Chip label="URL Pending" size="small" variant="outlined" sx={{ fontSize: '11px', color: '#64748B' }} />;
       }
     },
     {

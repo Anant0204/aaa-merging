@@ -99,10 +99,10 @@ export const ConsultationList = () => {
   const columns = [
     {
       id: 'visaType',
-      label: 'Visa Type',
+      label: 'IT Service / Project Scope',
       render: (row) => (
         <Chip
-          label={row.visaType || row.serviceType || 'Spain Visa'}
+          label={row.visaType || row.serviceType || 'IT Discovery'}
           size="small"
           color="primary"
           variant="outlined"
@@ -182,7 +182,7 @@ export const ConsultationList = () => {
     <Box>
       <PageHeader
         title={getPageTitle()}
-        subtitle="Track Spain Visa assessments, eligibility consultations, and virtual meeting links."
+        subtitle="Track IT project discovery calls, architecture reviews, and technical consultations."
         action={
           <Button
             variant="contained"
