@@ -19,9 +19,24 @@ const { generateQrSvg } = require('../utils/qrGenerator');
 /**
  * Resolves tenant identity securely from authenticated JWT payload.
  * NEVER trusts client-supplied query string or body tenantId.
+ * NEVER silently assigns all users to the same shared 'default' tenant.
  */
 function resolveTenantId(req) {
-  return req.user?.tenantId || 'default';
+  if (req.user?.tenantId && typeof req.user.tenantId === 'string' && req.user.tenantId.trim()) {
+    return req.user.tenantId.trim();
+  }
+
+  if (req.user?.email && req.user.email.toLowerCase().endsWith('@aaaconsultancy.com')) {
+    return 'tenant_aaa_consultancy';
+  }
+
+  if (req.user?.id) {
+    return `tenant_user_${req.user.id}`;
+  }
+
+  const err = new Error('UNAUTHORIZED_TENANT: Missing valid tenant affiliation in authentication token.');
+  err.statusCode = 403;
+  throw err;
 }
 
 /**
