@@ -299,7 +299,7 @@ async function runAudit() {
 
   test('Prisma Schema: Virtual back-relation on User model introduces no database columns', () => {
     const schemaContent = fs.readFileSync(path.join(__dirname, 'prisma/schema.prisma'), 'utf8');
-    assert(schemaContent.includes('respondedReviews  Review[]           @relation("ReviewResponder")'));
+    assert(/respondedReviews\s+Review\[\]\s+@relation\("ReviewResponder"\)/.test(schemaContent));
     // Ensure no foreign key field exists on User for reviews
     const userModel = schemaContent.slice(schemaContent.indexOf('model User {'), schemaContent.indexOf('@@map("users")'));
     assert(!userModel.includes('reviewId'));

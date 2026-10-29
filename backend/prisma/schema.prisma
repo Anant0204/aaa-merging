@@ -80,6 +80,9 @@ model Lead {
   // Property Investment Service Fields
   preferableArea   String?
   budget           String?
+  companyName      String?          @db.VarChar(191)
+  dealValue        Decimal?         @db.Decimal(12, 2)
+  currency         String           @default("USD") @db.VarChar(10)
   // Translation Service Lead Fields
   sourceLanguage   String?
   targetLanguage   String?
@@ -101,6 +104,7 @@ model Lead {
 
   @@map("leads")
   @@index([createdAt])
+  @@index([companyName])
 }
 
 
