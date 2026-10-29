@@ -3,35 +3,33 @@ import { useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { useMutation } from '@tanstack/react-query';
 
-// Spain Theme Image Assets
-import spainSevillePlaza from '../../assets/spain_seville_plaza.png';
-import spainRelocationLifestyle from '../../assets/spain_relocation_lifestyle.png';
-import waelMadiPhoto from '../../assets/wael_madi.png';
+// IT Enterprise Visual Assets
+import itHeroBanner from '../../assets/it_hero_banner.jpg';
+import itDevOpsShowcase from '../../assets/it_devops_showcase.jpg';
 
 // Material Icons
-import TranslateIcon from '@mui/icons-material/Translate';
-import VerifiedUserIcon from '@mui/icons-material/VerifiedUser';
-import DescriptionIcon from '@mui/icons-material/Description';
-import HomeIcon from '@mui/icons-material/Home';
-import BusinessCenterIcon from '@mui/icons-material/BusinessCenter';
-import SchoolIcon from '@mui/icons-material/School';
-import FamilyRestroomIcon from '@mui/icons-material/FamilyRestroom';
-import FlightTakeoffIcon from '@mui/icons-material/FlightTakeoff';
+import CodeIcon from '@mui/icons-material/Code';
+import TerminalIcon from '@mui/icons-material/Terminal';
+import CloudIcon from '@mui/icons-material/Cloud';
+import StorageIcon from '@mui/icons-material/Storage';
+import SecurityIcon from '@mui/icons-material/Security';
+import SpeedIcon from '@mui/icons-material/Speed';
+import SmartToyIcon from '@mui/icons-material/SmartToy';
+import DevicesIcon from '@mui/icons-material/Devices';
+import LayersIcon from '@mui/icons-material/Layers';
+import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
+import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
-import ShieldIcon from '@mui/icons-material/Shield';
-import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
-import LocalPhoneIcon from '@mui/icons-material/LocalPhone';
-import EmailIcon from '@mui/icons-material/Email';
-import LocationOnIcon from '@mui/icons-material/LocationOn';
-import InfoIcon from '@mui/icons-material/Info';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import MenuIcon from '@mui/icons-material/Menu';
 import CloseIcon from '@mui/icons-material/Close';
 import StarIcon from '@mui/icons-material/Star';
-import PublicIcon from '@mui/icons-material/Public';
+import PhoneIcon from '@mui/icons-material/Phone';
+import EmailIcon from '@mui/icons-material/Email';
+import LocationOnIcon from '@mui/icons-material/LocationOn';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import VerifiedIcon from '@mui/icons-material/Verified';
 import CheckIcon from '@mui/icons-material/Check';
 
 // Services
@@ -41,17 +39,13 @@ import { useAlert } from '../../contexts/AlertContext';
 export const LandingPage = () => {
   const navigate = useNavigate();
   const { showAlert } = useAlert();
-  
-  // Mobile Nav State
+
+  // Navigation & Interactive States
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  
-  // FAQ Accordion State
   const [activeFaq, setActiveFaq] = useState(null);
+  const [activeTab, setActiveTab] = useState('cloud');
 
-  // Login Dropdown State
-  const [loginDropdownOpen, setLoginDropdownOpen] = useState(false);
-
-  // Custom Scroll Helper for HashRouter Compatibility
+  // Smooth Scroll
   const handleScroll = (e, targetId) => {
     e.preventDefault();
     const element = document.getElementById(targetId);
@@ -60,37 +54,38 @@ export const LandingPage = () => {
     }
   };
 
-  // Form States
+  // IT Project Discovery Lead Form
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
     email: '',
     phone: '',
-    nationality: '',
-    countryOfResidence: '',
-    preferredLanguage: 'English',
-    serviceType: 'Digital Nomad Visa (DNV)',
+    companyName: '',
+    serviceType: 'Custom Software & SaaS Development',
+    budget: '$15,000 - $50,000',
+    timeline: '1 - 3 Months',
+    notes: '',
   });
 
-  // API Call Mutation
   const leadMutation = useMutation({
     mutationFn: dbService.createLead,
     onSuccess: () => {
-      showAlert('Thank you! Your eligibility assessment request has been submitted successfully. Our representative will contact you soon.', 'success');
+      showAlert('Thank you! Your project discovery request has been submitted. Our solutions architect will contact you within 24 hours.', 'success');
       setFormData({
         firstName: '',
         lastName: '',
         email: '',
         phone: '',
-        nationality: '',
-        countryOfResidence: '',
-        preferredLanguage: 'English',
-        serviceType: 'Digital Nomad Visa (DNV)',
+        companyName: '',
+        serviceType: 'Custom Software & SaaS Development',
+        budget: '$15,000 - $50,000',
+        timeline: '1 - 3 Months',
+        notes: '',
       });
     },
     onError: (error) => {
-      console.error(error);
-      showAlert('Failed to submit request. Please verify your details or try again later.', 'error');
+      console.error('Lead submission error:', error);
+      showAlert('Unable to submit inquiry. Please check your inputs or email us directly.', 'error');
     }
   });
 
@@ -102,303 +97,330 @@ export const LandingPage = () => {
   const handleFormSubmit = (e) => {
     e.preventDefault();
     if (!formData.firstName || !formData.lastName || !formData.email || !formData.phone) {
-      showAlert('Please fill in all required fields.', 'warning');
+      showAlert('Please fill in your name, business email, and contact number.', 'warning');
       return;
     }
+
     leadMutation.mutate({
       ...formData,
-      status: 'New Lead'
+      status: 'New Lead',
+      source: 'Landing Page'
     });
   };
 
-  // Nav items
+  // Navigation Links
   const navItems = [
     { label: 'Services', href: '#services' },
-    { label: 'Why Choose Us', href: '#why-us' },
-    { label: 'Packages', href: '#packages' },
-    { label: 'Our Founder', href: '#ceo' },
+    { label: 'Tech Stack', href: '#stack' },
+    { label: 'Process', href: '#process' },
+    { label: 'Plans', href: '#plans' },
+    { label: 'Case Studies', href: '#case-studies' },
     { label: 'FAQs', href: '#faqs' },
     { label: 'Contact', href: '#contact' },
   ];
 
-  // Core Services
+  // Core IT Services
   const services = [
     {
-      title: 'Digital Nomad Visa (DNV)',
-      desc: 'Remote work residency solutions tailored for professionals, freelancers, and global entrepreneurs planning to operate from Spain.',
-      icon: <BusinessCenterIcon className="text-brand-gold text-3xl" />,
-      tag: 'Most Popular'
+      title: 'Custom Software & SaaS Platforms',
+      desc: 'Scalable multi-tenant cloud architectures, enterprise web portals, and microservice backends built for high concurrency and zero downtime.',
+      icon: <CodeIcon className="text-[#C59B27] text-3xl" />,
+      tag: 'Core Specialization',
     },
     {
-      title: 'Non-Lucrative Visa (NLV)',
-      desc: 'Perfect residency option for retirees, families, and financially independent individuals wishing to reside in Spain without employment.',
-      icon: <VerifiedUserIcon className="text-brand-gold text-3xl" />
+      title: 'Full-Stack Web & Mobile Apps',
+      desc: 'Cross-platform native iOS & Android applications with Flutter & React Native alongside responsive ultra-fast web apps powered by React and Next.js.',
+      icon: <DevicesIcon className="text-[#3F51B5] text-3xl" />,
     },
     {
-      title: 'Self-Employed / Business Residency',
-      desc: 'Expert support for entrepreneurs and business owners establishing startups or local companies in Spain.',
-      icon: <PublicIcon className="text-brand-gold text-3xl" />
+      title: 'AI & Intelligent Automation',
+      desc: 'Custom LLM integrations, retrieval-augmented generation (RAG), computer vision, and workflow automation to unlock exponential efficiency.',
+      icon: <SmartToyIcon className="text-[#D2A33C] text-3xl" />,
+      tag: 'Trending',
     },
     {
-      title: 'Study Visa',
-      desc: 'Complete assistance for university admissions, prestigious language schools, master\'s programs, and Spain’s PCE preparation.',
-      icon: <SchoolIcon className="text-brand-gold text-3xl" />
+      title: 'Cloud Infrastructure & DevOps (SRE)',
+      desc: 'Automated CI/CD pipelines, Kubernetes container orchestration, Terraform infrastructure-as-code, and 24/7 site reliability engineering on AWS/GCP.',
+      icon: <CloudIcon className="text-emerald-400 text-3xl" />,
     },
     {
-      title: 'Partner & Family Reunification',
-      desc: 'Reliable residency support and documentation guidance to reunite legal residents or EU citizens with their spouses and children.',
-      icon: <FamilyRestroomIcon className="text-brand-gold text-3xl" />
+      title: 'Enterprise CRM & ERP Systems',
+      desc: 'Bespoke customer data platforms, sales pipeline automations, inventory management, and integration with legacy enterprise ERPs.',
+      icon: <LayersIcon className="text-[#E5C058] text-3xl" />,
     },
     {
-      title: 'Tourism Visa & Schengen Guidance',
-      desc: 'Professional itinerary planning, documents checklist preparation, and support for Schengen short-stay tourist applications.',
-      icon: <FlightTakeoffIcon className="text-brand-gold text-3xl" />
+      title: 'UI/UX Product Design & Prototyping',
+      desc: 'Human-centered user experience design, interactive Figma design systems, usability research, and rapid clickable prototypes.',
+      icon: <AutoAwesomeIcon className="text-indigo-400 text-3xl" />,
     },
     {
-      title: 'Property Investment Guidance',
-      desc: 'Comprehensive advice for global property buyers, high-net-worth investors, and local relocation compliance.',
-      icon: <HomeIcon className="text-brand-gold text-3xl" />
+      title: 'E-Commerce & Omnichannel Platforms',
+      desc: 'Headless e-commerce, high-volume checkout engines, payment gateway integrations, and real-time inventory synchronization.',
+      icon: <RocketLaunchIcon className="text-amber-400 text-3xl" />,
     },
     {
-      title: 'Spanish Sworn Translation',
-      desc: 'Certified translation of official documents (PCC, Birth Certificate, Bank Statements) from English, Arabic, Urdu, or French to Spanish by Ministry-approved sworn translators.',
-      icon: <TranslateIcon className="text-brand-gold text-3xl" />
+      title: '24/7 Managed IT Support & Security',
+      desc: 'Proactive vulnerability assessments, SOC2 & ISO 27001 compliance hardening, automated database backups, and dedicated SLA support.',
+      icon: <SecurityIcon className="text-[#C59B27] text-3xl" />,
     }
   ];
 
-  // Why Choose Us
-  const whyUsPoints = [
-    {
-      title: 'Dubai-Based Headquarters',
-      desc: 'Conveniently located in Dubai, proudly serving clients across the UAE, GCC, Asia, and globally.'
-    },
-    {
-      title: 'Specialized Spain Focus',
-      desc: 'Unlike generic agencies, we specialize exclusively in Spain visa, residency, and relocation pathways.'
-    },
-    {
-      title: 'Dedicated Case Managers',
-      desc: 'Personalized support with a single point of contact holding extensive experience in Spanish regulatory affairs.'
-    },
-    {
-      title: 'AI-Powered System & Automation',
-      desc: 'Optimized CRM and documentation checks for efficient processing and prompt status updates.'
-    },
-    {
-      title: 'End-to-End Support Services',
-      desc: 'We assist with everything from initial consultations and document verification to local Spanish settlement support.'
-    },
-    {
-      title: 'Complete Honesty & Transparency',
-      desc: 'No hidden charges. Clear contracts, honest assessments, and realistic feedback on application strength.'
-    }
-  ];
-
-  // Workflow Phases
-  const workflowSteps = [
-    {
-      step: '01',
-      title: 'Eligibility & Profile Assessment',
-      desc: 'We evaluate your profile, financial logs, and credentials to identify the optimal visa or residency pathway.'
-    },
-    {
-      step: '02',
-      title: 'Document Preparation & Verification',
-      desc: 'Our team prepares checklists, verifies translations, coordinates legalizations, and reviews drafts to eliminate errors.'
-    },
-    {
-      step: '03',
-      title: 'Submission & Legal Coordination',
-      desc: 'We coordinate with Spanish consulates and government offices, managing appointment scheduling and tracking.'
-    },
-    {
-      step: '04',
-      title: 'Post-Visa Relocation Support',
-      desc: 'After approval, we assist with NIE/TIE, local registration (Empadronamiento), bank accounts, and settlement.'
-    }
-  ];
-
-  // Packages list
-  const packages = [
-    {
-      title: 'Schengen Tourist Visa Package',
-      desc: 'Short-Stay Tourist Visa Support',
-      includes: [
-        'Initial Consultation & Profile Assessment',
-        'Personalized Documents Checklist',
-        'Flight Itinerary Route Guidance',
-        'Financial Documents Guidance',
-        'Application Forms Review',
-        'Appointment Booking Support',
-        'Submission Guidance & Updates'
-      ],
-      price: 'Standard Service Fee Apply',
-      accent: false
-    },
-    {
-      title: 'Residency Full Processing Package',
-      desc: 'Complete End-to-End Residency Applications',
-      includes: [
-        'Everything in Assessment Phase',
-        'Personalized Spain Residency Strategy',
-        'Risk & Weakness Profile Analysis',
-        'Sworn Translation Support',
-        'Legal Coordination in Spain & GCC',
-        'Full Dossier Review & Quality Check',
-        'Appeal Support (If applicable)'
-      ],
-      price: 'Comprehensive Pricing Available',
-      accent: false
-    },
-    {
-      title: 'Relocation Administrative Package',
-      desc: 'Essential In-Spain Setup Support',
-      includes: [
-        'Spanish NIE/NIF Assistance & Guidance',
-        'TIE Card & Fingerprint Appointment Assist',
-        'Local Empadronamiento Registration',
-        'Spanish Bank Account Opening Support',
-        'Digital Certificate Setup & Activation',
-        'Social Security & SIP Health Card Support',
-        'Spanish SIM Card & Mobile Connection'
-      ],
-      price: 'Relocation Assistance Rates',
-      accent: false
-    },
-    {
-      title: 'Premium Full Package',
-      desc: 'Our Ultimate All-Inclusive Relocation Solution',
-      includes: [
-        'Full Residency Processing (Assessment to Approval)',
-        'Full In-Spain Relocation & Admin Package',
-        'Priority Case Handling & VIP Status',
-        'Dedicated Senior Case Manager',
-        'Resubmission & Appeal Fees Included',
-        'Regular Milestones Progress Updates',
-        'Customized Settlement Roadmap'
-      ],
-      price: 'All-In-One Premium Rates',
-      accent: true
-    }
-  ];
-
-  // Testimonials
-  const testimonials = [
-    {
-      name: 'Aditya Tyagi',
-      role: 'Digital Nomad from Dubai',
-      text: 'Thanks to the AAA team, my Spain Digital Nomad Visa application was approved in record time! Their dedicated case manager reviewed every line of my bank statements and employment documents.',
-      rating: 5
-    },
-    {
-      name: 'Elena Rostova',
-      role: 'NLV Visa Holder',
-      text: 'I wanted to retire in Costa del Sol. AAA Business Consultancy guided us through the complex financial requirements of the Non-Lucrative Visa. The process was transparent and stress-free.',
-      rating: 5
-    },
-    {
-      name: 'Omar Al-Mansoori',
-      role: 'Business Investor',
-      text: 'AAA managed our company registration and business visa from Dubai. Their coordination with local lawyers in Madrid was seamless. Truly a top-grade professional service.',
-      rating: 5
-    }
-  ];
-
-  // FAQ Accordion Data
-  const faqs = [
-    {
-      q: 'What is the Spain Digital Nomad Visa (DNV)?',
-      a: 'The Spain Digital Nomad Visa allows remote workers, freelancers, and entrepreneurs who work for non-Spanish companies to reside in Spain. It offers a fast-track process, residency for up to 5 years, and potential tax benefits.'
-    },
-    {
-      q: 'Do you assist with document translations and legalizations?',
-      a: 'Yes! We provide complete Sworn Translation (Traducción Jurada) support as part of our full residency packages, which is mandatory for Spanish consulates. We also guide you on apostille and legalization procedures.'
-    },
-    {
-      q: 'How long does the Non-Lucrative Visa (NLV) process take?',
-      a: 'The Non-Lucrative Visa processing time typically varies between 4 to 8 weeks after document submission at the Spanish consulate in your home country. Gathering all the required documents (financial proof, medical certificates, background checks) takes another 3 to 4 weeks.'
-    },
-    {
-      q: 'Can you help us open a Spanish bank account and get NIE?',
-      a: 'Absolutely. NIE (Número de Identidad de Extranjero) assistance is included in our relocation packages. We also help you open your Spanish bank account remotely or immediately upon arrival, and assist with fingerprint appointments for the TIE card.'
-    },
-    {
-      q: 'Why should I choose a Dubai-based consultancy?',
-      a: 'Being based in Dubai allows us to provide real-time, face-to-face support for GCC-based clients. We understand the specific document requirements of consulates in the Middle East and coordinate directly with government entities locally and in Spain.'
-    }
-  ];
-
-  const handleFaqToggle = (index) => {
-    setActiveFaq(activeFaq === index ? null : index);
+  // Engineering Tech Stack Categories
+  const techCategories = {
+    cloud: [
+      { name: 'Amazon Web Services', tag: 'Cloud Platform', icon: 'AWS' },
+      { name: 'Google Cloud Platform', tag: 'Compute & AI', icon: 'GCP' },
+      { name: 'Kubernetes & Docker', tag: 'Containers', icon: 'K8s' },
+      { name: 'Terraform', tag: 'Infrastructure as Code', icon: 'TF' },
+      { name: 'GitHub Actions', tag: 'CI/CD Pipeline', icon: 'CI' },
+      { name: 'Cloudflare', tag: 'Edge & DDoS Defense', icon: 'CF' }
+    ],
+    backend: [
+      { name: 'Node.js & Express', tag: 'API Engine', icon: 'Node' },
+      { name: 'Python & FastAPI', tag: 'Data & AI', icon: 'Py' },
+      { name: 'Go (Golang)', tag: 'High Concurrency', icon: 'Go' },
+      { name: 'PostgreSQL', tag: 'Relational DB', icon: 'PG' },
+      { name: 'Redis', tag: 'In-Memory Cache', icon: 'Redis' },
+      { name: 'Apache Kafka', tag: 'Event Streaming', icon: 'Kafka' }
+    ],
+    frontend: [
+      { name: 'React 19 & Next.js', tag: 'Modern Web UI', icon: 'React' },
+      { name: 'TypeScript', tag: 'Type-Safe Logic', icon: 'TS' },
+      { name: 'Tailwind CSS', tag: 'Design System', icon: 'CSS' },
+      { name: 'React Native', tag: 'Mobile Engine', icon: 'RN' },
+      { name: 'Flutter', tag: 'Cross-Platform', icon: 'FL' },
+      { name: 'GraphQL / REST', tag: 'API Layer', icon: 'GQL' }
+    ],
+    ai: [
+      { name: 'OpenAI GPT-4o & Claude', tag: 'LLM Foundations', icon: 'AI' },
+      { name: 'LangChain & LlamaIndex', tag: 'RAG Frameworks', icon: 'LC' },
+      { name: 'Pinecone & pgvector', tag: 'Vector Databases', icon: 'VEC' },
+      { name: 'PyTorch & HuggingFace', tag: 'Model Training', icon: 'HF' },
+      { name: 'Whisper & Computer Vision', tag: 'Multimodal', icon: 'CV' },
+      { name: 'Automated RPA Bots', tag: 'Process Automation', icon: 'RPA' }
+    ]
   };
 
+  // Structured IT Delivery Workflow
+  const deliveryStages = [
+    {
+      num: '01',
+      title: 'Architectural Discovery',
+      desc: 'Technical scoping, business logic mapping, system architecture blueprinting, and SLA alignment before writing a single line of code.'
+    },
+    {
+      num: '02',
+      title: 'Agile Sprint Sprints',
+      desc: 'Bi-weekly sprint deliverables, interactive staging environments, continuous feature demos, and transparent burndown tracking.'
+    },
+    {
+      num: '03',
+      title: 'Automated QA & Security',
+      desc: 'Rigorous unit testing, automated regression suites, penetration testing, load simulation, and SOC2 compliance validation.'
+    },
+    {
+      num: '04',
+      title: 'Zero-Downtime Deployment',
+      desc: 'Blue/green or rolling cloud deployment, automated container orchestration, 24/7 telemetry monitoring, and ongoing warranty support.'
+    }
+  ];
+
+  // IT Engagement Packages
+  const engagementPlans = [
+    {
+      name: 'Startup MVP Acceleration',
+      badge: 'Rapid Launch',
+      desc: 'Designed for early-stage companies needing to validate and launch a production-ready digital product in 4 to 8 weeks.',
+      price: '$9,500',
+      period: 'Starting Project Scope',
+      features: [
+        'Full Product Architecture & Tech Spec',
+        'Modern React / Next.js Web Application',
+        'Node.js or Python Cloud Backend',
+        'Automated CI/CD Pipeline & AWS Setup',
+        'User Authentication & Role Management',
+        'Stripe / Payment Gateway Integration',
+        '30-Day Post-Launch Warranty Support'
+      ],
+      highlight: false
+    },
+    {
+      name: 'Dedicated Engineering Pod',
+      badge: 'Most Popular',
+      desc: 'A dedicated, full-stack software engineering team scaling your product roadmap with predictable monthly velocity.',
+      price: '$14,500',
+      period: 'per month / retainer',
+      features: [
+        'Dedicated Senior Full-Stack Engineers',
+        'Lead Solutions Architect & Tech PM',
+        'QA Engineer & Automated Test Coverage',
+        'Daily Standups & Bi-Weekly Sprint Demos',
+        'Direct Slack & Jira Workspace Integration',
+        'Code Ownership & Full IP Transfer',
+        'Flexible Pod Scaling (Up or Down)'
+      ],
+      highlight: true
+    },
+    {
+      name: 'Cloud & DevOps Modernization',
+      badge: 'Infrastructure',
+      desc: 'Transform legacy infrastructure into resilient, auto-scaling Kubernetes clusters with automated security guardrails.',
+      price: '$8,000',
+      period: 'one-time engagement',
+      features: [
+        'Cloud Infrastructure & Cost Audit',
+        'Docker & Kubernetes Migration',
+        'Terraform Infrastructure as Code',
+        'Zero-Downtime CI/CD Pipeline Setup',
+        'Database Optimization & Caching Strategy',
+        'Comprehensive Disaster Recovery Plan',
+        '24/7 Cloud Telemetry & Alerting'
+      ],
+      highlight: false
+    },
+    {
+      name: 'Enterprise Digital Transformation',
+      badge: 'Custom Enterprise',
+      desc: 'Bespoke end-to-end software, custom ERP/CRM, and AI-driven automation built for complex enterprise requirements.',
+      price: 'Custom Scope',
+      period: 'annual or multi-stage',
+      features: [
+        'Bespoke Enterprise Software Architecture',
+        'Deep Legacy Systems Integration',
+        'Custom AI & Workflow Automation Engines',
+        'SOC2 & ISO 27001 Security Hardening',
+        'Strict Guaranteed SLA (99.99% Uptime)',
+        '24/7/365 Dedicated SRE Support Team',
+        'Executive Steering & Governance'
+      ],
+      highlight: false
+    }
+  ];
+
+  // Case Studies
+  const caseStudies = [
+    {
+      client: 'Apex Fintech Global',
+      metric: '350% Throughput Surge',
+      service: 'High-Concurrency Payment Engine',
+      desc: 'Architected a microservices payment router handling 20,000+ transactions per minute with sub-50ms latency and bank-grade encryption.',
+      tags: ['Node.js', 'Redis', 'Kubernetes', 'AWS']
+    },
+    {
+      client: 'OmniHealth AI Systems',
+      metric: '99.4% Diagnostic Accuracy',
+      service: 'HIPAA-Compliant AI Platform',
+      desc: 'Built an intelligent patient triage and clinical data platform utilizing secure RAG LLM pipelines compliant with strict HIPAA guidelines.',
+      tags: ['Python', 'FastAPI', 'PyTorch', 'GCP']
+    },
+    {
+      client: 'Veloce Logistics & Supply',
+      metric: '42% Cost Reduction',
+      service: 'Custom ERP & Fleet Automation',
+      desc: 'Replaced disjointed legacy spreadsheets with an end-to-end automated ERP system tracking real-time telemetry across 1,200 vehicles.',
+      tags: ['React', 'Next.js', 'PostgreSQL', 'Docker']
+    }
+  ];
+
+  // FAQs
+  const faqs = [
+    {
+      q: 'Who owns the intellectual property (IP) and code of the project?',
+      a: 'You retain 100% ownership of all source code, design assets, database schemas, and intellectual property. Full repository access and documentation are handed over immediately upon milestone completion.'
+    },
+    {
+      q: 'How do you structure project communication and sprint delivery?',
+      a: 'We operate in 2-week agile sprints. You will have a dedicated Slack channel, Jira/Linear task board access, weekly demo calls, and daily asynchronous standup updates.'
+    },
+    {
+      q: 'Can you work with our existing in-house engineering team?',
+      a: 'Yes. Our dedicated pods integrate seamlessly into your existing Git workflows, CI/CD pipelines, and project management tools, acting as an organic extension of your engineering department.'
+    },
+    {
+      q: 'What happens after the product is launched in production?',
+      a: 'Every project includes a minimum 30-day post-launch warranty covering bug fixes and system stabilization. We also offer 24/7 ongoing maintenance, SRE support, and continuous feature development retainers.'
+    },
+    {
+      q: 'How do you guarantee data security and compliance?',
+      a: 'We follow security-by-design standards including AES-256 encryption at rest, TLS 1.3 in transit, role-based access control, regular penetration testing, and compliance readiness for SOC2 Type II, ISO 27001, and GDPR.'
+    }
+  ];
+
   return (
-    <div className="font-plus-jakarta bg-slate-50 text-slate-900 scroll-smooth selection:bg-brand-gold selection:text-white min-h-screen">
+    <div className="font-plus-jakarta bg-[#070D19] text-[#F9FAFB] min-h-screen selection:bg-[#C59B27] selection:text-[#051A3B]">
       
-      {/* 1. STICKY NAVIGATION BAR */}
-      <header className="sticky top-0 z-50 bg-brand-navy/95 backdrop-blur-md border-b border-brand-navy-light shadow-lg">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+      {/* 1. STICKY UNIFIED BRAND NAVIGATION BAR */}
+      <header className="sticky top-0 z-50 bg-[#070D19]/95 backdrop-blur-xl border-b border-[#1F2E4D] shadow-xl">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
           
-          {/* Logo */}
-          <Link to="/" className="flex items-center space-x-3 group">
-            <div className="relative w-12 h-12 bg-gradient-to-tr from-brand-gold via-yellow-500 to-brand-gold-dark rounded-xl flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform">
-              {/* Stylized A3 Logo */}
-              <span className="font-outfit font-extrabold text-2xl text-brand-navy tracking-tighter">A³</span>
+          {/* Logo & Brand Identity (flex-shrink-0 to guarantee no text collision) */}
+          <Link to="/" className="flex items-center space-x-3 group flex-shrink-0">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#3F51B5] via-indigo-600 to-[#C59B27] flex items-center justify-center font-outfit font-black text-xl text-white shadow-lg shadow-[#3F51B5]/30 group-hover:scale-105 transition-transform flex-shrink-0">
+              K
             </div>
-            <div className="flex flex-col">
-              <span className="font-outfit font-bold text-lg text-white leading-tight tracking-wide group-hover:text-brand-gold transition-colors">
-                AAA BUSINESS CONSULTANCY
+            <div className="flex flex-col flex-shrink-0">
+              <span className="font-outfit font-black text-lg text-white tracking-tight flex items-center space-x-1.5 leading-none">
+                <span>KIAAN</span>
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#C59B27] to-[#E5C058]">TECHNOLOGIES</span>
               </span>
-              <span className="text-[10px] text-brand-gold uppercase tracking-[0.25em] font-semibold">
-                Advise • Assist • Achieve
+              <span className="text-[10px] text-slate-400 uppercase tracking-[0.2em] font-medium mt-1">
+                Cloud • Software • AI Systems
               </span>
             </div>
           </Link>
 
-          {/* Desktop Links */}
-          <nav className="hidden md:flex space-x-8 items-center">
+          {/* Desktop Navigation Links with generous breathing room */}
+          <nav className="hidden lg:flex items-center space-x-5 xl:space-x-7">
             {navItems.map((item, idx) => (
               <a
                 key={idx}
                 href={item.href}
                 onClick={(e) => handleScroll(e, item.href.replace('#', ''))}
-                className="text-slate-300 hover:text-brand-gold text-sm font-medium transition-colors"
+                className="text-slate-300 hover:text-[#E5C058] text-xs uppercase tracking-wider font-semibold transition-colors whitespace-nowrap"
               >
                 {item.label}
               </a>
             ))}
           </nav>
 
-          {/* Action Buttons */}
-          <div className="hidden lg:flex items-center">
+          {/* Right Action Buttons */}
+          <div className="hidden sm:flex items-center space-x-3 flex-shrink-0">
             <Link
               to="/login"
-              className="text-xs font-semibold bg-brand-gold text-brand-navy hover:bg-brand-gold-light px-6 py-3 rounded-lg shadow-md hover:shadow-brand-gold/20 transition-all transform hover:-translate-y-0.5"
+              className="text-xs font-semibold text-slate-300 hover:text-white px-4 py-2 rounded-lg border border-[#1F2E4D] bg-[#0B1426] hover:border-[#C59B27]/60 hover:bg-[#122038] transition-all whitespace-nowrap"
             >
-              Staff Login
+              Client &amp; Staff Portal
             </Link>
+            <a
+              href="#contact"
+              onClick={(e) => handleScroll(e, 'contact')}
+              className="text-xs font-extrabold text-[#051A3B] bg-gradient-to-r from-[#C59B27] via-amber-400 to-[#E5C058] hover:brightness-110 px-5 py-2.5 rounded-lg shadow-lg shadow-[#C59B27]/20 transition-all transform hover:-translate-y-0.5 flex items-center space-x-1.5 whitespace-nowrap"
+            >
+              <span>Start Project</span>
+              <ArrowForwardIcon className="text-xs!" />
+            </a>
           </div>
 
-          {/* Mobile menu button */}
-          <div className="md:hidden flex items-center">
+          {/* Mobile Menu Toggle */}
+          <div className="lg:hidden flex items-center flex-shrink-0">
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="text-slate-300 hover:text-white p-2 focus:outline-none"
-              aria-label="Toggle menu"
+              className="text-slate-300 hover:text-white p-2 rounded-lg bg-[#0B1426] border border-[#1F2E4D]"
+              aria-label="Toggle navigation"
             >
               {mobileMenuOpen ? <CloseIcon /> : <MenuIcon />}
             </button>
           </div>
         </div>
 
-        {/* Mobile menu dropdown */}
+        {/* Mobile Dropdown Menu */}
         <AnimatePresence>
           {mobileMenuOpen && (
             <motion.div
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              className="md:hidden bg-brand-navy border-t border-brand-navy-light px-4 pt-4 pb-6 space-y-3"
+              className="lg:hidden bg-[#0B1426] border-t border-[#1F2E4D] px-6 py-6 space-y-3"
             >
               {navItems.map((item, idx) => (
                 <a
@@ -408,19 +430,29 @@ export const LandingPage = () => {
                     setMobileMenuOpen(false);
                     handleScroll(e, item.href.replace('#', ''));
                   }}
-                  className="block text-slate-300 hover:text-brand-gold py-2 text-base font-medium border-b border-brand-navy-light"
+                  className="block text-slate-300 hover:text-[#E5C058] py-2 text-sm font-medium border-b border-[#1F2E4D]/60"
                 >
                   {item.label}
                 </a>
               ))}
-              <div className="pt-4 flex flex-col space-y-3">
+              <div className="pt-2 flex flex-col space-y-3">
                 <Link
                   to="/login"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="text-center bg-brand-gold text-brand-navy py-2.5 rounded-lg text-sm font-bold shadow-sm"
+                  className="text-center text-xs font-semibold text-slate-300 py-2.5 rounded-lg border border-[#1F2E4D] bg-[#070D19]"
                 >
-                  Staff Login
+                  Client &amp; Staff Portal
                 </Link>
+                <a
+                  href="#contact"
+                  onClick={(e) => {
+                    setMobileMenuOpen(false);
+                    handleScroll(e, 'contact');
+                  }}
+                  className="text-center text-xs font-bold text-[#051A3B] py-3 rounded-lg bg-gradient-to-r from-[#C59B27] to-[#E5C058] shadow-md"
+                >
+                  Request Technical Consultation
+                </a>
               </div>
             </motion.div>
           )}
@@ -428,140 +460,118 @@ export const LandingPage = () => {
       </header>
 
       {/* 2. HERO SECTION */}
-      <section className="relative bg-brand-navy overflow-hidden py-12 lg:py-20">
-        {/* Background Gradients & Accents */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(197,155,39,0.08),transparent_50%)]" />
-        <div className="absolute -top-40 -right-40 w-96 h-96 bg-brand-gold/10 rounded-full blur-[120px]" />
+      <section className="relative overflow-hidden pt-12 pb-20 lg:pt-20 lg:pb-28">
+        {/* Unified Navy & Gold Ambient Glow Backgrounds */}
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[450px] bg-gradient-to-tr from-[#3F51B5]/20 via-[#0B2A59]/30 to-[#C59B27]/15 rounded-full blur-[140px] pointer-events-none" />
+        <div className="absolute top-0 right-0 w-96 h-96 bg-[#C59B27]/10 rounded-full blur-[120px] pointer-events-none" />
         
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
             
             {/* Hero Left Content */}
             <div className="lg:col-span-7 flex flex-col space-y-6 text-center lg:text-left">
-              <div className="inline-flex self-center lg:self-start items-center space-x-2 bg-brand-navy-light/60 border border-brand-gold/20 px-3 py-1.5 rounded-full">
-                <span className="w-2 h-2 bg-brand-gold rounded-full animate-ping" />
-                <span className="text-[11px] font-outfit text-brand-gold uppercase tracking-[0.2em] font-bold">
-                  Dubai Headquartered • Global Services
+              
+              <div className="inline-flex self-center lg:self-start items-center space-x-2.5 bg-[#0B1426] border border-[#C59B27]/30 px-3.5 py-1.5 rounded-full shadow-inner">
+                <span className="w-2 h-2 bg-[#C59B27] rounded-full animate-ping" />
+                <span className="text-[11px] font-outfit text-[#E5C058] uppercase tracking-widest font-bold">
+                  Kiaan Technologies • Cloud-Native &amp; AI Systems
                 </span>
               </div>
               
-              <h1 className="font-outfit font-black text-4xl sm:text-5xl lg:text-6xl text-white tracking-tight leading-[1.1]!">
-                Spain Visa &amp; <br className="hidden sm:inline" />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-gold via-yellow-400 to-brand-gold-light">
-                  Relocation Experts
+              <h1 className="font-outfit font-black text-4xl sm:text-5xl lg:text-6xl text-white tracking-tight leading-[1.08]!">
+                Engineering Scalable <br className="hidden sm:inline" />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-[#E5C058]">
+                  Digital Products &amp; Cloud Architectures
                 </span>
               </h1>
               
               <p className="text-slate-300 text-base sm:text-lg max-w-2xl mx-auto lg:mx-0 leading-relaxed font-light">
-                Your trusted partner for a better future in Spain. We simplify your immigration journey with personalized visa strategies, secure document verification, and end-to-end relocation assistance.
+                We partner with ambitious startups and global enterprises to design, build, and deploy high-concurrency web applications, AI automations, and resilient cloud infrastructure with complete intellectual property ownership.
               </p>
 
-              <div className="flex flex-wrap justify-center lg:justify-start gap-3 pt-4">
+              {/* Action Buttons */}
+              <div className="flex flex-wrap justify-center lg:justify-start gap-4 pt-2">
                 <a
                   href="#contact"
                   onClick={(e) => handleScroll(e, 'contact')}
-                  className="bg-brand-gold hover:bg-brand-gold-light text-brand-navy font-bold px-8 py-4 rounded-xl shadow-lg hover:shadow-brand-gold/20 transition-all flex items-center justify-center space-x-2 text-sm transform hover:-translate-y-0.5 animate-pulse"
+                  className="bg-gradient-to-r from-[#C59B27] via-amber-400 to-[#E5C058] hover:brightness-110 text-[#051A3B] font-extrabold px-8 py-4 rounded-xl shadow-xl shadow-[#C59B27]/20 transition-all flex items-center justify-center space-x-2 text-sm transform hover:-translate-y-0.5"
                 >
-                  <span>Contact Corporate Offices</span>
+                  <span>Schedule Technical Discovery</span>
                   <ArrowForwardIcon className="text-sm!" />
                 </a>
-                <button
-                  onClick={() => navigate('/public/translation')}
-                  className="bg-transparent border-2 border-brand-gold text-brand-gold hover:bg-brand-gold hover:text-brand-navy font-bold px-8 py-4 rounded-xl transition-all flex items-center justify-center space-x-2 text-sm transform hover:-translate-y-0.5"
+                <a
+                  href="#services"
+                  onClick={(e) => handleScroll(e, 'services')}
+                  className="bg-[#0B1426] hover:bg-[#122038] border border-[#1F2E4D] hover:border-[#C59B27]/50 text-slate-200 font-semibold px-8 py-4 rounded-xl transition-all flex items-center justify-center space-x-2 text-sm backdrop-blur-md"
                 >
-                  <span>🇪🇸 Spain Sworn Translation</span>
-                </button>
+                  <span>Explore Capabilities</span>
+                </a>
               </div>
 
-              {/* Trust Indicators */}
-              <div className="grid grid-cols-3 gap-4 pt-10 border-t border-brand-navy-light/60 max-w-md mx-auto lg:mx-0">
-                <div>
-                  <div className="text-xl font-bold font-outfit text-white">22+ Years</div>
-                  <div className="text-[11px] text-slate-400">CEO Experience</div>
+              {/* Live Reliability Metrics */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-8 border-t border-[#1F2E4D]">
+                <div className="space-y-0.5">
+                  <div className="text-2xl font-black font-outfit text-[#E5C058]">99.99%</div>
+                  <div className="text-[11px] text-slate-400 font-light">Guaranteed Uptime SLA</div>
                 </div>
-                <div>
-                  <div className="text-xl font-bold font-outfit text-white">100%</div>
-                  <div className="text-[11px] text-slate-400">Transparency</div>
+                <div className="space-y-0.5">
+                  <div className="text-2xl font-black font-outfit text-white">250+</div>
+                  <div className="text-[11px] text-slate-400 font-light">Deployed Systems</div>
                 </div>
-                <div>
-                  <div className="text-xl font-bold font-outfit text-white">Dedicated</div>
-                  <div className="text-[11px] text-slate-400">Case Managers</div>
+                <div className="space-y-0.5">
+                  <div className="text-2xl font-black font-outfit text-white">&lt; 24hr</div>
+                  <div className="text-[11px] text-slate-400 font-light">Rapid Sprint Start</div>
+                </div>
+                <div className="space-y-0.5">
+                  <div className="text-2xl font-black font-outfit text-[#E5C058]">100%</div>
+                  <div className="text-[11px] text-slate-400 font-light">Client IP Ownership</div>
                 </div>
               </div>
             </div>
 
-            {/* Hero Right Visual (Responsive stacked on mobile, absolute rotated cards on desktop) */}
-            <div className="lg:col-span-5 relative w-full flex flex-col space-y-6 py-6 lg:pt-0 lg:pb-16 lg:block">
-              
-              {/* Spain Seville Plaza Background Image Card */}
-              <div className="w-full lg:w-[85%] aspect-[4/3] rounded-2xl overflow-hidden border border-brand-gold/30 shadow-2xl bg-slate-900 relative z-10 lg:transform lg:-rotate-3">
-                <img
-                  src={spainSevillePlaza}
-                  alt="Seville, Spain"
-                  className="w-full h-full object-cover filter brightness-90"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-brand-navy/60 to-transparent" />
-                <div className="absolute bottom-2 left-3 bg-brand-navy/80 px-2 py-0.5 rounded text-[8px] text-brand-gold font-bold">
-                  Plaza de España, Spain
-                </div>
-              </div>
-              
-              {/* Main Card (Spain Visa Card) - Overlapping the bottom right on desktop */}
-              <div className="w-full lg:absolute lg:-bottom-10 lg:right-0 bg-brand-navy-light/95 border border-brand-gold/20 p-5 rounded-xl shadow-2xl z-20 backdrop-blur-sm lg:max-w-[320px] lg:transform lg:rotate-2 lg:hover:rotate-0 lg:hover:scale-102 transition-all duration-300">
-                <div className="flex justify-between items-center mb-4">
-                  <div className="flex items-center space-x-2">
-                    <div className="w-2.5 h-2.5 bg-red-500 rounded-full" />
-                    <div className="w-2.5 h-2.5 bg-yellow-400 rounded-full" />
-                    <div className="w-2.5 h-2.5 bg-green-500 rounded-full" />
-                  </div>
-                  <span className="text-[8px] uppercase bg-brand-gold/15 text-brand-gold font-bold px-1.5 py-0.5 rounded border border-brand-gold/10">
-                    LIVE TRACKER
-                  </span>
-                </div>
-
-                <h3 className="font-outfit font-bold text-sm text-white mb-2 leading-tight">Relocation Roadmap</h3>
-                <div className="space-y-3">
-                  <div className="flex items-start space-x-2 bg-brand-navy/60 p-2 rounded border border-brand-gold/10">
-                    <CheckCircleIcon className="text-brand-gold text-sm mt-0.5!" />
-                    <div>
-                      <div className="text-[10px] font-semibold text-white">Profile Approved</div>
-                      <div className="text-[8px] text-slate-400">DNV Eligibility check passed</div>
-                    </div>
+            {/* Hero Right Visual (Modern 3D High-Tech Infrastructure Showcase) */}
+            <div className="lg:col-span-5 relative">
+              <div className="relative rounded-2xl p-1 bg-gradient-to-tr from-[#3F51B5]/40 via-[#0B2A59]/40 to-[#C59B27]/40 shadow-2xl shadow-black/60">
+                <div className="relative rounded-[14px] overflow-hidden bg-[#050A14] aspect-[16/10] border border-[#1F2E4D]">
+                  <img
+                    src={itHeroBanner}
+                    alt="Cloud & AI IT Ecosystem"
+                    className="w-full h-full object-cover filter brightness-95 hover:scale-102 transition-transform duration-700"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#070D19] via-transparent to-transparent opacity-80" />
+                  
+                  {/* Floating Live Telemetry Badge 1 */}
+                  <div className="absolute top-4 left-4 bg-[#0B1426]/90 backdrop-blur-md border border-[#C59B27]/30 px-3 py-1.5 rounded-lg flex items-center space-x-2">
+                    <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
+                    <span className="text-[10px] font-mono font-bold text-[#E5C058]">API Gateway: 18ms Latency</span>
                   </div>
 
-                  <div className="flex items-start space-x-2 bg-brand-navy/60 p-2 rounded border border-brand-gold/10">
-                    <CheckCircleIcon className="text-brand-gold text-sm mt-0.5!" />
-                    <div>
-                      <div className="text-[10px] font-semibold text-white">Documents Sworn Translated</div>
-                      <div className="text-[8px] text-slate-400">Apostilled &amp; translated to Spanish</div>
+                  {/* Floating Live Telemetry Badge 2 */}
+                  <div className="absolute bottom-4 left-4 right-4 bg-[#0B1426]/95 backdrop-blur-md border border-[#1F2E4D] p-3 rounded-xl flex items-center justify-between">
+                    <div className="flex items-center space-x-2.5">
+                      <div className="w-8 h-8 rounded-lg bg-[#3F51B5]/20 text-[#3F51B5] flex items-center justify-center font-bold">
+                        <CloudIcon className="text-base!" />
+                      </div>
+                      <div>
+                        <div className="text-xs font-bold text-white">Microservices Cluster</div>
+                        <div className="text-[10px] text-slate-400 font-mono">48/48 Pods Healthy (Kubernetes)</div>
+                      </div>
                     </div>
+                    <span className="text-[10px] uppercase font-bold text-[#E5C058] bg-[#C59B27]/15 border border-[#C59B27]/30 px-2 py-0.5 rounded">
+                      SOC2 Ready
+                    </span>
                   </div>
-
-                  <div className="flex items-start space-x-2 bg-brand-navy/30 p-2 rounded border border-slate-700/50">
-                    <div className="w-3.5 h-3.5 rounded-full border border-dashed border-brand-gold/50 flex items-center justify-center text-[8px] text-brand-gold font-bold animate-pulse">
-                      ●
-                    </div>
-                    <div>
-                      <div className="text-[10px] font-semibold text-white">Consulate Appointment</div>
-                      <div className="text-[8px] text-slate-400">Scheduling appointment in Dubai / GCC</div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="mt-4 pt-3 border-t border-brand-navy/80 flex items-center justify-between text-[9px] text-slate-400">
-                  <span>Est. Processing: 21 Days</span>
-                  <span className="text-brand-gold font-semibold">Stage 3 of 4</span>
                 </div>
               </div>
 
-              {/* Sub Card 1 (Relocation Check) - Floating top right */}
-              <div className="absolute -top-6 right-4 bg-white p-3 rounded-lg shadow-xl z-30 border border-slate-100 flex items-center space-x-2 hidden lg:flex">
-                <div className="p-1 bg-green-50 rounded text-green-600">
-                  <CheckIcon className="text-sm!" />
+              {/* Floating Tech Stat Mini-Card */}
+              <div className="hidden sm:flex absolute -bottom-6 -left-6 bg-[#0B1426]/95 border border-[#1F2E4D] p-3.5 rounded-xl shadow-2xl backdrop-blur-md items-center space-x-3 z-20">
+                <div className="p-2 bg-[#C59B27]/10 rounded-lg text-[#C59B27]">
+                  <VerifiedIcon className="text-xl!" />
                 </div>
                 <div>
-                  <div className="text-[10px] font-bold text-slate-900">Spanish NIE Issued</div>
-                  <div className="text-[8px] text-slate-400">TIE appointment set</div>
+                  <div className="text-xs font-bold text-white">CI/CD Production Rollout</div>
+                  <div className="text-[10px] text-slate-400 font-mono">Zero-Downtime Blue/Green Deploy</div>
                 </div>
               </div>
 
@@ -571,228 +581,254 @@ export const LandingPage = () => {
         </div>
       </section>
 
-      {/* 3. TRUSTED BY / CLIENTS */}
-      <section className="bg-slate-100 border-y border-slate-200 py-5">
+      {/* 3. TECH LOGOS / ECOSYSTEM BANNER */}
+      <section className="bg-[#050A14] border-y border-[#1F2E4D] py-6">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0 text-center md:text-left">
-            <span className="text-xs font-outfit uppercase tracking-widest text-slate-400 font-bold mb-2 md:mb-0">
-              Trusted by Clients Across the Globe
+            <span className="text-xs font-outfit uppercase tracking-widest text-[#C59B27] font-bold">
+              Engineering Cloud Ecosystems With
             </span>
-            <div className="grid grid-cols-2 sm:flex sm:flex-wrap justify-center items-center gap-4 sm:gap-8 md:gap-12 opacity-70">
-              <span className="font-outfit font-extrabold text-[10px] sm:text-xs text-slate-600 uppercase tracking-widest text-center">DUBAI HEADQUARTERS</span>
-              <span className="font-outfit font-extrabold text-[10px] sm:text-xs text-slate-600 uppercase tracking-widest text-center">GCC COVERAGE</span>
-              <span className="font-outfit font-extrabold text-[10px] sm:text-xs text-slate-600 uppercase tracking-widest text-center">ASIA &amp; MIDDLE EAST</span>
-              <span className="font-outfit font-extrabold text-[10px] sm:text-xs text-slate-600 uppercase tracking-widest text-center">SPAIN PARTNERS</span>
+            <div className="flex flex-wrap justify-center items-center gap-6 sm:gap-10 text-slate-300 font-mono text-xs sm:text-sm font-semibold">
+              <span className="hover:text-[#E5C058] transition-colors flex items-center space-x-1.5">
+                <CloudIcon className="text-base text-[#3F51B5]" />
+                <span>AWS &amp; GCP</span>
+              </span>
+              <span className="hover:text-[#E5C058] transition-colors flex items-center space-x-1.5">
+                <CodeIcon className="text-base text-[#C59B27]" />
+                <span>React 19 &amp; Next.js</span>
+              </span>
+              <span className="hover:text-[#E5C058] transition-colors flex items-center space-x-1.5">
+                <TerminalIcon className="text-base text-emerald-400" />
+                <span>Node &amp; Python</span>
+              </span>
+              <span className="hover:text-[#E5C058] transition-colors flex items-center space-x-1.5">
+                <SmartToyIcon className="text-base text-purple-400" />
+                <span>OpenAI &amp; RAG AI</span>
+              </span>
+              <span className="hover:text-[#E5C058] transition-colors flex items-center space-x-1.5">
+                <StorageIcon className="text-base text-amber-400" />
+                <span>PostgreSQL &amp; Redis</span>
+              </span>
             </div>
           </div>
         </div>
       </section>
 
-      {/* 4. ABOUT COMPANY */}
-      <section className="py-12 bg-white" id="about">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-            
-            {/* Left text */}
-            <div className="lg:col-span-7 space-y-6">
-              <div className="text-xs font-outfit uppercase tracking-widest text-brand-gold font-bold">
-                About Our Firm
-              </div>
-              <h2 className="font-outfit font-extrabold text-3xl sm:text-4xl text-brand-navy">
-                Advise. Assist. Achieve. <br className="hidden md:inline" />
-                Your Journey. Our Expertise.
-              </h2>
-              <div className="h-1 w-12 bg-brand-gold rounded" />
-              <p className="text-slate-600 text-sm sm:text-base leading-relaxed font-light">
-                AAA Business Consultancy is a professional consultancy firm specializing in Spain visa, residency, study, and relocation solutions. Based in Dubai and serving clients worldwide, we provide personalized guidance and professional support for individuals, families, entrepreneurs, remote workers, and investors planning their future in Spain.
-              </p>
-              <p className="text-slate-600 text-sm sm:text-base leading-relaxed font-light">
-                With a modern approach powered by professional consultation, digital systems, and strategic partnerships, our mission is to make the Spain visa, residency, and relocation journey simple, transparent, and stress-free. We don’t just process applications — we help our clients build new opportunities, new lifestyles, and a better future in Spain.
-              </p>
-
-              {/* Values grid */}
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 pt-6">
-                {['Integrity & Honesty', 'Professionalism', 'Transparency', 'Client Focus', 'Excellence', 'Commitment'].map((val, idx) => (
-                  <div key={idx} className="flex items-center space-x-2 text-slate-700">
-                    <CheckCircleIcon className="text-brand-gold text-sm!" />
-                    <span className="text-xs font-semibold">{val}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Right graphics - Spain Relocation Lifestyle Image + Foundations */}
-            <div className="lg:col-span-5 flex flex-col space-y-6">
-              <div className="relative rounded-2xl overflow-hidden border-2 border-brand-gold/30 shadow-xl group aspect-[4/3] bg-slate-900">
-                <img
-                  src={spainRelocationLifestyle}
-                  alt="Relocating to Spain"
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-brand-navy/90 via-slate-900/20 to-transparent" />
-                <div className="absolute bottom-4 left-4 right-4 bg-white/10 backdrop-blur-md border border-white/20 p-4 rounded-xl">
-                  <span className="text-[10px] font-outfit text-brand-gold uppercase tracking-widest font-bold">Relocation Lifestyle</span>
-                  <p className="text-xs text-white mt-1 font-light leading-snug">
-                    "Helping clients build new opportunities, new lifestyles, and a better future in Spain."
-                  </p>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="p-6 bg-slate-50 rounded-xl border border-slate-100 shadow-sm min-h-[135px] flex flex-col justify-between">
-                  <div>
-                    <span className="text-[11px] font-bold text-brand-gold uppercase tracking-wider block">Our Mission</span>
-                    <p className="text-[10px] text-slate-600 mt-2 leading-relaxed font-light">
-                      To make the Spain visa, residency, and relocation journey simple, transparent, and stress-free through client-centric legal compliance and proactive document coordination.
-                    </p>
-                  </div>
-                </div>
-                <div className="p-6 bg-slate-50 rounded-xl border border-slate-100 shadow-sm min-h-[135px] flex flex-col justify-between">
-                  <div>
-                    <span className="text-[11px] font-bold text-brand-gold uppercase tracking-wider block">Our Vision</span>
-                    <p className="text-[10px] text-slate-600 mt-2 leading-relaxed font-light">
-                      To be the most preferred, trusted corporate and client consultancy for Spain immigration across the GCC, recognized for absolute integrity and high approval rates.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-          </div>
-        </div>
-      </section>
-
-      {/* 5. SERVICES */}
-      <section className="py-12 bg-slate-50 border-t border-slate-200" id="services">
+      {/* 4. CORE SERVICES SECTION */}
+      <section className="py-20 bg-[#070D19]" id="services">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
-          <div className="text-center max-w-3xl mx-auto mb-8 space-y-4">
-            <span className="text-xs font-outfit uppercase tracking-widest text-brand-gold font-bold">
-              Specialized Pathways
+          <div className="text-center max-w-3xl mx-auto mb-14 space-y-3">
+            <span className="text-xs font-outfit uppercase tracking-widest text-[#C59B27] font-bold">
+              Comprehensive Technology Capabilities
             </span>
-            <h2 className="font-outfit font-black text-3xl sm:text-4xl text-brand-navy">
-              Spain Visa &amp; Residency Services
+            <h2 className="font-outfit font-black text-3xl sm:text-4xl text-white">
+              End-to-End IT Services &amp; Digital Engineering
             </h2>
-            <p className="text-slate-500 text-sm font-light max-w-xl mx-auto leading-relaxed">
-              Whether you are relocating for work, business, study, retirement, family, or investment, our team is committed to providing reliable support at every step.
+            <p className="text-slate-400 text-sm sm:text-base font-light">
+              From initial product ideation and system architecture to high-velocity full-stack engineering and 24/7 site reliability.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {services.map((item, idx) => (
               <motion.div
                 key={idx}
-                whileHover={{ y: -8, boxShadow: '0px 20px 25px -5px rgba(15, 23, 42, 0.05), 0px 10px 10px -5px rgba(15, 23, 42, 0.05)' }}
-                onClick={() => item.link ? navigate(item.link) : null}
-                className={`bg-white p-6 rounded-2xl border border-slate-100 shadow-sm relative flex flex-col h-full group transition-all ${item.link ? 'cursor-pointer' : ''}`}
+                whileHover={{ y: -6 }}
+                className="bg-[#0B1426] border border-[#1F2E4D] hover:border-[#C59B27]/50 p-6 rounded-2xl shadow-xl transition-all relative flex flex-col justify-between group overflow-hidden"
               >
-                {item.tag && (
-                  <span className="absolute top-4 right-4 text-[10px] font-bold bg-brand-gold/10 text-brand-gold border border-brand-gold/25 px-2.5 py-0.5 rounded-full">
-                    {item.tag}
-                  </span>
-                )}
-                <div className="w-14 h-14 bg-brand-navy/5 rounded-xl flex items-center justify-center mb-6 group-hover:bg-brand-gold/15 transition-colors">
-                  {item.icon}
+                <div>
+                  <div className="flex justify-between items-start mb-5">
+                    <div className="w-12 h-12 bg-[#070D19] border border-[#1F2E4D] rounded-xl flex items-center justify-center group-hover:scale-105 transition-transform">
+                      {item.icon}
+                    </div>
+                    {item.tag && (
+                      <span className="text-[10px] font-bold bg-[#C59B27]/10 text-[#E5C058] border border-[#C59B27]/25 px-2.5 py-0.5 rounded-full">
+                        {item.tag}
+                      </span>
+                    )}
+                  </div>
+                  
+                  <h3 className="font-outfit font-bold text-base text-white mb-2.5 group-hover:text-[#E5C058] transition-colors">
+                    {item.title}
+                  </h3>
+                  <p className="text-slate-400 text-xs leading-relaxed font-light">
+                    {item.desc}
+                  </p>
                 </div>
-                <h3 className="font-outfit font-bold text-base text-brand-navy mb-3 group-hover:text-brand-gold transition-colors">
-                  {item.title}
-                </h3>
-                <p className="text-slate-500 text-xs leading-relaxed font-light flex-grow">
-                  {item.desc}
-                </p>
+
+                <div className="mt-6 pt-4 border-t border-[#1F2E4D] flex items-center text-xs font-semibold text-[#C59B27] group-hover:text-[#E5C058]">
+                  <span>Explore Architecture</span>
+                  <ArrowForwardIcon className="text-xs! ml-1 group-hover:translate-x-1 transition-transform" />
+                </div>
               </motion.div>
             ))}
           </div>
 
-          {/* Translation mini-CTA */}
-          {/* Informational Subtext */}
-          <div className="mt-8 text-center">
-            <p className="text-xs text-slate-500 font-light">
-              * Legalizations, sworn translations, and consular appointments are coordinated directly through our Madrid legal hub.
-            </p>
-          </div>
-
         </div>
       </section>
 
-      {/* 6. WHY CHOOSE US */}
-      <section className="py-12 bg-white" id="why-us">
+      {/* 5. ENGINEERING SHOWCASE & DEVOPS SECTION */}
+      <section className="py-20 bg-[#050A14] border-t border-[#1F2E4D] relative overflow-hidden" id="showcase">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
             
             {/* Left Content */}
-            <div className="lg:col-span-5 space-y-6">
-              <span className="text-xs font-outfit uppercase tracking-widest text-brand-gold font-bold">
-                Why Clients Trust AAA
+            <div className="lg:col-span-6 space-y-6">
+              <span className="text-xs font-outfit uppercase tracking-widest text-[#C59B27] font-bold">
+                DevOps &amp; Continuous Delivery
               </span>
-              <h2 className="font-outfit font-black text-3xl sm:text-4xl text-brand-navy leading-tight!">
-                Professional Spain Relocation Solutions
+              <h2 className="font-outfit font-black text-3xl sm:text-4xl text-white leading-tight">
+                Built for High Concurrency, Microseconds Latency &amp; Zero Downtime
               </h2>
-              <div className="h-1 w-12 bg-brand-gold rounded" />
-              <p className="text-slate-600 text-sm font-light leading-relaxed">
-                AAA Business Consultancy was built on a strong foundation of trust, honesty, and long-term client relationships. We do not just submit application packets; we verify, improve, translate, and secure every document to maximize your approval rates.
-              </p>
+              <div className="h-1 w-12 bg-[#C59B27] rounded" />
               
-              <div className="bg-slate-50 border border-slate-100 p-4 rounded-xl flex items-center space-x-3">
-                <ShieldIcon className="text-brand-gold text-2xl!" />
-                <div>
-                  <div className="text-xs font-bold text-brand-navy">100% Confidential &amp; Secure</div>
-                  <div className="text-[11px] text-slate-500">Your personal details are protected at every stage.</div>
+              <p className="text-slate-300 text-sm font-light leading-relaxed">
+                Modern enterprise applications cannot afford infrastructure bottlenecks. Our engineering pods design resilient cloud environments with real-time observability, automated container failover, and strict regression test suites.
+              </p>
+
+              <div className="space-y-3.5">
+                <div className="flex items-start space-x-3 bg-[#0B1426] border border-[#1F2E4D] p-3.5 rounded-xl">
+                  <CheckCircleIcon className="text-[#C59B27] text-lg mt-0.5!" />
+                  <div>
+                    <h4 className="text-xs font-bold text-white">Automated CI/CD Pipeline Automation</h4>
+                    <p className="text-[11px] text-slate-400 font-light mt-0.5">Every pull request is automatically built, linted, tested, and staged before human approval.</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start space-x-3 bg-[#0B1426] border border-[#1F2E4D] p-3.5 rounded-xl">
+                  <CheckCircleIcon className="text-[#C59B27] text-lg mt-0.5!" />
+                  <div>
+                    <h4 className="text-xs font-bold text-white">Security-First Architecture &amp; Data Encryption</h4>
+                    <p className="text-[11px] text-slate-400 font-light mt-0.5">AES-256-GCM encryption, TLS 1.3, least-privilege IAM, and automated secret rotations.</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start space-x-3 bg-[#0B1426] border border-[#1F2E4D] p-3.5 rounded-xl">
+                  <CheckCircleIcon className="text-[#C59B27] text-lg mt-0.5!" />
+                  <div>
+                    <h4 className="text-xs font-bold text-white">24/7 Incident Observability &amp; Alerting</h4>
+                    <p className="text-[11px] text-slate-400 font-light mt-0.5">Prometheus, Grafana, and Datadog monitoring with automated PagerDuty escalation.</p>
+                  </div>
                 </div>
               </div>
             </div>
 
-            {/* Right Points Grid */}
-            <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-6">
-              {whyUsPoints.map((item, idx) => (
-                <div key={idx} className="p-5 border border-slate-100 hover:border-brand-gold/30 rounded-xl transition-all space-y-2">
-                  <h3 className="font-outfit font-bold text-sm text-brand-navy flex items-center space-x-2">
-                    <span className="w-1.5 h-1.5 bg-brand-gold rounded-full" />
-                    <span>{item.title}</span>
-                  </h3>
-                  <p className="text-[11px] text-slate-500 leading-relaxed font-light">
-                    {item.desc}
-                  </p>
+            {/* Right Visual Image */}
+            <div className="lg:col-span-6">
+              <div className="relative rounded-2xl p-1 bg-gradient-to-tr from-[#3F51B5]/30 via-[#0B2A59]/40 to-[#C59B27]/30 shadow-2xl">
+                <div className="relative rounded-[14px] overflow-hidden bg-[#070D19] aspect-[16/10] border border-[#1F2E4D]">
+                  <img
+                    src={itDevOpsShowcase}
+                    alt="DevOps & Agile Sprint Telemetry"
+                    className="w-full h-full object-cover filter brightness-95 hover:scale-102 transition-transform duration-500"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#050A14]/80 via-transparent to-transparent" />
+                  <div className="absolute bottom-3 left-4 bg-[#0B1426]/90 border border-[#C59B27]/30 px-3 py-1 rounded text-[10px] font-mono text-[#E5C058]">
+                    Live Sprint Telemetry • Continuous QA &amp; SRE
+                  </div>
                 </div>
-              ))}
+              </div>
             </div>
 
+          </div>
+        </div>
+      </section>
+
+      {/* 6. ENGINEERING TECH STACK TABS */}
+      <section className="py-20 bg-[#070D19] border-t border-[#1F2E4D]" id="stack">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          
+          <div className="text-center max-w-3xl mx-auto mb-12 space-y-3">
+            <span className="text-xs font-outfit uppercase tracking-widest text-[#C59B27] font-bold">
+              Modern Technology Ecosystem
+            </span>
+            <h2 className="font-outfit font-black text-3xl sm:text-4xl text-white">
+              Proven Technologies for Scalable Platforms
+            </h2>
+            <p className="text-slate-400 text-sm font-light">
+              We select battle-tested, high-performance frameworks and cloud platforms tailored to your business needs.
+            </p>
+
+            {/* Tech Category Selector Buttons */}
+            <div className="flex flex-wrap justify-center gap-2 pt-4">
+              {[
+                { id: 'cloud', label: 'Cloud & DevOps' },
+                { id: 'backend', label: 'Backend & Databases' },
+                { id: 'frontend', label: 'Frontend & Mobile' },
+                { id: 'ai', label: 'AI & Machine Learning' }
+              ].map(tab => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+                    activeTab === tab.id
+                      ? 'bg-gradient-to-r from-[#C59B27] to-[#E5C058] text-[#051A3B] shadow-md shadow-[#C59B27]/20'
+                      : 'bg-[#0B1426] text-slate-400 hover:text-white border border-[#1F2E4D]'
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Tech Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {techCategories[activeTab].map((tech, idx) => (
+              <div
+                key={idx}
+                className="bg-[#0B1426] border border-[#1F2E4D] p-5 rounded-xl hover:border-[#C59B27]/40 transition-all flex items-center justify-between"
+              >
+                <div className="flex items-center space-x-3.5">
+                  <div className="w-10 h-10 rounded-lg bg-[#C59B27]/10 text-[#E5C058] border border-[#C59B27]/20 flex items-center justify-center font-mono font-bold text-xs">
+                    {tech.icon}
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-bold text-white">{tech.name}</h4>
+                    <p className="text-[11px] text-slate-400 font-light">{tech.tag}</p>
+                  </div>
+                </div>
+                <span className="text-[10px] uppercase font-mono text-[#E5C058] bg-[#070D19] px-2 py-0.5 rounded border border-[#C59B27]/30">
+                  Verified
+                </span>
+              </div>
+            ))}
           </div>
 
         </div>
       </section>
 
-      {/* 7. PROCESS / WORKFLOW */}
-      <section className="py-12 bg-slate-50 border-y border-slate-200" id="process">
+      {/* 7. DELIVERY LIFECYCLE (WORKFLOW) */}
+      <section className="py-20 bg-[#050A14] border-t border-[#1F2E4D]" id="process">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
-          <div className="text-center max-w-3xl mx-auto mb-8 space-y-4">
-            <span className="text-xs font-outfit uppercase tracking-widest text-brand-gold font-bold">
-              The Path to Spain
+          <div className="text-center max-w-3xl mx-auto mb-14 space-y-3">
+            <span className="text-xs font-outfit uppercase tracking-widest text-[#C59B27] font-bold">
+              Structured Engineering Process
             </span>
-            <h2 className="font-outfit font-black text-3xl sm:text-4xl text-brand-navy">
-              Structured Journey &amp; Workflow
+            <h2 className="font-outfit font-black text-3xl sm:text-4xl text-white">
+              Agile Product Delivery Lifecycle
             </h2>
-            <p className="text-slate-500 text-sm font-light leading-relaxed">
-              We apply an step-by-step rigorous mechanism to verify eligibility, prepare credentials, submit files, and assist with settlement in Spain.
+            <p className="text-slate-400 text-sm font-light">
+              Predictable, transparent sprints delivering continuous code commits, automated QA, and seamless deployments.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 relative">
-            {/* Connecting lines for large screens */}
-            <div className="hidden lg:block absolute top-1/3 left-0 right-0 h-0.5 bg-slate-200 -z-10" />
-
-            {workflowSteps.map((step, idx) => (
-              <div key={idx} className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm relative group space-y-4 flex flex-col justify-between">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {deliveryStages.map((step, idx) => (
+              <div
+                key={idx}
+                className="bg-[#0B1426] border border-[#1F2E4D] p-6 rounded-2xl relative flex flex-col justify-between group hover:border-[#C59B27]/40 transition-all"
+              >
                 <div>
-                  <div className="w-10 h-10 bg-brand-navy text-brand-gold rounded-full flex items-center justify-center font-outfit font-extrabold text-sm mb-4 border border-brand-navy-light">
-                    {step.step}
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#3F51B5] via-indigo-600 to-[#C59B27] text-white font-black flex items-center justify-center font-mono text-sm mb-5 shadow-md shadow-[#3F51B5]/25">
+                    {step.num}
                   </div>
-                  <h3 className="font-outfit font-bold text-sm text-brand-navy mb-2 group-hover:text-brand-gold transition-colors">
+                  <h3 className="font-outfit font-bold text-base text-white mb-2.5 group-hover:text-[#E5C058] transition-colors">
                     {step.title}
                   </h3>
-                  <p className="text-[11px] text-slate-500 leading-relaxed font-light">
+                  <p className="text-slate-400 text-xs leading-relaxed font-light">
                     {step.desc}
                   </p>
                 </div>
@@ -803,63 +839,80 @@ export const LandingPage = () => {
         </div>
       </section>
 
-      {/* 8. PACKAGES */}
-      <section className="py-12 bg-white" id="packages">
+      {/* 8. ENGAGEMENT PLANS & PRICING */}
+      <section className="py-20 bg-[#070D19] border-t border-[#1F2E4D]" id="plans">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
-          <div className="text-center max-w-3xl mx-auto mb-8 space-y-4">
-            <span className="text-xs font-outfit uppercase tracking-widest text-brand-gold font-bold">
-              Select Your Plan
+          <div className="text-center max-w-3xl mx-auto mb-14 space-y-3">
+            <span className="text-xs font-outfit uppercase tracking-widest text-[#C59B27] font-bold">
+              Flexible Partnership Models
             </span>
-            <h2 className="font-outfit font-black text-3xl sm:text-4xl text-brand-navy">
-              Residency &amp; Relocation Packages
+            <h2 className="font-outfit font-black text-3xl sm:text-4xl text-white">
+              IT Engagement &amp; Delivery Plans
             </h2>
-            <p className="text-slate-500 text-sm font-light leading-relaxed">
-              Select from our standard consular visa package, full residency processing, relocation administrative setup, or all-inclusive VIP packages.
+            <p className="text-slate-400 text-sm font-light">
+              Choose from fixed-scope product builds, dedicated monthly engineering pods, or ongoing 24/7 maintenance retainers.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {packages.map((pkg, idx) => (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {engagementPlans.map((plan, idx) => (
               <div
                 key={idx}
-                className={`rounded-2xl p-6 flex flex-col justify-between h-full border transition-all ${
-                  pkg.accent
-                    ? 'bg-brand-navy text-white border-brand-gold shadow-xl scale-105'
-                    : 'bg-white text-slate-900 border-slate-200 hover:border-brand-gold/30 shadow-sm'
+                className={`rounded-2xl p-6 flex flex-col justify-between transition-all ${
+                  plan.highlight
+                    ? 'bg-gradient-to-b from-[#0B1426] via-[#0B1426] to-[#122038] border-2 border-[#C59B27] shadow-2xl shadow-[#C59B27]/10 lg:-translate-y-2'
+                    : 'bg-[#0B1426] border border-[#1F2E4D] hover:border-slate-700'
                 }`}
               >
                 <div className="space-y-6">
                   <div>
-                    {pkg.accent && (
-                      <span className="text-[9px] uppercase tracking-wider font-bold bg-brand-gold text-brand-navy px-2 py-0.5 rounded mb-2 inline-block">
-                        Best Value (VIP)
-                      </span>
-                    )}
-                    <h3 className="font-outfit font-extrabold text-base leading-tight">
-                      {pkg.title}
+                    <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded inline-block mb-3 ${
+                      plan.highlight
+                        ? 'bg-[#C59B27] text-[#051A3B]'
+                        : 'bg-[#070D19] text-slate-300 border border-[#1F2E4D]'
+                    }`}>
+                      {plan.badge}
+                    </span>
+                    <h3 className="font-outfit font-black text-lg text-white leading-tight">
+                      {plan.name}
                     </h3>
-                    <p className={`text-[10px] mt-1 ${pkg.accent ? 'text-slate-300' : 'text-slate-400'}`}>
-                      {pkg.desc}
+                    <p className="text-xs text-slate-400 mt-2 font-light leading-relaxed">
+                      {plan.desc}
                     </p>
                   </div>
 
-                  <div className={`h-px ${pkg.accent ? 'bg-brand-navy-light' : 'bg-slate-100'}`} />
+                  <div className="py-2 border-y border-[#1F2E4D]">
+                    <div className="text-2xl font-black font-outfit text-white">
+                      {plan.price}
+                    </div>
+                    <div className="text-[11px] text-[#C59B27] font-light">
+                      {plan.period}
+                    </div>
+                  </div>
 
-                  <ul className="space-y-3 flex-grow">
-                    {pkg.includes.map((inc, iIdx) => (
-                      <li key={iIdx} className="flex items-start space-x-2 text-[10px]">
-                        <CheckIcon className={`text-xs mt-0.5 ${pkg.accent ? 'text-brand-gold' : 'text-green-600'} flex-shrink-0`} />
-                        <span className={pkg.accent ? 'text-slate-200' : 'text-slate-600'}>{inc}</span>
+                  <ul className="space-y-2.5">
+                    {plan.features.map((feat, fIdx) => (
+                      <li key={fIdx} className="flex items-start space-x-2 text-xs text-slate-300">
+                        <CheckIcon className="text-xs text-[#C59B27] mt-0.5 flex-shrink-0" />
+                        <span className="font-light">{feat}</span>
                       </li>
                     ))}
                   </ul>
                 </div>
 
-                <div className="mt-6 pt-4 border-t border-slate-100/10">
-                  <div className={`text-xs font-extrabold ${pkg.accent ? 'text-brand-gold' : 'text-brand-navy'} text-center uppercase tracking-wider`}>
-                    {pkg.price}
-                  </div>
+                <div className="mt-8 pt-4 border-t border-[#1F2E4D]">
+                  <a
+                    href="#contact"
+                    onClick={(e) => handleScroll(e, 'contact')}
+                    className={`block w-full py-2.5 text-center text-xs font-bold rounded-xl transition-all ${
+                      plan.highlight
+                        ? 'bg-gradient-to-r from-[#C59B27] via-amber-400 to-[#E5C058] text-[#051A3B] hover:brightness-110 shadow-lg'
+                        : 'bg-[#122038] hover:bg-[#1A2E50] text-white border border-[#1F2E4D]'
+                    }`}
+                  >
+                    Select Partnership
+                  </a>
                 </div>
               </div>
             ))}
@@ -868,129 +921,57 @@ export const LandingPage = () => {
         </div>
       </section>
 
-      {/* 9. CEO MESSAGE */}
-      <section className="py-12 bg-brand-navy text-white relative overflow-hidden" id="ceo">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_70%,rgba(197,155,39,0.05),transparent_50%)]" />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-            
-            {/* CEO Image */}
-            <div className="lg:col-span-5 flex justify-center">
-              <div className="relative group max-w-sm">
-                <div className="absolute -inset-2 bg-gradient-to-tr from-brand-gold to-brand-gold-dark rounded-2xl opacity-40 blur-lg group-hover:opacity-60 transition-opacity" />
-                <div className="relative bg-brand-navy-light p-3 rounded-2xl border border-brand-gold/20 shadow-2xl">
-                  {/* Real Photo of CEO Wael Madi */}
-                  <div className="w-72 h-80 rounded-xl overflow-hidden flex flex-col justify-end p-4 relative bg-slate-900 border border-brand-gold/10">
-                    <img
-                      src={waelMadiPhoto}
-                      alt="Wael Madi"
-                      className="w-full h-full object-cover absolute inset-0 filter brightness-95 hover:scale-105 transition-transform duration-500"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-brand-navy/90 via-brand-navy/20 to-transparent z-10 pointer-events-none" />
-                    <div className="relative z-20 text-center">
-                      <h4 className="font-outfit font-bold text-sm text-white">Wael Madi</h4>
-                      <p className="text-[10px] text-brand-gold uppercase tracking-wider">Founder &amp; CEO</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* CEO Text */}
-            <div className="lg:col-span-7 space-y-6">
-              <span className="text-xs font-outfit uppercase tracking-widest text-brand-gold font-bold">
-                Founder's Message
-              </span>
-              <h2 className="font-outfit font-black text-3xl sm:text-4xl">
-                Built on Trust &amp; Professional Integrity
-              </h2>
-              <div className="h-1 w-12 bg-brand-gold rounded" />
-              
-              <p className="text-slate-300 text-sm sm:text-base leading-relaxed font-light italic">
-                "With more than 22 years of business experience in Dubai and international markets, AAA Business Consultancy was built on a strong foundation of trust, honesty, professionalism, and long-term relationships."
-              </p>
-              
-              <p className="text-slate-300 text-sm sm:text-base leading-relaxed font-light">
-                "At AAA, we believe that our success comes from the success of our clients. That is why we are committed to providing reliable guidance, transparent support, and personalized solutions for every client we serve. Our carefully selected team combines dedication and deep market understanding to support your journey to Spain."
-              </p>
-
-              <div className="pt-4 flex items-center space-x-4">
-                <div className="flex flex-col">
-                  <span className="font-outfit font-bold text-sm text-brand-gold">Wael Madi</span>
-                  <span className="text-[10px] text-slate-400">Founder &amp; CEO, AAA Business Consultancy</span>
-                </div>
-              </div>
-            </div>
-
-          </div>
-        </div>
-      </section>
-
-      {/* 10. STATISTICS */}
-      <section className="py-10 bg-slate-50 border-b border-slate-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 text-center">
-            
-            <div className="space-y-1">
-              <div className="font-outfit font-black text-4xl sm:text-5xl text-brand-navy">22+</div>
-              <div className="text-xs text-slate-500 font-medium">Years CEO Business Experience</div>
-            </div>
-
-            <div className="space-y-1">
-              <div className="font-outfit font-black text-4xl sm:text-5xl text-brand-navy">100%</div>
-              <div className="text-xs text-slate-500 font-medium">Immigration Transparency</div>
-            </div>
-
-            <div className="space-y-1">
-              <div className="font-outfit font-black text-4xl sm:text-5xl text-brand-navy">10+</div>
-              <div className="text-xs text-slate-500 font-medium">In-Spain Relocation Procedures</div>
-            </div>
-
-            <div className="space-y-1">
-              <div className="font-outfit font-black text-4xl sm:text-5xl text-brand-navy">Global</div>
-              <div className="text-xs text-slate-500 font-medium">Clients Serviced from Dubai</div>
-            </div>
-
-          </div>
-        </div>
-      </section>
-
-      {/* 11. TESTIMONIALS */}
-      <section className="py-12 bg-white" id="testimonials">
+      {/* 9. CASE STUDIES / TESTIMONIALS */}
+      <section className="py-20 bg-[#050A14] border-t border-[#1F2E4D]" id="case-studies">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
-          <div className="text-center max-w-3xl mx-auto mb-8 space-y-4">
-            <span className="text-xs font-outfit uppercase tracking-widest text-brand-gold font-bold">
-              Success Stories
+          <div className="text-center max-w-3xl mx-auto mb-14 space-y-3">
+            <span className="text-xs font-outfit uppercase tracking-widest text-[#C59B27] font-bold">
+              Engineering Impact
             </span>
-            <h2 className="font-outfit font-black text-3xl sm:text-4xl text-brand-navy">
-              What Our Clients Say
+            <h2 className="font-outfit font-black text-3xl sm:text-4xl text-white">
+              Proven Results Across Global Industries
             </h2>
-            <p className="text-slate-500 text-sm font-light leading-relaxed">
-              Discover stories of professionals, retirees, and families who relocated smoothly with our Dubai consultancy team.
+            <p className="text-slate-400 text-sm font-light">
+              See how our digital solutions have unlocked measurable business scaling for our clients.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {testimonials.map((test, idx) => (
-              <div key={idx} className="bg-slate-50 p-6 rounded-2xl border border-slate-100 shadow-sm relative flex flex-col justify-between">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {caseStudies.map((study, idx) => (
+              <div
+                key={idx}
+                className="bg-[#0B1426] border border-[#1F2E4D] p-6 rounded-2xl flex flex-col justify-between hover:border-[#C59B27]/40 transition-all"
+              >
                 <div className="space-y-4">
-                  <div className="flex space-x-1">
-                    {[...Array(test.rating)].map((_, i) => (
-                      <StarIcon key={i} className="text-brand-gold text-sm!" />
+                  <div className="flex items-center space-x-1 text-[#C59B27]">
+                    {[...Array(5)].map((_, i) => (
+                      <StarIcon key={i} className="text-sm!" />
                     ))}
                   </div>
-                  <p className="text-xs text-slate-600 leading-relaxed font-light italic">
-                    "{test.text}"
+
+                  <div>
+                    <div className="text-xs uppercase tracking-wider font-mono text-[#E5C058] font-bold">
+                      {study.service}
+                    </div>
+                    <div className="text-2xl font-black font-outfit text-white mt-1">
+                      {study.metric}
+                    </div>
+                  </div>
+
+                  <p className="text-xs text-slate-300 font-light leading-relaxed">
+                    "{study.desc}"
                   </p>
                 </div>
-                <div className="mt-6 pt-4 border-t border-slate-200 flex items-center space-x-3">
-                  <div className="w-8 h-8 rounded-full bg-brand-navy text-brand-gold flex items-center justify-center font-bold text-xs font-outfit">
-                    {test.name[0]}
-                  </div>
-                  <div>
-                    <h4 className="font-outfit font-bold text-xs text-brand-navy">{test.name}</h4>
-                    <p className="text-[10px] text-slate-400">{test.role}</p>
+
+                <div className="mt-6 pt-4 border-t border-[#1F2E4D] flex items-center justify-between">
+                  <span className="text-xs font-bold text-white">{study.client}</span>
+                  <div className="flex space-x-1">
+                    {study.tags.map((tag, tIdx) => (
+                      <span key={tIdx} className="text-[9px] font-mono bg-[#070D19] border border-[#1F2E4D] px-1.5 py-0.5 rounded text-slate-300">
+                        {tag}
+                      </span>
+                    ))}
                   </div>
                 </div>
               </div>
@@ -1000,19 +981,19 @@ export const LandingPage = () => {
         </div>
       </section>
 
-      {/* 12. FAQ SECTION */}
-      <section className="py-12 bg-slate-50 border-t border-slate-200" id="faqs">
+      {/* 10. FAQ SECTION */}
+      <section className="py-20 bg-[#070D19] border-t border-[#1F2E4D]" id="faqs">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           
-          <div className="text-center mb-8 space-y-4">
-            <span className="text-xs font-outfit uppercase tracking-widest text-brand-gold font-bold">
-              Common Queries
+          <div className="text-center mb-12 space-y-3">
+            <span className="text-xs font-outfit uppercase tracking-widest text-[#C59B27] font-bold">
+              Got Questions?
             </span>
-            <h2 className="font-outfit font-black text-3xl sm:text-4xl text-brand-navy">
-              Frequently Asked Questions
+            <h2 className="font-outfit font-black text-3xl sm:text-4xl text-white">
+              Frequently Asked Technical Questions
             </h2>
-            <p className="text-slate-500 text-sm font-light leading-relaxed">
-              Everything you need to know about Spain visas, residency applications, document translations, and local registration.
+            <p className="text-slate-400 text-sm font-light">
+              Clear answers regarding intellectual property, sprint cadence, pricing models, and security.
             </p>
           </div>
 
@@ -1020,28 +1001,31 @@ export const LandingPage = () => {
             {faqs.map((faq, idx) => {
               const isOpen = activeFaq === idx;
               return (
-                <div key={idx} className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
+                <div
+                  key={idx}
+                  className="bg-[#0B1426] border border-[#1F2E4D] rounded-xl overflow-hidden transition-all"
+                >
                   <button
-                    onClick={() => handleFaqToggle(idx)}
+                    onClick={() => setActiveFaq(isOpen ? null : idx)}
                     className="w-full px-6 py-4 flex justify-between items-center text-left focus:outline-none"
                   >
-                    <span className="font-outfit font-bold text-sm text-brand-navy">
+                    <span className="font-outfit font-bold text-sm text-white">
                       {faq.q}
                     </span>
-                    <span className="text-brand-gold">
+                    <span className="text-[#C59B27]">
                       {isOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
                     </span>
                   </button>
-                  
+
                   <AnimatePresence initial={false}>
                     {isOpen && (
                       <motion.div
                         initial={{ height: 0, opacity: 0 }}
                         animate={{ height: 'auto', opacity: 1 }}
                         exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.25 }}
+                        transition={{ duration: 0.2 }}
                       >
-                        <div className="px-6 pb-5 text-xs text-slate-500 leading-relaxed font-light border-t border-slate-100 pt-3">
+                        <div className="px-6 pb-5 text-xs text-slate-300 leading-relaxed font-light border-t border-[#1F2E4D] pt-3">
                           {faq.a}
                         </div>
                       </motion.div>
@@ -1055,195 +1039,289 @@ export const LandingPage = () => {
         </div>
       </section>
 
-      {/* 13. GLOBAL OFFICES & CONTACT */}
-      <section className="py-12 bg-brand-navy text-white relative overflow-hidden" id="contact">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_10%_10%,rgba(197,155,39,0.06),transparent_50%)]" />
+      {/* 11. TECHNICAL CONSULTATION & DISCOVERY FORM */}
+      <section className="py-20 bg-[#050A14] border-t border-[#1F2E4D] relative overflow-hidden" id="contact">
+        <div className="absolute top-1/2 right-1/4 w-[500px] h-[300px] bg-[#C59B27]/10 rounded-full blur-[140px] pointer-events-none" />
+        
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
             
-            {/* Left Column: Corporate Strategy & Inquiries */}
+            {/* Left Contact Info */}
             <div className="lg:col-span-5 space-y-6">
-              <div className="space-y-4">
-                <span className="text-xs font-outfit uppercase tracking-widest text-brand-gold font-bold">
-                  Corporate Directory
-                </span>
-                <h2 className="font-outfit font-black text-3xl sm:text-4xl">
-                  Connect With Our Global Team
-                </h2>
-                <p className="text-slate-300 text-xs sm:text-sm font-light leading-relaxed">
-                  AAA Business Consultancy provides seamless immigration coordination between the GCC region and Spain. Contact our corporate hubs to align on client visa processing, documentation support, and relocation coordination.
-                </p>
-              </div>
+              <span className="text-xs font-outfit uppercase tracking-widest text-[#C59B27] font-bold">
+                Direct Engineering Collaboration
+              </span>
+              <h2 className="font-outfit font-black text-3xl sm:text-4xl text-white">
+                Let's Build Your Next Digital Product
+              </h2>
+              <div className="h-1 w-12 bg-[#C59B27] rounded" />
+              
+              <p className="text-slate-300 text-sm font-light leading-relaxed">
+                Connect with our senior engineering architects. We evaluate your requirements, suggest optimal tech stacks, and provide a detailed architectural roadmap within 24 business hours.
+              </p>
 
-              {/* Direct Contact Channels - Prominent and separate */}
-              <div className="space-y-3">
-                <div className="text-[10px] uppercase text-brand-gold tracking-widest font-bold">
-                  Direct Communication
+              <div className="space-y-4 pt-2">
+                <div className="flex items-center space-x-3.5 bg-[#0B1426] border border-[#1F2E4D] p-4 rounded-xl">
+                  <div className="w-10 h-10 rounded-lg bg-[#C59B27]/10 text-[#C59B27] flex items-center justify-center">
+                    <EmailIcon className="text-lg!" />
+                  </div>
+                  <div>
+                    <div className="text-[10px] text-slate-400 uppercase tracking-wider font-mono">Technical Inquiries</div>
+                    <div className="text-sm font-bold text-white">contact@kiaantech.com</div>
+                  </div>
                 </div>
-                
-                <a 
-                  href="tel:+971509554142" 
-                  className="flex items-center space-x-4 bg-brand-navy-light/80 border-2 border-brand-gold/30 p-4 rounded-xl hover:border-brand-gold hover:bg-slate-800 transition-all shadow-lg group"
-                >
-                  <div className="w-12 h-12 bg-green-500/10 text-green-400 rounded-full flex items-center justify-center flex-shrink-0 border border-green-500/20 group-hover:scale-110 transition-transform">
-                    <LocalPhoneIcon className="text-xl!" />
-                  </div>
-                  <div>
-                    <div className="text-[9px] text-slate-400 uppercase tracking-widest font-bold">Call &amp; WhatsApp Hotline</div>
-                    <div className="text-sm font-black text-white mt-0.5 group-hover:text-brand-gold transition-colors">+971 50 955 4142</div>
-                  </div>
-                </a>
 
-                <a 
-                  href="mailto:info@aaabusinessconsultancy.com" 
-                  className="flex items-center space-x-4 bg-brand-navy-light/80 border-2 border-brand-gold/30 p-4 rounded-xl hover:border-brand-gold hover:bg-slate-800 transition-all shadow-lg group"
-                >
-                  <div className="w-12 h-12 bg-brand-gold/10 text-brand-gold rounded-full flex items-center justify-center flex-shrink-0 border border-brand-gold/20 group-hover:scale-110 transition-transform">
-                    <EmailIcon className="text-xl!" />
+                <div className="flex items-center space-x-3.5 bg-[#0B1426] border border-[#1F2E4D] p-4 rounded-xl">
+                  <div className="w-10 h-10 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center">
+                    <PhoneIcon className="text-lg!" />
                   </div>
                   <div>
-                    <div className="text-[9px] text-slate-400 uppercase tracking-widest font-bold">Official Corporate Email</div>
-                    <div className="text-sm font-black text-white mt-0.5 group-hover:text-brand-gold transition-colors">info@aaabusinessconsultancy.com</div>
+                    <div className="text-[10px] text-slate-400 uppercase tracking-wider font-mono">Direct Support &amp; WhatsApp</div>
+                    <div className="text-sm font-bold text-white">+1 (800) 550-9842</div>
                   </div>
-                </a>
+                </div>
+
+                <div className="flex items-center space-x-3.5 bg-[#0B1426] border border-[#1F2E4D] p-4 rounded-xl">
+                  <div className="w-10 h-10 rounded-lg bg-[#3F51B5]/20 text-[#3F51B5] flex items-center justify-center">
+                    <LocationOnIcon className="text-lg!" />
+                  </div>
+                  <div>
+                    <div className="text-[10px] text-slate-400 uppercase tracking-wider font-mono">Global Technology Hubs</div>
+                    <div className="text-sm font-bold text-white">San Francisco • London • Dubai Silicon Oasis</div>
+                  </div>
+                </div>
               </div>
             </div>
 
-            {/* Right Column: Global Office Cards */}
-            <div className="lg:col-span-7 space-y-6">
-              
-              {/* Dubai Card */}
-              <div className="bg-brand-navy-light/95 border border-slate-700/50 p-8 rounded-2xl shadow-xl min-h-[210px] flex flex-col justify-between">
-                <div>
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <span className="text-[9px] uppercase bg-brand-gold/15 text-brand-gold font-bold px-2 py-0.5 rounded border border-brand-gold/10">
-                        DUBAI HEADQUARTERS
-                      </span>
-                      <h3 className="font-outfit font-bold text-lg text-white mt-2">AAA Business Consultancy L.L.C</h3>
-                    </div>
-                    <div className="w-8 h-8 bg-brand-gold/10 rounded-full flex items-center justify-center text-brand-gold">
-                      <LocationOnIcon className="text-base!" />
-                    </div>
-                  </div>
-                  <div className="text-xs text-slate-300 leading-relaxed font-light mt-4">
-                    Business Village, Block B, 4th Floor, Office F09, Port Saeed, Deira, Dubai, UAE
-                  </div>
-                </div>
-                <div className="pt-3 border-t border-slate-850 flex justify-between text-[10px] text-slate-400 font-light">
-                  <span>Trade License: 4429675.01</span>
-                  <span>TRN: 105469065400001</span>
-                </div>
-              </div>
+            {/* Right Project Inquiry Form */}
+            <div className="lg:col-span-7 bg-[#0B1426] border border-[#1F2E4D] p-8 rounded-2xl shadow-2xl backdrop-blur-md">
+              <h3 className="font-outfit font-black text-xl text-white mb-1">
+                Request a Technical Discovery Call
+              </h3>
+              <p className="text-xs text-slate-400 mb-6 font-light">
+                Fill out your project details. Strict NDA guaranteed for all submitted materials.
+              </p>
 
-              {/* Spain Card */}
-              <div className="bg-brand-navy-light/95 border border-slate-700/50 p-8 rounded-2xl shadow-xl min-h-[210px] flex flex-col justify-between">
-                <div>
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <span className="text-[9px] uppercase bg-slate-700 text-slate-300 font-bold px-2 py-0.5 rounded">
-                        SPAIN REPRESENTATIVE OFFICE
-                      </span>
-                      <h3 className="font-outfit font-bold text-lg text-white mt-2">Legal Coordination Hub</h3>
-                    </div>
-                    <div className="w-8 h-8 bg-slate-700/20 rounded-full flex items-center justify-center text-slate-400">
-                      <LocationOnIcon className="text-base!" />
-                    </div>
+              <form onSubmit={handleFormSubmit} className="space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-300 mb-1">First Name *</label>
+                    <input
+                      type="text"
+                      name="firstName"
+                      value={formData.firstName}
+                      onChange={handleFormChange}
+                      required
+                      placeholder="Jane"
+                      className="w-full bg-[#070D19] border border-[#1F2E4D] rounded-lg px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-[#C59B27]"
+                    />
                   </div>
-                  <div className="text-xs text-slate-300 leading-relaxed font-light mt-4">
-                    Business Village, Block B, 4th Floor, Office F09, Port Saeed, Deira, Dubai, UAE
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-300 mb-1">Last Name *</label>
+                    <input
+                      type="text"
+                      name="lastName"
+                      value={formData.lastName}
+                      onChange={handleFormChange}
+                      required
+                      placeholder="Doe"
+                      className="w-full bg-[#070D19] border border-[#1F2E4D] rounded-lg px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-[#C59B27]"
+                    />
                   </div>
                 </div>
-                <div className="pt-3 border-t border-slate-800 text-[10px] text-slate-400 font-light">
-                  <span className="text-slate-300 font-semibold">Specialization:</span> Sworn Translations, NIE/TIE Fingerprints &amp; Local Settlement
-                </div>
-              </div>
 
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-300 mb-1">Work Email *</label>
+                    <input
+                      type="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleFormChange}
+                      required
+                      placeholder="jane@company.com"
+                      className="w-full bg-[#070D19] border border-[#1F2E4D] rounded-lg px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-[#C59B27]"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-300 mb-1">Phone / WhatsApp *</label>
+                    <input
+                      type="tel"
+                      name="phone"
+                      value={formData.phone}
+                      onChange={handleFormChange}
+                      required
+                      placeholder="+1 (555) 000-0000"
+                      className="w-full bg-[#070D19] border border-[#1F2E4D] rounded-lg px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-[#C59B27]"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-300 mb-1">Company / Organization</label>
+                    <input
+                      type="text"
+                      name="companyName"
+                      value={formData.companyName}
+                      onChange={handleFormChange}
+                      placeholder="Acme Corp"
+                      className="w-full bg-[#070D19] border border-[#1F2E4D] rounded-lg px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-[#C59B27]"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-300 mb-1">Primary Capability Needed</label>
+                    <select
+                      name="serviceType"
+                      value={formData.serviceType}
+                      onChange={handleFormChange}
+                      className="w-full bg-[#070D19] border border-[#1F2E4D] rounded-lg px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-[#C59B27]"
+                    >
+                      <option value="Custom Software & SaaS Development">Custom Software &amp; SaaS Development</option>
+                      <option value="Web & Mobile App Development">Web &amp; Mobile App Development</option>
+                      <option value="AI & Intelligent Automation">AI &amp; Intelligent Automation</option>
+                      <option value="Cloud Infrastructure & DevOps">Cloud Infrastructure &amp; DevOps</option>
+                      <option value="Enterprise CRM & ERP Solutions">Enterprise CRM &amp; ERP Solutions</option>
+                      <option value="UI/UX Product Design">UI/UX Product Design</option>
+                      <option value="24/7 Managed IT Support">24/7 Managed IT Support</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-300 mb-1">Estimated Budget Range</label>
+                    <select
+                      name="budget"
+                      value={formData.budget}
+                      onChange={handleFormChange}
+                      className="w-full bg-[#070D19] border border-[#1F2E4D] rounded-lg px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-[#C59B27]"
+                    >
+                      <option value="$5,000 - $15,000">$5,000 - $15,000 (MVP Prototype)</option>
+                      <option value="$15,000 - $50,000">$15,000 - $50,000 (Production Launch)</option>
+                      <option value="$50,000 - $100,000">$50,000 - $100,000 (Full Platform Build)</option>
+                      <option value="$100,000+">$100,000+ (Enterprise Transformation)</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-300 mb-1">Target Launch Timeline</label>
+                    <select
+                      name="timeline"
+                      value={formData.timeline}
+                      onChange={handleFormChange}
+                      className="w-full bg-[#070D19] border border-[#1F2E4D] rounded-lg px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-[#C59B27]"
+                    >
+                      <option value="Immediate (< 1 Month)">Immediate (&lt; 1 Month)</option>
+                      <option value="1 - 3 Months">1 - 3 Months</option>
+                      <option value="3 - 6 Months">3 - 6 Months</option>
+                      <option value="Flexible / Exploratory">Flexible / Exploratory</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1">Project Brief &amp; Architecture Notes</label>
+                  <textarea
+                    name="notes"
+                    value={formData.notes}
+                    onChange={handleFormChange}
+                    rows="3"
+                    placeholder="Briefly describe your product goals, tech preferences, or current challenges..."
+                    className="w-full bg-[#070D19] border border-[#1F2E4D] rounded-lg p-3 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-[#C59B27] resize-none"
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={leadMutation.isPending}
+                  className="w-full bg-gradient-to-r from-[#C59B27] via-amber-400 to-[#E5C058] hover:brightness-110 text-[#051A3B] font-extrabold py-3.5 rounded-xl shadow-lg shadow-[#C59B27]/25 transition-all text-xs uppercase tracking-wider flex items-center justify-center space-x-2 cursor-pointer disabled:opacity-50"
+                >
+                  {leadMutation.isPending ? (
+                    <span>Submitting Discovery Request...</span>
+                  ) : (
+                    <>
+                      <span>Submit Technical Request</span>
+                      <ArrowForwardIcon className="text-sm!" />
+                    </>
+                  )}
+                </button>
+              </form>
             </div>
 
           </div>
         </div>
       </section>
 
-      {/* 14. FOOTER */}
-      <footer className="bg-[#030e20] text-slate-400 border-t border-slate-800 pt-10 pb-6">
+      {/* 12. FOOTER */}
+      <footer className="bg-[#050A14] text-slate-400 border-t border-[#1F2E4D] pt-14 pb-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 pb-12 border-b border-slate-800">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 pb-12 border-b border-[#1F2E4D]">
             
             {/* Column 1: Brand Info */}
             <div className="space-y-4">
-              <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-brand-gold rounded-lg flex items-center justify-center">
-                  <span className="font-outfit font-extrabold text-lg text-brand-navy">A³</span>
+              <div className="flex items-center space-x-2.5">
+                <div className="w-9 h-9 bg-gradient-to-tr from-[#3F51B5] to-[#C59B27] rounded-lg flex items-center justify-center text-white font-black font-outfit text-lg">
+                  K
                 </div>
-                <div className="flex flex-col">
-                  <span className="font-outfit font-bold text-sm text-white leading-tight">
-                    AAA BUSINESS CONSULTANCY
-                  </span>
-                  <span className="text-[9px] text-brand-gold uppercase tracking-[0.2em]">
-                    Advise • Assist • Achieve
-                  </span>
-                </div>
+                <span className="font-outfit font-black text-base text-white tracking-tight">
+                  KIAAN TECHNOLOGIES
+                </span>
               </div>
-              <p className="text-[11px] font-light leading-relaxed">
-                Spain visa, residency, study, and administrative relocation assistance. Dubai-headquartered international immigration consultancy.
+              <p className="text-xs font-light leading-relaxed text-slate-400">
+                Full-stack digital engineering, cloud infrastructure modernization, and AI systems architecture for high-growth enterprises worldwide.
               </p>
-              <div className="text-[10px] text-slate-500 space-y-1">
-                <div>Trade License No: 4429675.01</div>
-                <div>TRN: 105469065400001</div>
-                <div>AAA Business Consultancy FZC LLC</div>
+              <div className="text-[11px] font-mono text-[#C59B27]">
+                SOC2 Type II • ISO 27001 Ready • AWS Advanced Partner
               </div>
             </div>
 
-            {/* Column 2: Quick Links */}
-            <div className="space-y-4">
-              <h4 className="font-outfit font-bold text-xs text-white uppercase tracking-wider">Quick Navigation</h4>
+            {/* Column 2: Capabilities */}
+            <div className="space-y-3">
+              <h4 className="font-outfit font-bold text-xs text-white uppercase tracking-wider">Capabilities</h4>
               <ul className="space-y-2 text-xs">
-                <li><a href="#services" onClick={(e) => handleScroll(e, 'services')} className="hover:text-brand-gold transition-colors">Immigration Services</a></li>
-                <li><a href="#why-us" onClick={(e) => handleScroll(e, 'why-us')} className="hover:text-brand-gold transition-colors">Why Choose Us</a></li>
-                <li><a href="#packages" onClick={(e) => handleScroll(e, 'packages')} className="hover:text-brand-gold transition-colors">Pricing Packages</a></li>
-                <li><a href="#ceo" onClick={(e) => handleScroll(e, 'ceo')} className="hover:text-brand-gold transition-colors">Our Founder</a></li>
-                <li><a href="#testimonials" onClick={(e) => handleScroll(e, 'testimonials')} className="hover:text-brand-gold transition-colors">Client Reviews</a></li>
+                <li><a href="#services" onClick={(e) => handleScroll(e, 'services')} className="hover:text-[#E5C058] transition-colors">Custom Software &amp; SaaS</a></li>
+                <li><a href="#services" onClick={(e) => handleScroll(e, 'services')} className="hover:text-[#E5C058] transition-colors">Web &amp; Mobile Applications</a></li>
+                <li><a href="#services" onClick={(e) => handleScroll(e, 'services')} className="hover:text-[#E5C058] transition-colors">AI &amp; Intelligent Automation</a></li>
+                <li><a href="#services" onClick={(e) => handleScroll(e, 'services')} className="hover:text-[#E5C058] transition-colors">Cloud &amp; DevOps Engineering</a></li>
+                <li><a href="#services" onClick={(e) => handleScroll(e, 'services')} className="hover:text-[#E5C058] transition-colors">Enterprise CRM &amp; ERP</a></li>
               </ul>
             </div>
 
-            {/* Column 3: Portals & Links */}
-            <div className="space-y-4">
-              <h4 className="font-outfit font-bold text-xs text-white uppercase tracking-wider">System Access</h4>
+            {/* Column 3: Portals & Navigation */}
+            <div className="space-y-3">
+              <h4 className="font-outfit font-bold text-xs text-white uppercase tracking-wider">Access &amp; Legal</h4>
               <ul className="space-y-2 text-xs">
-                <li><Link to="/login" className="hover:text-brand-gold transition-colors">Employee Logins</Link></li>
+                <li><Link to="/login" className="hover:text-[#E5C058] transition-colors">Client &amp; Staff CRM Portal</Link></li>
+                <li><a href="#plans" onClick={(e) => handleScroll(e, 'plans')} className="hover:text-[#E5C058] transition-colors">Engagement Plans</a></li>
+                <li><a href="#case-studies" onClick={(e) => handleScroll(e, 'case-studies')} className="hover:text-[#E5C058] transition-colors">Engineering Case Studies</a></li>
+                <li><a href="#faqs" onClick={(e) => handleScroll(e, 'faqs')} className="hover:text-[#E5C058] transition-colors">Technical FAQs</a></li>
               </ul>
             </div>
 
-            {/* Column 4: Contact & Socials */}
-            <div className="space-y-4">
-              <h4 className="font-outfit font-bold text-xs text-white uppercase tracking-wider">Social Channels</h4>
-              <p className="text-[11px] font-light leading-relaxed">Follow our social channels for latest updates on Spain immigration laws.</p>
-              
-              {/* Social List */}
-              <div className="grid grid-cols-2 gap-2 text-[10px] font-semibold text-slate-300">
-                <a href="https://facebook.com" target="_blank" rel="noreferrer" className="hover:text-brand-gold">Facebook</a>
-                <a href="https://instagram.com" target="_blank" rel="noreferrer" className="hover:text-brand-gold">Instagram</a>
-                <a href="https://linkedin.com" target="_blank" rel="noreferrer" className="hover:text-brand-gold">LinkedIn</a>
-                <a href="https://youtube.com" target="_blank" rel="noreferrer" className="hover:text-brand-gold">YouTube</a>
-                <a href="https://tiktok.com" target="_blank" rel="noreferrer" className="hover:text-brand-gold">TikTok</a>
-                <a href="https://twitter.com" target="_blank" rel="noreferrer" className="hover:text-brand-gold">Twitter / X</a>
+            {/* Column 4: Global Hubs */}
+            <div className="space-y-3">
+              <h4 className="font-outfit font-bold text-xs text-white uppercase tracking-wider">Global Locations</h4>
+              <div className="space-y-1.5 text-xs text-slate-400 font-light">
+                <div>• San Francisco, CA (HQ R&amp;D)</div>
+                <div>• London, UK (European Hub)</div>
+                <div>• Dubai Silicon Oasis, UAE (MENA)</div>
+                <div>• Singapore (APAC Delivery)</div>
               </div>
             </div>
 
           </div>
 
-          <div className="pt-8 flex flex-col sm:flex-row items-center justify-between text-[11px] text-slate-500 space-y-4 sm:space-y-0 text-center">
+          <div className="pt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 space-y-4 sm:space-y-0">
             <div>
-              &copy; {new Date().getFullYear()} AAA Business Consultancy FZC LLC. All Rights Reserved.
+              &copy; {new Date().getFullYear()} Kiaan Technologies Global Inc. All Rights Reserved.
             </div>
             <div className="space-x-4">
-              <span>Terms &amp; Conditions Apply</span>
+              <span>Privacy Policy</span>
               <span>•</span>
-              <span>Refund Policy</span>
+              <span>Terms of Service</span>
               <span>•</span>
-              <span>Payment Policy</span>
+              <span>Security &amp; Compliance</span>
             </div>
           </div>
 
