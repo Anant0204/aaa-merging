@@ -1159,33 +1159,7 @@ export const DashboardLayout = () => {
               </Select>
             </FormControl>
 
-            {/* Quick Role Switcher Dropdown (for testing and verification) */}
-            <FormControl size="small" sx={{ minWidth: 105 }}>
-              <Select
-                value={currentUser?.role || 'super_admin'}
-                onChange={handleRoleChange}
-                sx={{
-                  borderRadius: 2,
-                  height: 32,
-                  bgcolor: 'background.paper',
-                  fontSize: '0.78rem',
-                  fontWeight: 800,
-                  border: '1px solid',
-                  borderColor: 'secondary.main',
-                  color: 'secondary.main',
-                  '& .MuiSelect-select': { py: 0.5 }
-                }}
-              >
-                <MenuItem value="super_admin">CEO 👑</MenuItem>
-                <MenuItem value="admin">Manager 💼</MenuItem>
-                <MenuItem value="operations">Ops ⚙️</MenuItem>
-                <MenuItem value="consultant">Agent 🧑‍💼</MenuItem>
-                <MenuItem value="marketing">Marketing 📣</MenuItem>
-                {customizationSettings?.rolesDefinition?.map(role => (
-                  <MenuItem key={role.id} value={role.id}>{role.label.split('(')[0].trim()}</MenuItem>
-                ))}
-              </Select>
-            </FormControl>
+            {/* Quick Role Switcher removed from header - available on Login page */}
 
             {/* Social Inbox Shortcut */}
             <Tooltip title="Social Inbox">

@@ -52,6 +52,15 @@ export const Login = () => {
   const { login } = useAuth();
   const { showAlert } = useAlert();
   const [showPassword, setShowPassword] = React.useState(false);
+  const [loadingRole, setLoadingRole] = React.useState(null);
+
+  const QUICK_ROLES = [
+    { id: 'super_admin', label: 'CEO 👑', email: 'superadmin@aaaconsultancy.com' },
+    { id: 'admin', label: 'Manager 💼', email: 'admin@aaaconsultancy.com' },
+    { id: 'operations', label: 'Ops ⚙️', email: 'operations@aaaconsultancy.com' },
+    { id: 'marketing', label: 'Marketing 📣', email: 'marketing@aaaconsultancy.com' },
+    { id: 'consultant', label: 'Agent 🧑‍💼', email: 'agent@aaaconsultancy.com' }
+  ];
 
   React.useEffect(() => {
     const queryParams = new URLSearchParams(window.location.search || window.location.hash.split('?')[1]);
@@ -152,6 +161,7 @@ export const Login = () => {
     else if (role === 'finance') email = 'finance@aaaconsultancy.com';
     else if (role === 'operations') email = 'operations@aaaconsultancy.com';
 
+    setLoadingRole(role);
     try {
       const res = await dbService.authLogin(email, 'password123');
       if (res && res.token) {
@@ -160,12 +170,13 @@ export const Login = () => {
         navigate('/dashboard');
         return;
       }
-      // Backend responded but no token — unexpected
       showAlert('Login failed: unexpected server response.', 'error');
     } catch (err) {
       console.error('Quick login failed:', err);
       const msg = err?.response?.data?.message || 'Cannot connect to server. Please ensure the backend is running.';
       showAlert(msg, 'error');
+    } finally {
+      setLoadingRole(null);
     }
   };
 
@@ -257,6 +268,46 @@ export const Login = () => {
           <Button type="submit" variant="contained" color="secondary" size="large" fullWidth disabled={isSubmitting}>
             {isSubmitting ? 'Logging in...' : 'Log In'}
           </Button>
+
+          {/* Quick Demo Role Access */}
+          <Divider sx={{ my: 1.5, fontSize: '0.75rem', color: 'text.secondary', fontWeight: 600, letterSpacing: 0.5 }}>
+            QUICK ROLE ACCESS (DEMO)
+          </Divider>
+
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, justifyContent: 'center' }}>
+            {QUICK_ROLES.map((r) => {
+              const isLoading = loadingRole === r.id;
+              return (
+                <Chip
+                  key={r.id}
+                  label={isLoading ? 'Logging in...' : r.label}
+                  onClick={() => !loadingRole && handleQuickLogin(r.id)}
+                  clickable={!loadingRole}
+                  disabled={loadingRole !== null && !isLoading}
+                  variant="outlined"
+                  sx={{
+                    fontWeight: 700,
+                    fontSize: '0.8rem',
+                    py: 2,
+                    px: 0.5,
+                    borderRadius: '16px',
+                    cursor: loadingRole ? 'not-allowed' : 'pointer',
+                    borderColor: 'secondary.main',
+                    color: 'text.primary',
+                    bgcolor: isLoading ? 'secondary.light' : 'background.paper',
+                    transition: 'all 0.2s ease',
+                    '&:hover': {
+                      bgcolor: 'secondary.main',
+                      color: '#ffffff',
+                      borderColor: 'secondary.main',
+                      transform: 'translateY(-1px)',
+                      boxShadow: '0 4px 10px rgba(0,0,0,0.1)'
+                    }
+                  }}
+                />
+              );
+            })}
+          </Box>
         </Box>
       </form>
     </Box>
