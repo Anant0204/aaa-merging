@@ -200,7 +200,7 @@ export const Login = () => {
           Welcome back
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          Enter your credentials to access the CRM portal.
+          Enter your credentials to access the IT Services CRM portal.
         </Typography>
       </Box>
 

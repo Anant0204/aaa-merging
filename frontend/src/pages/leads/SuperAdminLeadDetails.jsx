@@ -39,6 +39,8 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 // Components & Services
 import { dbService } from '../../services/dbService';
 import PageHeader from '../../components/PageHeader';
+import SalesPipelineStepper from '../../components/SalesPipelineStepper';
+import DealCommercialsCard from '../../components/DealCommercialsCard';
 import StatusBadge from '../../components/StatusBadge';
 import AppCard from '../../components/AppCard';
 import Timeline from '../../components/Timeline';
@@ -531,6 +533,16 @@ export const SuperAdminLeadDetails = () => {
         }
       />
 
+      {/* IT Sales Pipeline Stage Stepper */}
+      <SalesPipelineStepper
+        currentStatus={lead.status}
+        onStageClick={(newStage) => {
+          if (window.confirm(`Update sales pipeline stage to "${newStage}"?`)) {
+            updateStatusMutation.mutate({ leadId: lead.id, status: newStage });
+          }
+        }}
+      />
+
       {/* Grid of basic information */}
       <Box className="grid grid-cols-12 gap-4" sx={{ mb: 3, alignItems: 'stretch' }}>
         <Box className="col-span-12 md:col-span-3">
@@ -548,6 +560,14 @@ export const SuperAdminLeadDetails = () => {
               <Typography variant="caption" color="text.secondary" sx={{ mb: 1, display: 'block', wordBreak: 'break-all' }}>
                 {lead.email}
               </Typography>
+              {(lead.qualificationData?.companyName || lead.companyName) && (
+                <Chip
+                  icon={<span style={{ fontSize: '13px' }}>🏢</span>}
+                  label={lead.qualificationData?.companyName || lead.companyName}
+                  size="small"
+                  sx={{ mb: 1, fontWeight: 700, bgcolor: 'rgba(99, 102, 241, 0.1)', color: '#4F46E5' }}
+                />
+              )}
               <Chip
                 label={`Customer ID: ${lead.clientCode || lead.clientId || lead.client?.clientCode || lead.displayId || 'CID-12001'}`}
                 size="small"
@@ -606,6 +626,14 @@ export const SuperAdminLeadDetails = () => {
                     {serviceObj ? serviceObj.name : lead.serviceId}
                   </Typography>
                 </Box>
+                <Box>
+                  <Typography variant="caption" color="text.secondary" display="block">
+                    Estimated Budget Range
+                  </Typography>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#16A34A' }}>
+                    {lead.budget || lead.qualificationData?.budget || 'Not specified'}
+                  </Typography>
+                </Box>
               </Box>
             </Box>
           </Paper>
@@ -631,6 +659,10 @@ export const SuperAdminLeadDetails = () => {
                     {/* TAB 0: Overview & Qualifications */}
                     {activeTab === 0 && (
                       <Box className="grid grid-cols-12 gap-4">
+                  {/* IT Deal & Commercials Overview Card */}
+                  <Box className="col-span-12">
+                    <DealCommercialsCard lead={lead} serviceName={serviceObj?.name} />
+                  </Box>
                         {/* Sworn Translation Payment & Notification Tracking Card */}
                         {isSwornTranslationLead && (() => {
                           const isPaid = lead.status === 'Payment Completed' || lead.qualificationData?.paymentStatus === 'Paid' || lead.payment?.status === 'Paid';
@@ -1523,7 +1555,7 @@ export const SuperAdminLeadDetails = () => {
       <AppModal
         open={convertModalOpen}
         onClose={() => setConvertModalOpen(false)}
-        title="Convert Lead to Client Portal"
+        title="Onboard Lead as Active IT Client"
         actions={
           <>
             <Button onClick={() => setConvertModalOpen(false)} variant="outlined">
@@ -1548,8 +1580,8 @@ export const SuperAdminLeadDetails = () => {
       >
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
           <Typography variant="body2">
-            You are converting <strong>{lead.firstName} {lead.lastName}</strong> into a Client.
-            This creates a profile, schedules local registration checklists, and generates initial billing invoice details.
+            You are onboarding <strong>{lead.firstName} {lead.lastName}</strong> into the active IT Client Portal.
+            This initializes project milestone tracking, development workspace setup, and initial billing invoicing.
           </Typography>
 
           {lead.serviceId === 'tourism' ? (
@@ -1564,16 +1596,16 @@ export const SuperAdminLeadDetails = () => {
           ) : (
             <>
               <FormControl fullWidth size="small">
-                <InputLabel id="package-select-label">Select Relocation Package</InputLabel>
+                <InputLabel id="package-select-label">Select Service Package / Engagement Tier</InputLabel>
                 <Select
                   labelId="package-select-label"
                   value={selectedPackageId}
                   onChange={(e) => setSelectedPackageId(e.target.value)}
-                  label="Select Relocation Package"
+                  label="Select Service Package / Engagement Tier"
                 >
                   {PACKAGES.map((pkg) => (
                     <MenuItem key={pkg.id} value={pkg.id}>
-                      {pkg.name} - {pkg.id === 'premium' ? 'Residency + Full Relocation Assistance' : 'Residency Processing Only'}
+                      {pkg.name} - {pkg.id === 'premium' ? 'Enterprise Dedicated Team + Full Support' : 'Standard Development Retainer'}
                     </MenuItem>
                   ))}
                 </Select>
@@ -1582,13 +1614,13 @@ export const SuperAdminLeadDetails = () => {
               <TextField
                 value={applicantsCount}
                 onChange={(e) => setApplicantsCount(parseInt(e.target.value, 10))}
-                label="Total Applicants (Main + Dependents)"
+                label="Project Team Size / Engineering Seats"
                 type="number"
                 inputProps={{ min: 1 }}
                 fullWidth
                 helperText={
                   selectedPackageId === 'premium'
-                    ? 'Premium Package discount calculates €500 for Main applicant and €250 for each dependent automatically.'
+                    ? 'Enterprise tier calculates team allocation and dedicated SLA automatically.'
                     : ''
                 }
               />

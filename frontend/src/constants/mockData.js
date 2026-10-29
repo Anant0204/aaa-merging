@@ -65,6 +65,16 @@ export const isSwornTranslationService = (serviceTypeOrId = '') => {
   return s.includes('translation') || s.includes('sworn') || s.includes('traducci');
 };
 
+export const IT_SALES_PIPELINE_STAGES = [
+  'New Inquiry',
+  'Discovery Scheduled',
+  'Requirement Analysis',
+  'Proposal Sent',
+  'Negotiation',
+  'Deal Won',
+  'Deal Lost'
+];
+
 export const getLeadStatusOptions = (leadOrRow, leadStages = []) => {
   const service = leadOrRow?.serviceType || leadOrRow?.serviceId || leadOrRow?.service?.name || leadOrRow?.service || '';
   const currentStatus = leadOrRow?.status;
@@ -81,7 +91,11 @@ export const getLeadStatusOptions = (leadOrRow, leadStages = []) => {
     ]));
   }
   
-  const standardList = Array.from(new Set([...leadStages.map(s => s.name || s), 'No Show']));
+  const standardList = Array.from(new Set([
+    ...IT_SALES_PIPELINE_STAGES,
+    ...leadStages.map(s => s.name || s),
+    'No Show'
+  ]));
   return currentStatus && !standardList.includes(currentStatus)
     ? [...standardList, currentStatus]
     : standardList;

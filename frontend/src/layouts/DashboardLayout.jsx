@@ -963,10 +963,10 @@ export const DashboardLayout = () => {
           {sidebarOpen && (
             <Box>
               <Typography variant="h6" sx={{ fontWeight: 800, lineHeight: 1.1, letterSpacing: '-0.02em' }}>
-                AAA CONSULTANCY
+                AAA TECHNOLOGIES
               </Typography>
-              <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.65rem', fontWeight: 600 }}>
-                SPAIN IMMIGRATION
+              <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.65rem', fontWeight: 600, letterSpacing: '0.04em' }}>
+                IT SERVICES & SOFTWARE
               </Typography>
             </Box>
           )}

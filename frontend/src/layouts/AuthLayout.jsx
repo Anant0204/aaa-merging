@@ -64,22 +64,22 @@ export const AuthLayout = () => {
               A³
             </Box>
             <Typography variant="h5" sx={{ fontWeight: 800, letterSpacing: '-0.02em', color: 'white' }}>
-              AAA Business Consultancy
+              AAA Technologies
             </Typography>
           </Box>
         </Box>
 
         <Box sx={{ zIndex: 2, mb: 4, textAlign: 'left' }}>
           <Typography variant="h2" sx={{ fontWeight: 800, color: 'white', mb: 2, lineHeight: 1.2 }}>
-            Your Trusted Partner for a Better Future in Spain.
+            Your Trusted Technology Partner
           </Typography>
           <Typography variant="body1" sx={{ color: 'rgba(255, 255, 255, 0.85)', maxWidth: 520 }}>
-            Specializing in Digital Nomad Visas (DNV), Non-Lucrative Residency, Study Visas, and complete relocation administrative assistance in Madrid, Barcelona, and Valencia.
+            We build custom software, web and mobile applications, AI-powered solutions, and scalable cloud infrastructure to help businesses grow.
           </Typography>
         </Box>
 
         <Typography variant="caption" sx={{ zIndex: 2, color: 'rgba(255,255,255,0.5)', textAlign: 'left' }}>
-          © {new Date().getFullYear()} AAA Business Consultancy LLC. Advise • Assist • Achieve.
+          © {new Date().getFullYear()} AAA Technologies LLC. Innovate • Build • Scale.
         </Typography>
       </Box>
 
@@ -144,10 +144,10 @@ export const AuthLayout = () => {
             </Box>
             <Box sx={{ textAlign: 'left' }}>
               <Typography variant="h5" sx={{ fontWeight: 800, lineHeight: 1.1, letterSpacing: '-0.02em', color: theme.palette.mode === 'light' ? 'primary.main' : 'white' }}>
-                AAA Business Consultancy
+                AAA Technologies
               </Typography>
               <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>
-                Spain Visa, Residency & Relocation Portal
+                IT Services & Enterprise Software Portal
               </Typography>
             </Box>
           </Box>

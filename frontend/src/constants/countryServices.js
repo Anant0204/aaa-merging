@@ -1,15 +1,19 @@
 /**
- * Centralized mapping of available visa & residency services by country of residence.
- * Based on AAA Business Consultancy LLC workflow requirements.
+ * Centralized mapping of available IT company services and development offerings.
+ * AAA Technologies & IT Solutions.
  */
 
-export const ALL_VISA_SERVICES = [
-  { id: 'dnv', name: 'Spain Digital Nomad Visa (DNV)', category: 'residency' },
-  { id: 'nlv', name: 'Spain Non-Lucrative Visa (NLV)', category: 'residency' },
-  { id: 'study', name: 'Spain Study Visa', category: 'study' },
-  { id: 'business', name: 'Spain Self-Employed / Business Visa', category: 'business' },
-  { id: 'tourist', name: 'Spain Tourist Visa (Schengen)', category: 'tourist' }
+export const ALL_IT_SERVICES = [
+  { id: 'custom_software', name: 'Custom Software & SaaS Development', category: 'software' },
+  { id: 'web_mobile', name: 'Web & Mobile App Development', category: 'development' },
+  { id: 'ai_automation', name: 'AI & Automation Solutions', category: 'ai' },
+  { id: 'cloud_devops', name: 'Cloud, DevOps & Infrastructure', category: 'cloud' },
+  { id: 'ui_ux_design', name: 'UI/UX Design & Prototyping', category: 'design' },
+  { id: 'dedicated_team', name: 'Dedicated Engineering Teams', category: 'staffing' }
 ];
+
+// Backwards-compatible alias for existing imports across the application
+export const ALL_VISA_SERVICES = ALL_IT_SERVICES;
 
 export const ALL_COUNTRIES = [
   "United Arab Emirates",
@@ -211,67 +215,22 @@ export const ALL_COUNTRIES = [
 ];
 
 export const COUNTRY_SERVICES_MAPPING = {
-  'Bahrain': [
-    { id: 'tourist', name: 'Spain Tourist Visa (Schengen)' },
-    { id: 'study', name: 'Spain Study Visa' }
-  ],
-  'Egypt': [
-    { id: 'dnv', name: 'Spain Digital Nomad Visa (DNV)' },
-    { id: 'nlv', name: 'Spain Non-Lucrative Visa (NLV)' },
-    { id: 'study', name: 'Spain Study Visa' },
-    { id: 'tourist', name: 'Spain Tourist Visa (Schengen)' }
-  ],
-  'India': [
-    { id: 'dnv', name: 'Spain Digital Nomad Visa (DNV)' },
-    { id: 'nlv', name: 'Spain Non-Lucrative Visa (NLV)' },
-    { id: 'study', name: 'Spain Study Visa' },
-    { id: 'tourist', name: 'Spain Tourist Visa (Schengen)' }
-  ],
-  'Kuwait': [
-    { id: 'tourist', name: 'Spain Tourist Visa (Schengen)' },
-    { id: 'study', name: 'Spain Study Visa' }
-  ],
-  'Oman': [
-    { id: 'dnv', name: 'Spain Digital Nomad Visa (DNV)' },
-    { id: 'nlv', name: 'Spain Non-Lucrative Visa (NLV)' },
-    { id: 'study', name: 'Spain Study Visa' },
-    { id: 'tourist', name: 'Spain Tourist Visa (Schengen)' }
-  ],
-  'Pakistan': [
-    { id: 'tourist', name: 'Spain Tourist Visa (Schengen)' },
-    { id: 'study', name: 'Spain Study Visa' }
-  ],
-  'Philippines': [
-    { id: 'dnv', name: 'Spain Digital Nomad Visa (DNV)' },
-    { id: 'nlv', name: 'Spain Non-Lucrative Visa (NLV)' },
-    { id: 'study', name: 'Spain Study Visa' },
-    { id: 'tourist', name: 'Spain Tourist Visa (Schengen)' }
-  ],
-  'Qatar': [
-    { id: 'study', name: 'Spain Study Visa' },
-    { id: 'nlv', name: 'Spain Non-Lucrative Visa (NLV)' },
-    { id: 'tourist', name: 'Spain Tourist Visa (Schengen)' }
-  ],
-  'Saudi Arabia': [
-    { id: 'dnv', name: 'Spain Digital Nomad Visa (DNV)' },
-    { id: 'nlv', name: 'Spain Non-Lucrative Visa (NLV)' },
-    { id: 'study', name: 'Spain Study Visa' },
-    { id: 'tourist', name: 'Spain Tourist Visa (Schengen)' }
-  ],
-  'United Arab Emirates': [
-    { id: 'study', name: 'Spain Study Visa' },
-    { id: 'dnv', name: 'Spain Digital Nomad Visa (DNV)' },
-    { id: 'nlv', name: 'Spain Non-Lucrative Visa (NLV)' },
-    { id: 'business', name: 'Spain Self-Employed / Business Visa' },
-    { id: 'tourist', name: 'Spain Tourist Visa (Schengen)' }
-  ],
-  'UAE': [
-    { id: 'study', name: 'Spain Study Visa' },
-    { id: 'dnv', name: 'Spain Digital Nomad Visa (DNV)' },
-    { id: 'nlv', name: 'Spain Non-Lucrative Visa (NLV)' },
-    { id: 'business', name: 'Spain Self-Employed / Business Visa' },
-    { id: 'tourist', name: 'Spain Tourist Visa (Schengen)' }
-  ]
+  'Bahrain': ALL_IT_SERVICES,
+  'Egypt': ALL_IT_SERVICES,
+  'India': ALL_IT_SERVICES,
+  'Kuwait': ALL_IT_SERVICES,
+  'Oman': ALL_IT_SERVICES,
+  'Pakistan': ALL_IT_SERVICES,
+  'Philippines': ALL_IT_SERVICES,
+  'Qatar': ALL_IT_SERVICES,
+  'Saudi Arabia': ALL_IT_SERVICES,
+  'United Arab Emirates': ALL_IT_SERVICES,
+  'UAE': ALL_IT_SERVICES,
+  'United States': ALL_IT_SERVICES,
+  'United Kingdom': ALL_IT_SERVICES,
+  'Canada': ALL_IT_SERVICES,
+  'Spain': ALL_IT_SERVICES,
+  'Germany': ALL_IT_SERVICES
 };
 
 /**
@@ -279,11 +238,11 @@ export const COUNTRY_SERVICES_MAPPING = {
  * Falls back to ALL_VISA_SERVICES if country is missing or not explicitly mapped.
  */
 export function getServicesForCountry(countryName) {
-  if (!countryName) return ALL_VISA_SERVICES;
+  if (!countryName) return ALL_IT_SERVICES;
   
   const normalizedCountry = Object.keys(COUNTRY_SERVICES_MAPPING).find(
     c => c.toLowerCase() === countryName.trim().toLowerCase()
   );
 
-  return normalizedCountry ? COUNTRY_SERVICES_MAPPING[normalizedCountry] : ALL_VISA_SERVICES;
+  return normalizedCountry ? COUNTRY_SERVICES_MAPPING[normalizedCountry] : ALL_IT_SERVICES;
 }

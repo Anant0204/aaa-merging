@@ -62,7 +62,7 @@ const leadSchema = yup.object().shape({
   phone: yup.string().required('Phone is required'),
   nationality: yup.string().required('Nationality is required'),
   preferredLanguage: yup.string().required('Preferred language is required'),
-  serviceId: yup.string().required('Visa service is required'),
+  serviceId: yup.string().required('IT service is required'),
   applicantsCount: yup.number().typeError('Must be a number').min(1, 'At least 1 applicant').required(),
   source: yup.string().required('Lead source is required'),
   notes: yup.string(),
@@ -411,9 +411,23 @@ export const AgentLeadList = () => {
     { id: 'clientCode', label: 'Customer ID', render: (row) => row.clientCode || row.leadCode || row.displayId || (typeof row.id === 'string' && row.id.length > 8 ? `LEAD-${row.id.substring(0, 6).toUpperCase()}` : (row.id || 'CID-12001')) },
     {
       id: 'name',
-      label: 'Name',
+      label: 'Contact & Company',
       sortable: true,
-      render: (row) => `${row.firstName} ${row.lastName}` },
+      render: (row) => {
+        const comp = row.qualificationData?.companyName || row.companyName;
+        return (
+          <Box>
+            <Typography variant="body2" sx={{ fontWeight: 700 }}>
+              {`${row.firstName} ${row.lastName}`}
+            </Typography>
+            {comp && (
+              <Typography variant="caption" sx={{ color: 'secondary.main', fontWeight: 600, display: 'block' }}>
+                🏢 {comp}
+              </Typography>
+            )}
+          </Box>
+        );
+      } },
     {
       id: 'createdDate',
       label: 'Created Date',
@@ -430,8 +444,17 @@ export const AgentLeadList = () => {
     },
     {
       id: 'service',
-      label: 'Service',
-      render: (row) => SERVICES.find((s) => s.id === row.serviceId)?.name || row.serviceId },
+      label: 'IT Service',
+      render: (row) => {
+        const matched = SERVICES.find((s) => s.id === row.serviceId || s.id === row.serviceType);
+        return matched?.name || row.serviceType || row.serviceId || 'IT Service';
+      } },
+    {
+      id: 'budget',
+      label: 'Budget',
+      sortable: true,
+      render: (row) => row.budget || row.qualificationData?.budget || '-'
+    },
     {
       id: 'status',
       label: 'Status',
@@ -841,17 +864,17 @@ export const AgentLeadList = () => {
             <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 2.5 }}>
               <Box sx={{ borderBottom: '2px solid', borderColor: 'secondary.main', pb: 1, mb: 1 }}>
                 <Typography variant="subtitle2" color="primary" sx={{ fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
-                  Visa & Case Setup
+                  IT Project & Scope Setup
                 </Typography>
               </Box>
 
               <FormControl fullWidth size="small" error={!!errors.serviceId}>
-                <InputLabel id="service-id-label">Visa Service</InputLabel>
+                <InputLabel id="service-id-label">IT Service / Project Type</InputLabel>
                 <Select
                   labelId="service-id-label"
                   {...register('serviceId')}
                   value={watchServiceId || ''}
-                  label="Visa Service"
+                  label="IT Service / Project Type"
                 >
                   {SERVICES.map((s) => (
                     <MenuItem key={s.id} value={s.id}>
@@ -970,7 +993,7 @@ export const AgentLeadList = () => {
       <AppModal
         open={assignModalOpen}
         onClose={() => setAssignModalOpen(false)}
-        title="Assign Spain Visa Agent"
+        title="Assign Solutions Consultant"
         actions={
           <>
             <Button onClick={() => setAssignModalOpen(false)} variant="outlined">
@@ -990,7 +1013,7 @@ export const AgentLeadList = () => {
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
           {selectedLead && (
             <Typography variant="body2" sx={{ mb: 1 }}>
-              Select the Spain Visa agent to handle the case for{' '}
+              Select the Solutions Consultant to handle the project for{' '}
               <strong>
                 {selectedLead.firstName} {selectedLead.lastName}
               </strong>{' '}

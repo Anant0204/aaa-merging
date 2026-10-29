@@ -99,8 +99,10 @@ const leadSchema = yup.object().shape({
   nationality: yup.string().required('Nationality is required'),
   countryOfResidence: yup.string().required('Country of Residence is required'),
   preferredLanguage: yup.string().required('Preferred language is required'),
-  serviceId: yup.string().required('Visa service is required'),
-  applicantsCount: yup.number().typeError('Must be a number').min(1, 'At least 1 applicant').required(),
+  serviceId: yup.string().required('IT service is required'),
+  applicantsCount: yup.number().default(1),
+  companyName: yup.string(),
+  budget: yup.string(),
   source: yup.string().required('Lead source is required'),
   notes: yup.string(),
   meetingPreferredDate: yup
@@ -379,6 +381,12 @@ export const SuperAdminLeadList = () => {
     const defaultStatus = data.meetingPreferredDate ? 'Meeting Scheduled' : (leadStages[0]?.name || 'New Lead');
     createLeadMutation.mutate({
       ...data,
+      applicantsCount: Number(data.applicantsCount) || 1,
+      qualificationData: {
+        ...(data.qualificationData || {}),
+        companyName: data.companyName || '',
+        budget: data.budget || '$10,000 - $25,000'
+      },
       status: defaultStatus,
       assignedConsultantId: ''
     });
@@ -433,16 +441,15 @@ export const SuperAdminLeadList = () => {
       }
 
       // Category Tab Filter
-      if (activeCategoryTab === 'visa') {
-        const isTranslation = (lead.serviceId || '').toLowerCase().includes('translation') || (lead.serviceType || '').toLowerCase().includes('translation');
-        const isProperty = (lead.serviceId || '').toLowerCase().includes('property') || (lead.serviceType || '').toLowerCase().includes('property');
-        if (isTranslation || isProperty) return false;
-      } else if (activeCategoryTab === 'property') {
-        const isProperty = (lead.serviceId || '').toLowerCase().includes('property') || (lead.serviceType || '').toLowerCase().includes('property');
-        if (!isProperty) return false;
-      } else if (activeCategoryTab === 'translation') {
-        const isTranslation = (lead.serviceId || '').toLowerCase().includes('translation') || (lead.serviceType || '').toLowerCase().includes('translation');
-        if (!isTranslation) return false;
+      if (activeCategoryTab === 'software') {
+        const s = ((lead.serviceId || '') + ' ' + (lead.serviceType || '')).toLowerCase();
+        if (!s.includes('software') && !s.includes('saas') && !s.includes('crm') && !s.includes('erp')) return false;
+      } else if (activeCategoryTab === 'mobile_web') {
+        const s = ((lead.serviceId || '') + ' ' + (lead.serviceType || '')).toLowerCase();
+        if (!s.includes('web') && !s.includes('mobile') && !s.includes('app') && !s.includes('ui_ux')) return false;
+      } else if (activeCategoryTab === 'ai_cloud') {
+        const s = ((lead.serviceId || '') + ' ' + (lead.serviceType || '')).toLowerCase();
+        if (!s.includes('ai') && !s.includes('cloud') && !s.includes('devops') && !s.includes('automation')) return false;
       }
 
       const matchService = matchesServiceCategory(lead, filters.serviceId);
@@ -478,9 +485,23 @@ export const SuperAdminLeadList = () => {
     { id: 'clientCode', label: 'Customer ID', render: (row) => row.clientCode || row.leadCode || row.displayId || (typeof row.id === 'string' && row.id.length > 8 ? `LEAD-${row.id.substring(0, 6).toUpperCase()}` : (row.id || 'CID-12001')) },
     {
       id: 'name',
-      label: 'Name',
+      label: 'Contact & Company',
       sortable: true,
-      render: (row) => `${row.firstName} ${row.lastName}`
+      render: (row) => {
+        const comp = row.qualificationData?.companyName || row.companyName;
+        return (
+          <Box>
+            <Typography variant="body2" sx={{ fontWeight: 700 }}>
+              {`${row.firstName} ${row.lastName}`}
+            </Typography>
+            {comp && (
+              <Typography variant="caption" sx={{ color: 'secondary.main', fontWeight: 600, display: 'block' }}>
+                🏢 {comp}
+              </Typography>
+            )}
+          </Box>
+        );
+      }
     },
     {
       id: 'createdDate',
@@ -499,8 +520,17 @@ export const SuperAdminLeadList = () => {
     },
     {
       id: 'service',
-      label: 'Service',
-      render: (row) => SERVICES.find((s) => s.id === row.serviceId)?.name || row.serviceId
+      label: 'IT Service',
+      render: (row) => {
+        const matched = SERVICES.find((s) => s.id === row.serviceId || s.id === row.serviceType);
+        return matched?.name || row.serviceType || row.serviceId || 'IT Service';
+      }
+    },
+    {
+      id: 'budget',
+      label: 'Budget',
+      sortable: true,
+      render: (row) => row.budget || row.qualificationData?.budget || '-'
     },
     {
       id: 'status',
@@ -686,10 +716,10 @@ export const SuperAdminLeadList = () => {
           indicatorColor="secondary"
           aria-label="lead categories tabs"
         >
-          <Tab value="all" label="💼 All Categories" sx={{ fontWeight: 700, textTransform: 'none' }} />
-          <Tab value="visa" label="✈️ Spain Visa & Case Assessment" sx={{ fontWeight: 700, textTransform: 'none' }} />
-          <Tab value="property" label="🏠 Property Investment Guidance" sx={{ fontWeight: 700, textTransform: 'none' }} />
-          <Tab value="translation" label="📄 Sworn Translation" sx={{ fontWeight: 700, textTransform: 'none' }} />
+          <Tab value="all" label="💼 All IT Inquiries" sx={{ fontWeight: 700, textTransform: 'none' }} />
+          <Tab value="software" label="💻 Software & SaaS" sx={{ fontWeight: 700, textTransform: 'none' }} />
+          <Tab value="mobile_web" label="📱 Web & Mobile Apps" sx={{ fontWeight: 700, textTransform: 'none' }} />
+          <Tab value="ai_cloud" label="🤖 AI & Cloud Solutions" sx={{ fontWeight: 700, textTransform: 'none' }} />
         </Tabs>
       </Box>
 
@@ -870,6 +900,8 @@ export const SuperAdminLeadList = () => {
                 <TextField {...register('lastName')} label="Last Name" error={!!errors.lastName} helperText={errors.lastName?.message} sx={{ flex: 1 }} />
               </Box>
 
+              <TextField {...register('companyName')} label="Company / Organization Name" fullWidth placeholder="e.g. Acme Innovations Inc." />
+
               <TextField {...register('email')} label="Email Address" error={!!errors.email} helperText={errors.email?.message} fullWidth />
 
               <Controller
@@ -950,17 +982,17 @@ export const SuperAdminLeadList = () => {
             <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 2.5 }}>
               <Box sx={{ borderBottom: '2px solid', borderColor: 'secondary.main', pb: 1, mb: 1 }}>
                 <Typography variant="subtitle2" color="primary" sx={{ fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
-                  Visa & Case Setup
+                  IT Project & Scope Setup
                 </Typography>
               </Box>
 
               <FormControl fullWidth size="small" error={!!errors.serviceId}>
-                <InputLabel id="service-id-label">Visa Service</InputLabel>
+                <InputLabel id="service-id-label">IT Service / Project Type</InputLabel>
                 <Select
                   labelId="service-id-label"
                   {...register('serviceId')}
                   value={watchServiceId || ''}
-                  label="Visa Service"
+                  label="IT Service / Project Type"
                 >
                   {SERVICES.map((s) => (
                     <MenuItem key={s.id} value={s.id}>
@@ -973,42 +1005,24 @@ export const SuperAdminLeadList = () => {
                 )}
               </FormControl>
 
-              {watchServiceId === 'property' && (
-                <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 2 }}>
-                  <FormControl fullWidth size="small">
-                    <InputLabel id="preferable-area-label">Preferable Area in Spain</InputLabel>
-                    <Select
-                      labelId="preferable-area-label"
-                      {...register('preferableArea')}
-                      defaultValue=""
-                      label="Preferable Area in Spain"
-                    >
-                      <MenuItem value="Madrid">Madrid</MenuItem>
-                      <MenuItem value="Barcelona">Barcelona</MenuItem>
-                      <MenuItem value="Malaga">Malaga & Costa del Sol</MenuItem>
-                      <MenuItem value="Valencia">Valencia</MenuItem>
-                      <MenuItem value="Alicante">Alicante & Costa Blanca</MenuItem>
-                      <MenuItem value="Balearic Islands">Balearic Islands (Mallorca, Ibiza)</MenuItem>
-                      <MenuItem value="Canary Islands">Canary Islands</MenuItem>
-                      <MenuItem value="Costa Brava">Costa Brava (Girona)</MenuItem>
-                      <MenuItem value="Marbella">Marbella & Andalusia</MenuItem>
-                      <MenuItem value="Other">Other / Not Decided</MenuItem>
-                    </Select>
-                  </FormControl>
-                </Box>
-              )}
+              
 
               <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 2, alignItems: 'flex-start' }}>
-                <TextField
-                  {...register('applicantsCount')}
-                  type="number"
-                  label="Number of Applicants"
-                  slotProps={{ htmlInput: { min: 1 } }}
-                  inputProps={{ min: 1 }}
-                  error={!!errors.applicantsCount}
-                  helperText={errors.applicantsCount?.message}
-                  sx={{ flex: 1 }}
-                />
+                <FormControl sx={{ flex: 1 }} size="small">
+                  <InputLabel id="budget-select-label">Project Budget Range</InputLabel>
+                  <Select
+                    labelId="budget-select-label"
+                    {...register('budget')}
+                    defaultValue="$10,000 - $25,000"
+                    label="Project Budget Range"
+                  >
+                    <MenuItem value="$5,000 - $10,000">$5,000 - $10,000</MenuItem>
+                    <MenuItem value="$10,000 - $25,000">$10,000 - $25,000</MenuItem>
+                    <MenuItem value="$25,000 - $50,000">$25,000 - $50,000</MenuItem>
+                    <MenuItem value="$50,000 - $100,000">$50,000 - $100,000</MenuItem>
+                    <MenuItem value="$100,000+">$100,000+</MenuItem>
+                  </Select>
+                </FormControl>
                 <FormControl sx={{ flex: 1 }} size="small" error={!!errors.source}>
                   <InputLabel id="source-label">Lead Source Channel</InputLabel>
                   <Select
@@ -1104,7 +1118,7 @@ export const SuperAdminLeadList = () => {
       <AppModal
         open={assignModalOpen}
         onClose={() => setAssignModalOpen(false)}
-        title="Assign Spain Visa Agent"
+        title="Assign Solutions Consultant"
         actions={
           <>
             <Button onClick={() => setAssignModalOpen(false)} variant="outlined">
@@ -1124,7 +1138,7 @@ export const SuperAdminLeadList = () => {
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
           {selectedLead && (
             <Typography variant="body2" sx={{ mb: 1 }}>
-              Select the Spain Visa agent to handle the case for{' '}
+              Select the Solutions Consultant to handle the project for{' '}
               <strong>
                 {selectedLead.firstName} {selectedLead.lastName}
               </strong>{' '}

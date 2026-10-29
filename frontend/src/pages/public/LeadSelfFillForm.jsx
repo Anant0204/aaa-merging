@@ -333,7 +333,10 @@ export const LeadSelfFillForm = () => {
     nationality: "",
     countryOfResidence: "",
     preferredLanguage: "English",
-    serviceId: "dnv",
+    serviceId: "custom_software",
+    companyName: "",
+    budget: "$10,000 - $25,000",
+    targetTimeline: "1 - 3 months",
     applicantsCount: "Main Only",
     dependentsDetails: [],
     meetingPreferredDate: "",
@@ -943,19 +946,19 @@ export const LeadSelfFillForm = () => {
     // Prepare payload
     const payload = {
       ...form,
+      nationality: form.nationality || form.countryOfResidence || "Global",
+      serviceType: form.serviceId || "Custom Software & SaaS Development",
+      budget: form.budget || "$10,000 - $25,000",
+      meetingNotes: form.meetingNotes || "",
+      qualificationData: {
+        companyName: form.companyName || "",
+        targetTimeline: form.targetTimeline || "1 - 3 months",
+        budget: form.budget || "$10,000 - $25,000",
+        projectScope: form.meetingNotes || ""
+      },
       preferredLanguage: finalPrefLang,
-      meetingPreferredLanguage: finalMeetingLang,
-      preferableArea: serviceCategory === "property" ? form.preferableAreaInSpain : undefined
+      meetingPreferredLanguage: finalMeetingLang
     };
-    if (serviceCategory === "property") {
-      payload.serviceType = "Property Investment Guidance";
-      payload.serviceId = "property";
-      payload.qualificationData = {
-        preferableAreaInSpain: form.preferableAreaInSpain
-      };
-    } else {
-      payload.serviceType = form.serviceId;
-    }
 
     try {
       let resData = null;
@@ -1115,7 +1118,7 @@ export const LeadSelfFillForm = () => {
                 letterSpacing: "-0.5px",
               }}
             >
-              AAA Consultancy Services
+              AAA Technologies LLC
             </span>
           </div>
           <p
@@ -1125,7 +1128,7 @@ export const LeadSelfFillForm = () => {
               margin: 0,
             }}
           >
-            Free Eligibility Consultation Booking
+            IT Project Discovery & Consultation Booking
           </p>
         </div>
 
@@ -1153,7 +1156,7 @@ export const LeadSelfFillForm = () => {
                 </div>
               ) : (
                 <p style={{ color: "rgba(255,255,255,0.8)", fontSize: "14px", lineHeight: 1.6, marginBottom: "24px" }}>
-                  Are you sure you want to cancel your scheduled Spain Visa Eligibility Assessment?
+                  Are you sure you want to cancel your scheduled IT Project Discovery Call?
                 </p>
               )}
               <div style={{ display: "flex", gap: "12px", justifyContent: "center" }}>
@@ -1208,7 +1211,7 @@ export const LeadSelfFillForm = () => {
                     👋 Welcome Back{form.firstName ? `, ${form.firstName}` : ""}!
                   </div>
                   <div style={{ color: "rgba(255, 255, 255, 0.8)", fontSize: "13px", lineHeight: "1.5" }}>
-                    You are scheduling a <strong>Follow-up Consultation</strong> with your assigned Case Officer. Your personal details are pre-filled & locked. Please select your preferred date & time below.
+                    You are scheduling a <strong>Follow-up Consultation</strong> with your assigned Technical Account Manager. Your personal details are pre-filled & locked. Please select your preferred date & time below.
                   </div>
                 </div>
               )}
@@ -1222,7 +1225,7 @@ export const LeadSelfFillForm = () => {
                     margin: 0,
                   }}
                 >
-                  {rescheduleConsultationId ? "Reschedule Assessment 🔄" : (isClientRebook ? "Schedule Follow-up Meeting 📅" : "Book Assessment 📅")}
+                  {rescheduleConsultationId ? "Reschedule Discovery Call 🔄" : (isClientRebook ? "Schedule Project Follow-up 📅" : "Schedule IT Project Discovery Call 🚀")}
                 </h2>
               </div>
 
@@ -1234,7 +1237,7 @@ export const LeadSelfFillForm = () => {
                   lineHeight: 1.6,
                 }}
               >
-                {isClientRebook ? "Select your preferred date and time slot below to schedule a follow-up consultation with your Case Officer." : "Please provide your details and choose a convenient date/time for your Free 20-Minute Eligibility Assessment."}
+                {isClientRebook ? "Select your preferred date and time slot below to schedule a follow-up discussion with your Solutions Consultant." : "Share your project requirements and select a convenient date/time for a 1-on-1 discovery and technical consultation with our engineering team."}
               </p>
 
               <style>{`
@@ -1251,61 +1254,24 @@ export const LeadSelfFillForm = () => {
                 }
               `}</style>
               <form onSubmit={handleSubmit}>
-                {/* Service Category Dropdown */}
-                <div style={{ marginBottom: "24px" }}>
-                  <label style={labelStyle}>Select Service Category *</label>
+                {/* IT Project Domain Selection */}
+                <div style={{ marginBottom: "20px" }}>
+                  <label style={labelStyle}>Select IT Project Domain / Service *</label>
                   <select
-                    value={serviceCategory}
+                    value={form.serviceId}
                     onChange={(e) => {
                       setError("");
-                      setServiceCategory(e.target.value);
+                      handleChange("serviceId", e.target.value);
                     }}
                     style={{ ...inputStyle, color: "#fff", border: "1px solid rgba(102, 126, 234, 0.4)" }}
                   >
-                    <option value="visa" style={{ background: "#24243e" }}>✈️ Spain Visa & Residency Services</option>
-                    <option value="property" style={{ background: "#24243e" }}>🏡 Property Investment Guidance Service</option>
-                    <option value="translation" style={{ background: "#24243e" }}>📜 Spanish Sworn Translation Service</option>
+                    <option value="custom_software" style={{ background: "#24243e" }}>💻 Custom Software & SaaS Development</option>
+                    <option value="web_mobile" style={{ background: "#24243e" }}>📱 Web & Mobile App Development</option>
+                    <option value="ai_automation" style={{ background: "#24243e" }}>🤖 AI & Intelligent Automation Solutions</option>
+                    <option value="cloud_devops" style={{ background: "#24243e" }}>☁️ Cloud Architecture, DevOps & Infrastructure</option>
+                    <option value="ui_ux_design" style={{ background: "#24243e" }}>🎨 UI/UX Design & Product Prototyping</option>
+                    <option value="dedicated_team" style={{ background: "#24243e" }}>👥 Dedicated Engineering Teams & Staffing</option>
                   </select>
-                </div>
-
-                {/* Section: Personal Details */}
-                <div className="lead-form-grid-2col">
-                  <div>
-                    <label style={labelStyle}>First Name *</label>
-                    <input
-                      required
-                      value={form.firstName}
-                      onChange={(e) =>
-                        handleChange("firstName", e.target.value)
-                      }
-                      placeholder="John"
-                      disabled={isExistingLead}
-                      style={{
-                        ...inputStyle,
-                        background: isExistingLead ? "rgba(255, 255, 255, 0.03)" : inputStyle.background,
-                        color: isExistingLead ? "rgba(255, 255, 255, 0.4)" : inputStyle.color,
-                        border: isExistingLead ? "1px solid rgba(255, 255, 255, 0.08)" : inputStyle.border,
-                        cursor: isExistingLead ? "not-allowed" : "text"
-                      }}
-                    />
-                  </div>
-                  <div>
-                    <label style={labelStyle}>Last Name *</label>
-                    <input
-                      required
-                      value={form.lastName}
-                      onChange={(e) => handleChange("lastName", e.target.value)}
-                      placeholder="Doe"
-                      disabled={isExistingLead}
-                      style={{
-                        ...inputStyle,
-                        background: isExistingLead ? "rgba(255, 255, 255, 0.03)" : inputStyle.background,
-                        color: isExistingLead ? "rgba(255, 255, 255, 0.4)" : inputStyle.color,
-                        border: isExistingLead ? "1px solid rgba(255, 255, 255, 0.08)" : inputStyle.border,
-                        cursor: isExistingLead ? "not-allowed" : "text"
-                      }}
-                    />
-                  </div>
                 </div>
 
                 <div className="lead-form-grid-2col">
@@ -1392,139 +1358,80 @@ export const LeadSelfFillForm = () => {
                 </div>
 
                 <div className="lead-form-grid-2col">
-                  <SearchableCountrySelect
-                    label="Nationality *"
-                    value={form.nationality}
-                    onChange={(val) => handleChange("nationality", val)}
-                    options={NATIONALITIES}
-                    placeholder="Select Nationality"
-                    disabled={isExistingLead}
-                    labelStyle={labelStyle}
-                    inputStyle={inputStyle}
-                  />
-                  <SearchableCountrySelect
-                    label="Country of Residence *"
-                    value={form.countryOfResidence}
-                    onChange={(val) => handleChange("countryOfResidence", val)}
-                    options={ALL_COUNTRIES}
-                    placeholder="Select Country"
-                    disabled={isExistingLead}
-                    labelStyle={labelStyle}
-                    inputStyle={inputStyle}
+                  <div>
+                    <label style={labelStyle}>Company / Organization Name</label>
+                    <input
+                      value={form.companyName || ""}
+                      onChange={(e) => handleChange("companyName", e.target.value)}
+                      placeholder="e.g. Acme Innovations LLC"
+                      style={inputStyle}
+                    />
+                  </div>
+                  <div>
+                    <SearchableCountrySelect
+                      label="Country / Primary Location *"
+                      value={form.countryOfResidence}
+                      onChange={(val) => {
+                        handleChange("countryOfResidence", val);
+                        handleChange("nationality", val);
+                      }}
+                      options={ALL_COUNTRIES}
+                      placeholder="Select Country"
+                      disabled={isExistingLead}
+                      labelStyle={labelStyle}
+                      inputStyle={inputStyle}
+                    />
+                  </div>
+                </div>
+                {/* Project Commercials: Budget & Timeline */}
+                <div className="lead-form-grid-2col" style={{ marginBottom: "20px" }}>
+                  <div>
+                    <label style={labelStyle}>Estimated Project Budget Range *</label>
+                    <select
+                      value={form.budget || "$10,000 - $25,000"}
+                      onChange={(e) => handleChange("budget", e.target.value)}
+                      style={{ ...inputStyle, color: "#fff" }}
+                    >
+                      <option value="< $5,000 (MVP / Pilot)" style={{ background: "#24243e" }}>Under $5,000 (MVP / Proof of Concept)</option>
+                      <option value="$5,000 - $15,000 (Standard)" style={{ background: "#24243e" }}>$5,000 - $15,000 (Standard Project)</option>
+                      <option value="$15,000 - $35,000 (Growth)" style={{ background: "#24243e" }}>$15,000 - $35,000 (Growth Platform)</option>
+                      <option value="$35,000 - $75,000 (Enterprise)" style={{ background: "#24243e" }}>$35,000 - $75,000 (Enterprise Solution)</option>
+                      <option value="$75,000+ (Large Scale / Retainer)" style={{ background: "#24243e" }}>$75,000+ (Large Scale / Retainer)</option>
+                      <option value="Flexible / To be scoped" style={{ background: "#24243e" }}>Flexible / Need Scoping Assistance</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label style={labelStyle}>Target Launch / Timeline</label>
+                    <select
+                      value={form.targetTimeline || "1 - 3 months"}
+                      onChange={(e) => handleChange("targetTimeline", e.target.value)}
+                      style={{ ...inputStyle, color: "#fff" }}
+                    >
+                      <option value="Urgent (< 1 month)" style={{ background: "#24243e" }}>Urgent (&lt; 1 month)</option>
+                      <option value="1 - 3 months" style={{ background: "#24243e" }}>1 - 3 months</option>
+                      <option value="3 - 6 months" style={{ background: "#24243e" }}>3 - 6 months</option>
+                      <option value="6+ months" style={{ background: "#24243e" }}>6+ months</option>
+                      <option value="Flexible" style={{ background: "#24243e" }}>Flexible / Exploring Ideas</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* Project Brief / Technical Scope */}
+                <div style={{ marginBottom: "20px" }}>
+                  <label style={labelStyle}>Project Overview / Technical Brief</label>
+                  <textarea
+                    rows={3}
+                    value={form.meetingNotes || ""}
+                    onChange={(e) => handleChange("meetingNotes", e.target.value)}
+                    placeholder="Briefly describe your product goals, key features, target platform (Web/iOS/Android), or preferred tech stack..."
+                    style={{
+                      ...inputStyle,
+                      minHeight: "80px",
+                      resize: "vertical",
+                      fontFamily: "inherit"
+                    }}
                   />
                 </div>
-                {/* Section: Visa Program (only for visa category) */}
-                {serviceCategory === 'visa' && (
-                  <>
-                    <div className="lead-form-grid-2col" style={{ marginBottom: "28px" }}>
-                      <div>
-                        <label style={labelStyle}>Visa Program of Interest</label>
-                        <select
-                          value={form.serviceId}
-                          onChange={(e) =>
-                            handleChange("serviceId", e.target.value)
-                          }
-                          style={{ ...inputStyle, color: "#fff" }}
-                        >
-                          {SERVICES.map((s) => (
-                            <option key={s.id} value={s.id} style={{ background: "#24243e", color: "#fff" }}>
-                              {s.name}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                      <div>
-                        <label style={labelStyle}>MAIN APPLICANT + DEPENDENTS</label>
-                        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                          <div
-                            style={{
-                              ...inputStyle,
-                              width: "auto",
-                              padding: "10px 14px",
-                              background: "rgba(139, 92, 246, 0.18)",
-                              color: "#c4b5fd",
-                              fontWeight: 700,
-                              fontSize: "14px",
-                              whiteSpace: "nowrap",
-                              border: "1px solid rgba(139, 92, 246, 0.4)",
-                              userSelect: "none",
-                              borderRadius: "10px"
-                            }}
-                          >
-                            👤 1 Main +
-                          </div>
-                          <div style={{ flex: 1, position: "relative", minWidth: "160px" }}>
-                            <input
-                              type="number"
-                              min="0"
-                              max="49"
-                              value={totalApplicantsDisplay === "" ? "" : Math.max(0, (parseInt(totalApplicantsDisplay, 10) || 1) - 1)}
-                              onFocus={(e) => e.target.select()}
-                              onClick={(e) => e.target.select()}
-                              onChange={(e) => {
-                                let raw = e.target.value;
-                                if (raw.length > 1 && raw.startsWith("0")) {
-                                  raw = raw.replace(/^0+/, "");
-                                }
-                                if (raw === "") {
-                                  setTotalApplicantsDisplay("");
-                                  handleChange("applicantsCount", "Main Only");
-                                  return;
-                                }
-                                let deps = parseInt(raw, 10);
-                                if (isNaN(deps) || deps < 0) deps = 0;
-                                if (deps > 49) deps = 49;
-                                const total = deps + 1;
-                                setTotalApplicantsDisplay(String(total));
-                                const valStr = deps === 0 ? "Main Only" : `Main + ${deps}`;
-                                handleChange("applicantsCount", valStr);
-                              }}
-                              onBlur={() => {
-                                if (!totalApplicantsDisplay || parseInt(totalApplicantsDisplay, 10) < 1) {
-                                  setTotalApplicantsDisplay("1");
-                                  handleChange("applicantsCount", "Main Only");
-                                }
-                              }}
-                              placeholder="0"
-                              style={{
-                                ...inputStyle,
-                                color: "#fff",
-                                paddingLeft: "14px",
-                                paddingRight: "100px",
-                                fontWeight: 700,
-                                fontSize: "15px",
-                                boxSizing: "border-box"
-                              }}
-                            />
-                            <span style={{ position: "absolute", right: "12px", top: "50%", transform: "translateY(-50%)", fontSize: "13px", color: "rgba(255,255,255,0.7)", pointerEvents: "none", fontWeight: 600 }}>
-                              Dependents
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </>
-                )}
-
-
-
-                {/* Section: Sworn Translation redirect notice */}
-                {serviceCategory === 'translation' && (
-                  <div
-                    style={{
-                      background: "rgba(255, 255, 255, 0.04)",
-                      border: "1px solid rgba(139, 92, 246, 0.3)",
-                      borderRadius: "14px",
-                      padding: "20px",
-                      marginBottom: "24px",
-                      textAlign: "center",
-                    }}
-                  >
-                    <p style={{ color: "rgba(255,255,255,0.85)", fontSize: "14px", margin: 0, lineHeight: 1.6 }}>
-                      For Spanish Sworn Translation services, click below to proceed to our translation quote tool where you can view rates, upload your PDF document, and get an instant word count and price estimation.
-                    </p>
-                  </div>
-                )}
 
                 {/* Section: Inquiry Preferences */}
                 {serviceCategory !== "translation" && (
@@ -1557,11 +1464,7 @@ export const LeadSelfFillForm = () => {
                           handleChange("meetingNotes", e.target.value)
                         }
                         rows={3}
-                        placeholder={
-                          serviceCategory === "property"
-                            ? "What are your property investment goals? E.g. 'I want a Golden Visa property in Malaga...'"
-                            : "What would you like to discuss? E.g. 'I want to know about Spain Visa requirements for my family...'"
-                        }
+                        placeholder="Briefly describe your product goals, key features, target platform, or required tech stack (e.g. React, Node.js, Python, AWS)..."
                         style={{
                           ...inputStyle,
                           resize: "vertical",
@@ -1675,9 +1578,7 @@ export const LeadSelfFillForm = () => {
                 >
                   <li>✅ Inquiry recorded in our CRM system</li>
                   <li>
-                    {serviceCategory === "property"
-                      ? "✅ A property investment specialist has been assigned to your case"
-                      : "✅ A dedicated consultant has been assigned to your profile"}
+                    ✅ A dedicated IT Solutions Consultant has been assigned to your project
                   </li>
                   <li>✅ You will receive direct updates on your WhatsApp ({form.phone || 'provided number'})</li>
                 </ul>
@@ -1694,7 +1595,7 @@ export const LeadSelfFillForm = () => {
             marginTop: "20px",
           }}
         >
-          © 2026 AAA Visa Consultancy · All rights reserved
+          © 2026 AAA Technologies LLC · All rights reserved
         </p>
       </div>
 
