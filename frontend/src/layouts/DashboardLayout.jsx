@@ -961,20 +961,24 @@ export const DashboardLayout = () => {
         <Box onClick={() => navigateTo('/dashboard')} sx={{ display: 'flex', alignItems: 'center', gap: 1, cursor: 'pointer' }}>
           <Box
             sx={{
-              width: 32,
-              height: 32,
-              borderRadius: 1,
-              background: 'linear-gradient(135deg, #2563EB 0%, #6366F1 100%)',
-              boxShadow: '0 4px 14px rgba(37, 99, 235, 0.35)',
+              width: 36,
+              height: 36,
+              borderRadius: 2,
+              backgroundColor: '#FFFFFF',
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
+              border: '1px solid #E2E8F0',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              color: 'white',
-              fontWeight: 800,
-              fontSize: '1.1rem',
+              p: 0.5,
+              flexShrink: 0,
             }}
           >
-            A³
+            <img
+              src="/aaa-logo.png"
+              alt="AAA Logo"
+              style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+            />
           </Box>
           {sidebarOpen && (
             <Box>

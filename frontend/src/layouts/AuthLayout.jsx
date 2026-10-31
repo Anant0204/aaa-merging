@@ -26,7 +26,7 @@ export const AuthLayout = () => {
           width: '55%',
           height: '100%',
           position: 'relative',
-          backgroundImage: 'url("https://images.unsplash.com/photo-1543783207-ec64e4d95325?q=80&w=1200")',
+          backgroundImage: 'url("https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=1600")',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           flexDirection: 'column',
@@ -40,46 +40,75 @@ export const AuthLayout = () => {
             left: 0,
             width: '100%',
             height: '100%',
-            backgroundColor: 'rgba(11, 27, 61, 0.75)', // Overlay brand Royal Navy
+            background: 'linear-gradient(135deg, rgba(7, 10, 19, 0.92) 0%, rgba(15, 23, 42, 0.85) 100%)',
             zIndex: 1,
           },
         }}
       >
         <Box sx={{ zIndex: 2 }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
             <Box
               sx={{
-                width: 38,
-                height: 38,
-                borderRadius: 1.5,
-                backgroundColor: 'secondary.main',
+                width: 48,
+                height: 48,
+                borderRadius: 2.5,
+                backgroundColor: '#FFFFFF',
+                boxShadow: '0 8px 24px rgba(0, 0, 0, 0.25)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: 'primary.main',
-                fontWeight: 800,
-                fontSize: '1.25rem',
+                p: 0.75,
+                flexShrink: 0,
               }}
             >
-              K
+              <img
+                src="/aaa-logo.png"
+                alt="AAA Technologies Logo"
+                style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+              />
             </Box>
-            <Typography variant="h5" sx={{ fontWeight: 800, letterSpacing: '-0.02em', color: 'white' }}>
-              Kiaan Technologies
-            </Typography>
+            <Box>
+              <Typography variant="h5" sx={{ fontWeight: 800, letterSpacing: '-0.02em', color: 'white', lineHeight: 1.1 }}>
+                AAA TECHNOLOGIES
+              </Typography>
+              <Typography variant="caption" sx={{ color: '#94A3B8', fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', fontSize: '0.7rem' }}>
+                Cloud • Software • AI Enterprise Portal
+              </Typography>
+            </Box>
           </Box>
         </Box>
 
         <Box sx={{ zIndex: 2, mb: 4, textAlign: 'left' }}>
+          <Box
+            sx={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 1,
+              px: 1.8,
+              py: 0.6,
+              borderRadius: '9999px',
+              backgroundColor: 'rgba(37, 99, 235, 0.2)',
+              border: '1px solid rgba(59, 130, 246, 0.4)',
+              color: '#60A5FA',
+              fontSize: '0.75rem',
+              fontWeight: 700,
+              letterSpacing: '0.05em',
+              textTransform: 'uppercase',
+              mb: 2,
+            }}
+          >
+            <span>⚡</span> Enterprise AI Systems & Digital Solutions
+          </Box>
           <Typography variant="h2" sx={{ fontWeight: 800, color: 'white', mb: 2, lineHeight: 1.2 }}>
             Your Trusted Technology Partner
           </Typography>
-          <Typography variant="body1" sx={{ color: 'rgba(255, 255, 255, 0.85)', maxWidth: 520 }}>
+          <Typography variant="body1" sx={{ color: 'rgba(255, 255, 255, 0.85)', maxWidth: 520, fontSize: '1.05rem', lineHeight: 1.6 }}>
             We build custom software, web and mobile applications, AI-powered solutions, and scalable cloud infrastructure to help businesses grow.
           </Typography>
         </Box>
 
         <Typography variant="caption" sx={{ zIndex: 2, color: 'rgba(255,255,255,0.5)', textAlign: 'left' }}>
-          © {new Date().getFullYear()} Kiaan Technologies LLC. Innovate • Build • Scale.
+          © {new Date().getFullYear()} AAA Technologies LLC. Innovate • Build • Scale.
         </Typography>
       </Box>
 
@@ -125,26 +154,31 @@ export const AuthLayout = () => {
           }}
         >
           {/* Brand Header (Only visible on mobile/tablet screens) */}
-          <Box sx={{ display: { xs: 'flex', md: 'none' }, alignItems: 'center', justifyContent: 'center', gap: 1.5, mb: 4 }}>
+          <Box sx={{ display: { xs: 'flex', md: 'none' }, alignItems: 'center', justifyContent: 'center', gap: 1.5, mb: 3 }}>
             <Box
               sx={{
-                width: 38,
-                height: 38,
-                borderRadius: 1.5,
-                background: 'linear-gradient(135deg, #2563EB 0%, #6366F1 100%)',
+                width: 44,
+                height: 44,
+                borderRadius: 2,
+                backgroundColor: '#FFFFFF',
+                boxShadow: '0 4px 14px rgba(0, 0, 0, 0.12)',
+                border: '1px solid #E2E8F0',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: 'white',
-                fontWeight: 800,
-                fontSize: '1.25rem',
+                p: 0.5,
+                flexShrink: 0,
               }}
             >
-              K
+              <img
+                src="/aaa-logo.png"
+                alt="AAA Technologies Logo"
+                style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+              />
             </Box>
             <Box sx={{ textAlign: 'left' }}>
-              <Typography variant="h5" sx={{ fontWeight: 800, lineHeight: 1.1, letterSpacing: '-0.02em', color: theme.palette.mode === 'light' ? 'primary.main' : 'white' }}>
-                Kiaan Technologies
+              <Typography variant="h6" sx={{ fontWeight: 800, lineHeight: 1.1, letterSpacing: '-0.02em', color: theme.palette.mode === 'light' ? 'primary.main' : 'white' }}>
+                AAA TECHNOLOGIES
               </Typography>
               <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>
                 IT Services & Enterprise Software Portal
