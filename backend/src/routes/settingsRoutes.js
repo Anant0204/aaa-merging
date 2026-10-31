@@ -1,6 +1,5 @@
 const express = require('express');
-const {
-  getExchangeRates, 
+const { 
   getCustomizationSettings, 
   updateCustomizationSettings,
   getLeadStages,
@@ -36,8 +35,6 @@ router.route('/customization')
 router.route('/lead-stages')
   .get(authMiddleware, getLeadStages)
   .put(authMiddleware, updateLeadStages);
-
-router.get('/exchange-rates', getExchangeRates);
 
 router.route('/company')
   .get(getCompanySettings)

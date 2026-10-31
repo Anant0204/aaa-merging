@@ -91,7 +91,6 @@ app.use('/api/templates', require('./routes/templateRoutes'));
 app.use('/api/v1/projects', require('./routes/projectRoutes'));
 app.use('/api/v1/reviews', require('./routes/reviewRoutes'));
 app.use('/api/v1/dashboard', require('./routes/dashboardRoutes'));
-app.use('/api/v1/ai-employees', require('./routes/aiEmployeeRoutes'));
 
 // Start Server
 const PORT = Number(process.env.PORT) || 5000;
@@ -113,9 +112,6 @@ server.listen(PORT, '0.0.0.0', () => {
 try {
   const { setupWorkers } = require('./queues/workers');
   setupWorkers();
-  // Initialize 24/7 Autonomous AI Employee Scheduler
-  const aiScheduler = require('./services/aiScheduler');
-  aiScheduler.start();
 } catch (err) {
   console.error('[Worker Setup Error]', err.message);
 }

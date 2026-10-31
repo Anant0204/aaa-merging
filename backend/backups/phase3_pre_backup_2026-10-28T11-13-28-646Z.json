@@ -1,0 +1,12 @@
+{
+  "backupName": "phase3_pre_migration_backup",
+  "createdAt": "2026-10-28T11:13:28.650Z",
+  "gitCommit": "900ef113e3fc86a27f5a1c731be1125009bff5c9",
+  "phase": "Phase 3.1 Review Models Pre-Migration",
+  "tablesTargeted": [
+    "reviews",
+    "review_provider_configs"
+  ],
+  "preMigrationStatus": "Tables do not exist yet. Additive migration only.",
+  "verified": true
+}
