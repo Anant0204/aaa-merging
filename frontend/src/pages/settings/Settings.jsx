@@ -810,7 +810,7 @@ export const Settings = () => {
                       width: 76,
                       height: 76,
                       borderRadius: 2,
-                      background: 'linear-gradient(135deg, #0A2540 0%, #C59B27 100%)',
+                      background: 'linear-gradient(135deg, #2563EB 0%, #6366F1 100%)',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
@@ -828,7 +828,7 @@ export const Settings = () => {
                       {generalSettings.companyName || 'AAA Business Consultancy LLC'}
                     </Typography>
                     <Typography variant="caption" color="text.secondary" display="block" sx={{ fontWeight: 500 }}>
-                      Primary Brand: Dark Navy (#0A2540) | Accent Color: Rich Gold (#C59B27)
+                      Primary Brand: Electric Blue (#2563EB) | Accent Color: AI Indigo (#6366F1)
                     </Typography>
                     <Typography variant="caption" color="secondary.main" display="block" sx={{ fontWeight: 700, mt: 0.5, textTransform: 'uppercase' }}>
                       Spain Visa, Residency & Relocation Services Portal
@@ -1482,8 +1482,8 @@ export const Settings = () => {
                 <Paper sx={{
                   p: 4,
                   borderRadius: 4,
-                  border: pkg.isRecommended ? '2px solid #C59B27' : '1px solid',
-                  borderColor: pkg.isRecommended ? '#C59B27' : 'divider',
+                  border: pkg.isRecommended ? '2px solid #2563EB' : '1px solid',
+                  borderColor: pkg.isRecommended ? '#2563EB' : 'divider',
                   background: pkg.isRecommended ? 'linear-gradient(180deg, #FAF6ED 0%, #ffffff 100%)' : 'linear-gradient(180deg, #ffffff 0%, rgba(244, 246, 249, 0.4) 100%)',
                   display: 'flex',
                   flexDirection: 'column',
@@ -2142,7 +2142,7 @@ export const Settings = () => {
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end" sx={{ pr: 1 }}>
-                      <span style={{ fontWeight: 700, color: '#C59B27', fontSize: '0.95rem', fontFamily: "'Outfit', sans-serif" }}>%</span>
+                      <span style={{ fontWeight: 700, color: '#2563EB', fontSize: '0.95rem', fontFamily: "'Outfit', sans-serif" }}>%</span>
                     </InputAdornment>
                   )
                 }}
@@ -2222,7 +2222,7 @@ export const Settings = () => {
                 fontFamily: "'Outfit', sans-serif",
                 textTransform: 'none',
                 fontWeight: 700,
-                background: 'linear-gradient(135deg, #C59B27 0%, #A57F1E 100%)',
+                background: 'linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%)',
                 boxShadow: '0 4px 14px 0 rgba(197, 155, 39, 0.3)',
                 transition: 'all 0.2s',
                 '&:hover': {
@@ -2293,7 +2293,7 @@ export const Settings = () => {
                     InputProps={{
                       startAdornment: (
                         <InputAdornment position="start" sx={{ mr: 0.5 }}>
-                          <span style={{ fontWeight: 700, color: '#C59B27', fontSize: '0.95rem' }}>€</span>
+                          <span style={{ fontWeight: 700, color: '#2563EB', fontSize: '0.95rem' }}>€</span>
                         </InputAdornment>
                       )
                     }}
@@ -2422,7 +2422,7 @@ export const Settings = () => {
                   fontFamily: "'Outfit', sans-serif",
                   textTransform: 'none',
                   fontWeight: 700,
-                  background: 'linear-gradient(135deg, #C59B27 0%, #A57F1E 100%)',
+                  background: 'linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%)',
                   boxShadow: '0 4px 14px 0 rgba(197, 155, 39, 0.3)',
                   transition: 'all 0.2s',
                   '&:hover': {
@@ -2632,7 +2632,7 @@ export const Settings = () => {
                 fontFamily: "'Outfit', sans-serif",
                 textTransform: 'none',
                 fontWeight: 700,
-                background: 'linear-gradient(135deg, #C59B27 0%, #A57F1E 100%)',
+                background: 'linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%)',
                 boxShadow: '0 4px 14px 0 rgba(197, 155, 39, 0.3)',
                 transition: 'all 0.2s',
                 '&:hover': {

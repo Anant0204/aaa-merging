@@ -124,13 +124,13 @@ export const LandingPage = () => {
     {
       title: 'Custom Software & SaaS Platforms',
       desc: 'Scalable multi-tenant cloud architectures, enterprise web portals, and microservice backends built for high concurrency and zero downtime.',
-      icon: <CodeIcon className="text-[#C59B27] text-3xl" />,
+      icon: <CodeIcon className="text-blue-400 text-3xl" />,
       tag: 'Core Specialization',
     },
     {
       title: 'Full-Stack Web & Mobile Apps',
       desc: 'Cross-platform native iOS & Android applications with Flutter & React Native alongside responsive ultra-fast web apps powered by React and Next.js.',
-      icon: <DevicesIcon className="text-[#3F51B5] text-3xl" />,
+      icon: <DevicesIcon className="text-[#2563EB] text-3xl" />,
     },
     {
       title: 'AI & Intelligent Automation',
@@ -146,7 +146,7 @@ export const LandingPage = () => {
     {
       title: 'Enterprise CRM & ERP Systems',
       desc: 'Bespoke customer data platforms, sales pipeline automations, inventory management, and integration with legacy enterprise ERPs.',
-      icon: <LayersIcon className="text-[#E5C058] text-3xl" />,
+      icon: <LayersIcon className="text-sky-300 text-3xl" />,
     },
     {
       title: 'UI/UX Product Design & Prototyping',
@@ -161,7 +161,7 @@ export const LandingPage = () => {
     {
       title: '24/7 Managed IT Support & Security',
       desc: 'Proactive vulnerability assessments, SOC2 & ISO 27001 compliance hardening, automated database backups, and dedicated SLA support.',
-      icon: <SecurityIcon className="text-[#C59B27] text-3xl" />,
+      icon: <SecurityIcon className="text-blue-400 text-3xl" />,
     }
   ];
 
@@ -347,21 +347,21 @@ export const LandingPage = () => {
   ];
 
   return (
-    <div className="font-plus-jakarta bg-[#070D19] text-[#F9FAFB] min-h-screen selection:bg-[#C59B27] selection:text-[#051A3B]">
+    <div className="font-plus-jakarta bg-[#070A13] text-[#F9FAFB] min-h-screen selection:bg-blue-600 selection:text-white font-extrabold">
       
       {/* 1. STICKY UNIFIED BRAND NAVIGATION BAR */}
-      <header className="sticky top-0 z-50 bg-[#070D19]/95 backdrop-blur-xl border-b border-[#1F2E4D] shadow-xl">
+      <header className="sticky top-0 z-50 bg-[#070A13]/95 backdrop-blur-xl border-b border-[#1E293B] shadow-xl">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
           
           {/* Logo & Brand Identity (flex-shrink-0 to guarantee no text collision) */}
           <Link to="/" className="flex items-center space-x-3 group flex-shrink-0">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#3F51B5] via-indigo-600 to-[#C59B27] flex items-center justify-center font-outfit font-black text-xl text-white shadow-lg shadow-[#3F51B5]/30 group-hover:scale-105 transition-transform flex-shrink-0">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#2563EB] via-indigo-600 to-[#06B6D4] flex items-center justify-center font-outfit font-black text-xl text-white shadow-lg shadow-blue-600/30 group-hover:scale-105 transition-transform flex-shrink-0">
               K
             </div>
             <div className="flex flex-col flex-shrink-0">
               <span className="font-outfit font-black text-lg text-white tracking-tight flex items-center space-x-1.5 leading-none">
                 <span>KIAAN</span>
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#C59B27] to-[#E5C058]">TECHNOLOGIES</span>
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#3B82F6] via-[#60A5FA] to-[#06B6D4]">TECHNOLOGIES</span>
               </span>
               <span className="text-[10px] text-slate-400 uppercase tracking-[0.2em] font-medium mt-1">
                 Cloud • Software • AI Systems
@@ -376,7 +376,7 @@ export const LandingPage = () => {
                 key={idx}
                 href={item.href}
                 onClick={(e) => handleScroll(e, item.href.replace('#', ''))}
-                className="text-slate-300 hover:text-[#E5C058] text-xs uppercase tracking-wider font-semibold transition-colors whitespace-nowrap"
+                className="text-slate-300 hover:text-sky-300 text-xs uppercase tracking-wider font-semibold transition-colors whitespace-nowrap"
               >
                 {item.label}
               </a>
@@ -387,14 +387,14 @@ export const LandingPage = () => {
           <div className="hidden sm:flex items-center space-x-3 flex-shrink-0">
             <Link
               to="/login"
-              className="text-xs font-semibold text-slate-300 hover:text-white px-4 py-2 rounded-lg border border-[#1F2E4D] bg-[#0B1426] hover:border-[#C59B27]/60 hover:bg-[#122038] transition-all whitespace-nowrap"
+              className="text-xs font-semibold text-slate-300 hover:text-white px-4 py-2 rounded-lg border border-[#1E293B] bg-[#0F172A] hover:border-blue-500/60 hover:bg-[#1E293B] transition-all whitespace-nowrap"
             >
               Client &amp; Staff Portal
             </Link>
             <a
               href="#contact"
               onClick={(e) => handleScroll(e, 'contact')}
-              className="text-xs font-extrabold text-[#051A3B] bg-gradient-to-r from-[#C59B27] via-amber-400 to-[#E5C058] hover:brightness-110 px-5 py-2.5 rounded-lg shadow-lg shadow-[#C59B27]/20 transition-all transform hover:-translate-y-0.5 flex items-center space-x-1.5 whitespace-nowrap"
+              className="text-xs font-extrabold text-white font-extrabold bg-gradient-to-r from-[#2563EB] via-blue-600 to-[#6366F1] hover:brightness-110 px-5 py-2.5 rounded-lg shadow-lg shadow-blue-600/30 transition-all transform hover:-translate-y-0.5 flex items-center space-x-1.5 whitespace-nowrap"
             >
               <span>Start Project</span>
               <ArrowForwardIcon className="text-xs!" />
@@ -405,7 +405,7 @@ export const LandingPage = () => {
           <div className="lg:hidden flex items-center flex-shrink-0">
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="text-slate-300 hover:text-white p-2 rounded-lg bg-[#0B1426] border border-[#1F2E4D]"
+              className="text-slate-300 hover:text-white p-2 rounded-lg bg-[#0F172A] border border-[#1E293B]"
               aria-label="Toggle navigation"
             >
               {mobileMenuOpen ? <CloseIcon /> : <MenuIcon />}
@@ -420,7 +420,7 @@ export const LandingPage = () => {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              className="lg:hidden bg-[#0B1426] border-t border-[#1F2E4D] px-6 py-6 space-y-3"
+              className="lg:hidden bg-[#0F172A] border-t border-[#1E293B] px-6 py-6 space-y-3"
             >
               {navItems.map((item, idx) => (
                 <a
@@ -430,7 +430,7 @@ export const LandingPage = () => {
                     setMobileMenuOpen(false);
                     handleScroll(e, item.href.replace('#', ''));
                   }}
-                  className="block text-slate-300 hover:text-[#E5C058] py-2 text-sm font-medium border-b border-[#1F2E4D]/60"
+                  className="block text-slate-300 hover:text-sky-300 py-2 text-sm font-medium border-b border-[#1E293B]/60"
                 >
                   {item.label}
                 </a>
@@ -439,7 +439,7 @@ export const LandingPage = () => {
                 <Link
                   to="/login"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="text-center text-xs font-semibold text-slate-300 py-2.5 rounded-lg border border-[#1F2E4D] bg-[#070D19]"
+                  className="text-center text-xs font-semibold text-slate-300 py-2.5 rounded-lg border border-[#1E293B] bg-[#070A13]"
                 >
                   Client &amp; Staff Portal
                 </Link>
@@ -449,7 +449,7 @@ export const LandingPage = () => {
                     setMobileMenuOpen(false);
                     handleScroll(e, 'contact');
                   }}
-                  className="text-center text-xs font-bold text-[#051A3B] py-3 rounded-lg bg-gradient-to-r from-[#C59B27] to-[#E5C058] shadow-md"
+                  className="text-center text-xs font-bold text-white font-extrabold py-3 rounded-lg bg-gradient-to-r from-[#3B82F6] via-[#60A5FA] to-[#06B6D4] shadow-md"
                 >
                   Request Technical Consultation
                 </a>
@@ -462,8 +462,8 @@ export const LandingPage = () => {
       {/* 2. HERO SECTION */}
       <section className="relative overflow-hidden pt-12 pb-20 lg:pt-20 lg:pb-28">
         {/* Unified Navy & Gold Ambient Glow Backgrounds */}
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[450px] bg-gradient-to-tr from-[#3F51B5]/20 via-[#0B2A59]/30 to-[#C59B27]/15 rounded-full blur-[140px] pointer-events-none" />
-        <div className="absolute top-0 right-0 w-96 h-96 bg-[#C59B27]/10 rounded-full blur-[120px] pointer-events-none" />
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[450px] bg-gradient-to-tr from-[#2563EB]/25 via-[#1E1B4B]/35 to-[#6366F1]/20 rounded-full blur-[140px] pointer-events-none" />
+        <div className="absolute top-0 right-0 w-96 h-96 bg-blue-500/10 rounded-full blur-[120px] pointer-events-none" />
         
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
@@ -471,16 +471,16 @@ export const LandingPage = () => {
             {/* Hero Left Content */}
             <div className="lg:col-span-7 flex flex-col space-y-6 text-center lg:text-left">
               
-              <div className="inline-flex self-center lg:self-start items-center space-x-2.5 bg-[#0B1426] border border-[#C59B27]/30 px-3.5 py-1.5 rounded-full shadow-inner">
-                <span className="w-2 h-2 bg-[#C59B27] rounded-full animate-ping" />
-                <span className="text-[11px] font-outfit text-[#E5C058] uppercase tracking-widest font-bold">
+              <div className="inline-flex self-center lg:self-start items-center space-x-2.5 bg-[#0F172A] border border-blue-500/30 px-3.5 py-1.5 rounded-full shadow-inner">
+                <span className="w-2 h-2 bg-blue-600 rounded-full animate-ping" />
+                <span className="text-[11px] font-outfit text-sky-300 uppercase tracking-widest font-bold">
                   Kiaan Technologies • Cloud-Native &amp; AI Systems
                 </span>
               </div>
               
               <h1 className="font-outfit font-black text-4xl sm:text-5xl lg:text-6xl text-white tracking-tight leading-[1.08]!">
                 Engineering Scalable <br className="hidden sm:inline" />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-[#E5C058]">
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-[#60A5FA]">
                   Digital Products &amp; Cloud Architectures
                 </span>
               </h1>
@@ -494,7 +494,7 @@ export const LandingPage = () => {
                 <a
                   href="#contact"
                   onClick={(e) => handleScroll(e, 'contact')}
-                  className="bg-gradient-to-r from-[#C59B27] via-amber-400 to-[#E5C058] hover:brightness-110 text-[#051A3B] font-extrabold px-8 py-4 rounded-xl shadow-xl shadow-[#C59B27]/20 transition-all flex items-center justify-center space-x-2 text-sm transform hover:-translate-y-0.5"
+                  className="bg-gradient-to-r from-[#2563EB] via-blue-600 to-[#6366F1] hover:brightness-110 text-white font-extrabold font-extrabold px-8 py-4 rounded-xl shadow-xl shadow-blue-600/30 transition-all flex items-center justify-center space-x-2 text-sm transform hover:-translate-y-0.5"
                 >
                   <span>Schedule Technical Discovery</span>
                   <ArrowForwardIcon className="text-sm!" />
@@ -502,16 +502,16 @@ export const LandingPage = () => {
                 <a
                   href="#services"
                   onClick={(e) => handleScroll(e, 'services')}
-                  className="bg-[#0B1426] hover:bg-[#122038] border border-[#1F2E4D] hover:border-[#C59B27]/50 text-slate-200 font-semibold px-8 py-4 rounded-xl transition-all flex items-center justify-center space-x-2 text-sm backdrop-blur-md"
+                  className="bg-[#0F172A] hover:bg-[#1E293B] border border-[#1E293B] hover:border-blue-500/50 text-slate-200 font-semibold px-8 py-4 rounded-xl transition-all flex items-center justify-center space-x-2 text-sm backdrop-blur-md"
                 >
                   <span>Explore Capabilities</span>
                 </a>
               </div>
 
               {/* Live Reliability Metrics */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-8 border-t border-[#1F2E4D]">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-8 border-t border-[#1E293B]">
                 <div className="space-y-0.5">
-                  <div className="text-2xl font-black font-outfit text-[#E5C058]">99.99%</div>
+                  <div className="text-2xl font-black font-outfit text-sky-300">99.99%</div>
                   <div className="text-[11px] text-slate-400 font-light">Guaranteed Uptime SLA</div>
                 </div>
                 <div className="space-y-0.5">
@@ -523,7 +523,7 @@ export const LandingPage = () => {
                   <div className="text-[11px] text-slate-400 font-light">Rapid Sprint Start</div>
                 </div>
                 <div className="space-y-0.5">
-                  <div className="text-2xl font-black font-outfit text-[#E5C058]">100%</div>
+                  <div className="text-2xl font-black font-outfit text-sky-300">100%</div>
                   <div className="text-[11px] text-slate-400 font-light">Client IP Ownership</div>
                 </div>
               </div>
@@ -531,25 +531,25 @@ export const LandingPage = () => {
 
             {/* Hero Right Visual (Modern 3D High-Tech Infrastructure Showcase) */}
             <div className="lg:col-span-5 relative">
-              <div className="relative rounded-2xl p-1 bg-gradient-to-tr from-[#3F51B5]/40 via-[#0B2A59]/40 to-[#C59B27]/40 shadow-2xl shadow-black/60">
-                <div className="relative rounded-[14px] overflow-hidden bg-[#050A14] aspect-[16/10] border border-[#1F2E4D]">
+              <div className="relative rounded-2xl p-1 bg-gradient-to-tr from-[#2563EB]/40 via-[#1E1B4B]/40 to-[#6366F1]/40 shadow-2xl shadow-black/60">
+                <div className="relative rounded-[14px] overflow-hidden bg-[#050A14] aspect-[16/10] border border-[#1E293B]">
                   <img
                     src={itHeroBanner}
                     alt="Cloud & AI IT Ecosystem"
                     className="w-full h-full object-cover filter brightness-95 hover:scale-102 transition-transform duration-700"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#070D19] via-transparent to-transparent opacity-80" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#070A13] via-transparent to-transparent opacity-80" />
                   
                   {/* Floating Live Telemetry Badge 1 */}
-                  <div className="absolute top-4 left-4 bg-[#0B1426]/90 backdrop-blur-md border border-[#C59B27]/30 px-3 py-1.5 rounded-lg flex items-center space-x-2">
+                  <div className="absolute top-4 left-4 bg-[#0F172A]/90 backdrop-blur-md border border-blue-500/30 px-3 py-1.5 rounded-lg flex items-center space-x-2">
                     <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
-                    <span className="text-[10px] font-mono font-bold text-[#E5C058]">API Gateway: 18ms Latency</span>
+                    <span className="text-[10px] font-mono font-bold text-sky-300">API Gateway: 18ms Latency</span>
                   </div>
 
                   {/* Floating Live Telemetry Badge 2 */}
-                  <div className="absolute bottom-4 left-4 right-4 bg-[#0B1426]/95 backdrop-blur-md border border-[#1F2E4D] p-3 rounded-xl flex items-center justify-between">
+                  <div className="absolute bottom-4 left-4 right-4 bg-[#0F172A]/95 backdrop-blur-md border border-[#1E293B] p-3 rounded-xl flex items-center justify-between">
                     <div className="flex items-center space-x-2.5">
-                      <div className="w-8 h-8 rounded-lg bg-[#3F51B5]/20 text-[#3F51B5] flex items-center justify-center font-bold">
+                      <div className="w-8 h-8 rounded-lg bg-[#2563EB]/20 text-[#2563EB] flex items-center justify-center font-bold">
                         <CloudIcon className="text-base!" />
                       </div>
                       <div>
@@ -557,7 +557,7 @@ export const LandingPage = () => {
                         <div className="text-[10px] text-slate-400 font-mono">48/48 Pods Healthy (Kubernetes)</div>
                       </div>
                     </div>
-                    <span className="text-[10px] uppercase font-bold text-[#E5C058] bg-[#C59B27]/15 border border-[#C59B27]/30 px-2 py-0.5 rounded">
+                    <span className="text-[10px] uppercase font-bold text-sky-300 bg-blue-500/15 border border-blue-500/30 px-2 py-0.5 rounded">
                       SOC2 Ready
                     </span>
                   </div>
@@ -565,8 +565,8 @@ export const LandingPage = () => {
               </div>
 
               {/* Floating Tech Stat Mini-Card */}
-              <div className="hidden sm:flex absolute -bottom-6 -left-6 bg-[#0B1426]/95 border border-[#1F2E4D] p-3.5 rounded-xl shadow-2xl backdrop-blur-md items-center space-x-3 z-20">
-                <div className="p-2 bg-[#C59B27]/10 rounded-lg text-[#C59B27]">
+              <div className="hidden sm:flex absolute -bottom-6 -left-6 bg-[#0F172A]/95 border border-[#1E293B] p-3.5 rounded-xl shadow-2xl backdrop-blur-md items-center space-x-3 z-20">
+                <div className="p-2 bg-blue-500/10 rounded-lg text-blue-400">
                   <VerifiedIcon className="text-xl!" />
                 </div>
                 <div>
@@ -582,30 +582,30 @@ export const LandingPage = () => {
       </section>
 
       {/* 3. TECH LOGOS / ECOSYSTEM BANNER */}
-      <section className="bg-[#050A14] border-y border-[#1F2E4D] py-6">
+      <section className="bg-[#050A14] border-y border-[#1E293B] py-6">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0 text-center md:text-left">
-            <span className="text-xs font-outfit uppercase tracking-widest text-[#C59B27] font-bold">
+            <span className="text-xs font-outfit uppercase tracking-widest text-blue-400 font-bold">
               Engineering Cloud Ecosystems With
             </span>
             <div className="flex flex-wrap justify-center items-center gap-6 sm:gap-10 text-slate-300 font-mono text-xs sm:text-sm font-semibold">
-              <span className="hover:text-[#E5C058] transition-colors flex items-center space-x-1.5">
-                <CloudIcon className="text-base text-[#3F51B5]" />
+              <span className="hover:text-sky-300 transition-colors flex items-center space-x-1.5">
+                <CloudIcon className="text-base text-[#2563EB]" />
                 <span>AWS &amp; GCP</span>
               </span>
-              <span className="hover:text-[#E5C058] transition-colors flex items-center space-x-1.5">
-                <CodeIcon className="text-base text-[#C59B27]" />
+              <span className="hover:text-sky-300 transition-colors flex items-center space-x-1.5">
+                <CodeIcon className="text-base text-blue-400" />
                 <span>React 19 &amp; Next.js</span>
               </span>
-              <span className="hover:text-[#E5C058] transition-colors flex items-center space-x-1.5">
+              <span className="hover:text-sky-300 transition-colors flex items-center space-x-1.5">
                 <TerminalIcon className="text-base text-emerald-400" />
                 <span>Node &amp; Python</span>
               </span>
-              <span className="hover:text-[#E5C058] transition-colors flex items-center space-x-1.5">
+              <span className="hover:text-sky-300 transition-colors flex items-center space-x-1.5">
                 <SmartToyIcon className="text-base text-purple-400" />
                 <span>OpenAI &amp; RAG AI</span>
               </span>
-              <span className="hover:text-[#E5C058] transition-colors flex items-center space-x-1.5">
+              <span className="hover:text-sky-300 transition-colors flex items-center space-x-1.5">
                 <StorageIcon className="text-base text-amber-400" />
                 <span>PostgreSQL &amp; Redis</span>
               </span>
@@ -615,11 +615,11 @@ export const LandingPage = () => {
       </section>
 
       {/* 4. CORE SERVICES SECTION */}
-      <section className="py-20 bg-[#070D19]" id="services">
+      <section className="py-20 bg-[#070A13]" id="services">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
           <div className="text-center max-w-3xl mx-auto mb-14 space-y-3">
-            <span className="text-xs font-outfit uppercase tracking-widest text-[#C59B27] font-bold">
+            <span className="text-xs font-outfit uppercase tracking-widest text-blue-400 font-bold">
               Comprehensive Technology Capabilities
             </span>
             <h2 className="font-outfit font-black text-3xl sm:text-4xl text-white">
@@ -635,21 +635,21 @@ export const LandingPage = () => {
               <motion.div
                 key={idx}
                 whileHover={{ y: -6 }}
-                className="bg-[#0B1426] border border-[#1F2E4D] hover:border-[#C59B27]/50 p-6 rounded-2xl shadow-xl transition-all relative flex flex-col justify-between group overflow-hidden"
+                className="bg-[#0F172A] border border-[#1E293B] hover:border-blue-500/50 p-6 rounded-2xl shadow-xl transition-all relative flex flex-col justify-between group overflow-hidden"
               >
                 <div>
                   <div className="flex justify-between items-start mb-5">
-                    <div className="w-12 h-12 bg-[#070D19] border border-[#1F2E4D] rounded-xl flex items-center justify-center group-hover:scale-105 transition-transform">
+                    <div className="w-12 h-12 bg-[#070A13] border border-[#1E293B] rounded-xl flex items-center justify-center group-hover:scale-105 transition-transform">
                       {item.icon}
                     </div>
                     {item.tag && (
-                      <span className="text-[10px] font-bold bg-[#C59B27]/10 text-[#E5C058] border border-[#C59B27]/25 px-2.5 py-0.5 rounded-full">
+                      <span className="text-[10px] font-bold bg-blue-500/10 text-sky-300 border border-blue-500/30 px-2.5 py-0.5 rounded-full">
                         {item.tag}
                       </span>
                     )}
                   </div>
                   
-                  <h3 className="font-outfit font-bold text-base text-white mb-2.5 group-hover:text-[#E5C058] transition-colors">
+                  <h3 className="font-outfit font-bold text-base text-white mb-2.5 group-hover:text-sky-300 transition-colors">
                     {item.title}
                   </h3>
                   <p className="text-slate-400 text-xs leading-relaxed font-light">
@@ -657,7 +657,7 @@ export const LandingPage = () => {
                   </p>
                 </div>
 
-                <div className="mt-6 pt-4 border-t border-[#1F2E4D] flex items-center text-xs font-semibold text-[#C59B27] group-hover:text-[#E5C058]">
+                <div className="mt-6 pt-4 border-t border-[#1E293B] flex items-center text-xs font-semibold text-blue-400 group-hover:text-sky-300">
                   <span>Explore Architecture</span>
                   <ArrowForwardIcon className="text-xs! ml-1 group-hover:translate-x-1 transition-transform" />
                 </div>
@@ -669,43 +669,43 @@ export const LandingPage = () => {
       </section>
 
       {/* 5. ENGINEERING SHOWCASE & DEVOPS SECTION */}
-      <section className="py-20 bg-[#050A14] border-t border-[#1F2E4D] relative overflow-hidden" id="showcase">
+      <section className="py-20 bg-[#050A14] border-t border-[#1E293B] relative overflow-hidden" id="showcase">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
             
             {/* Left Content */}
             <div className="lg:col-span-6 space-y-6">
-              <span className="text-xs font-outfit uppercase tracking-widest text-[#C59B27] font-bold">
+              <span className="text-xs font-outfit uppercase tracking-widest text-blue-400 font-bold">
                 DevOps &amp; Continuous Delivery
               </span>
               <h2 className="font-outfit font-black text-3xl sm:text-4xl text-white leading-tight">
                 Built for High Concurrency, Microseconds Latency &amp; Zero Downtime
               </h2>
-              <div className="h-1 w-12 bg-[#C59B27] rounded" />
+              <div className="h-1 w-12 bg-blue-600 rounded" />
               
               <p className="text-slate-300 text-sm font-light leading-relaxed">
                 Modern enterprise applications cannot afford infrastructure bottlenecks. Our engineering pods design resilient cloud environments with real-time observability, automated container failover, and strict regression test suites.
               </p>
 
               <div className="space-y-3.5">
-                <div className="flex items-start space-x-3 bg-[#0B1426] border border-[#1F2E4D] p-3.5 rounded-xl">
-                  <CheckCircleIcon className="text-[#C59B27] text-lg mt-0.5!" />
+                <div className="flex items-start space-x-3 bg-[#0F172A] border border-[#1E293B] p-3.5 rounded-xl">
+                  <CheckCircleIcon className="text-blue-400 text-lg mt-0.5!" />
                   <div>
                     <h4 className="text-xs font-bold text-white">Automated CI/CD Pipeline Automation</h4>
                     <p className="text-[11px] text-slate-400 font-light mt-0.5">Every pull request is automatically built, linted, tested, and staged before human approval.</p>
                   </div>
                 </div>
 
-                <div className="flex items-start space-x-3 bg-[#0B1426] border border-[#1F2E4D] p-3.5 rounded-xl">
-                  <CheckCircleIcon className="text-[#C59B27] text-lg mt-0.5!" />
+                <div className="flex items-start space-x-3 bg-[#0F172A] border border-[#1E293B] p-3.5 rounded-xl">
+                  <CheckCircleIcon className="text-blue-400 text-lg mt-0.5!" />
                   <div>
                     <h4 className="text-xs font-bold text-white">Security-First Architecture &amp; Data Encryption</h4>
                     <p className="text-[11px] text-slate-400 font-light mt-0.5">AES-256-GCM encryption, TLS 1.3, least-privilege IAM, and automated secret rotations.</p>
                   </div>
                 </div>
 
-                <div className="flex items-start space-x-3 bg-[#0B1426] border border-[#1F2E4D] p-3.5 rounded-xl">
-                  <CheckCircleIcon className="text-[#C59B27] text-lg mt-0.5!" />
+                <div className="flex items-start space-x-3 bg-[#0F172A] border border-[#1E293B] p-3.5 rounded-xl">
+                  <CheckCircleIcon className="text-blue-400 text-lg mt-0.5!" />
                   <div>
                     <h4 className="text-xs font-bold text-white">24/7 Incident Observability &amp; Alerting</h4>
                     <p className="text-[11px] text-slate-400 font-light mt-0.5">Prometheus, Grafana, and Datadog monitoring with automated PagerDuty escalation.</p>
@@ -716,15 +716,15 @@ export const LandingPage = () => {
 
             {/* Right Visual Image */}
             <div className="lg:col-span-6">
-              <div className="relative rounded-2xl p-1 bg-gradient-to-tr from-[#3F51B5]/30 via-[#0B2A59]/40 to-[#C59B27]/30 shadow-2xl">
-                <div className="relative rounded-[14px] overflow-hidden bg-[#070D19] aspect-[16/10] border border-[#1F2E4D]">
+              <div className="relative rounded-2xl p-1 bg-gradient-to-tr from-[#2563EB]/30 via-[#1E1B4B]/40 to-[#2563EB]/30 shadow-2xl">
+                <div className="relative rounded-[14px] overflow-hidden bg-[#070A13] aspect-[16/10] border border-[#1E293B]">
                   <img
                     src={itDevOpsShowcase}
                     alt="DevOps & Agile Sprint Telemetry"
                     className="w-full h-full object-cover filter brightness-95 hover:scale-102 transition-transform duration-500"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#050A14]/80 via-transparent to-transparent" />
-                  <div className="absolute bottom-3 left-4 bg-[#0B1426]/90 border border-[#C59B27]/30 px-3 py-1 rounded text-[10px] font-mono text-[#E5C058]">
+                  <div className="absolute bottom-3 left-4 bg-[#0F172A]/90 border border-blue-500/30 px-3 py-1 rounded text-[10px] font-mono text-sky-300">
                     Live Sprint Telemetry • Continuous QA &amp; SRE
                   </div>
                 </div>
@@ -736,11 +736,11 @@ export const LandingPage = () => {
       </section>
 
       {/* 6. ENGINEERING TECH STACK TABS */}
-      <section className="py-20 bg-[#070D19] border-t border-[#1F2E4D]" id="stack">
+      <section className="py-20 bg-[#070A13] border-t border-[#1E293B]" id="stack">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
           <div className="text-center max-w-3xl mx-auto mb-12 space-y-3">
-            <span className="text-xs font-outfit uppercase tracking-widest text-[#C59B27] font-bold">
+            <span className="text-xs font-outfit uppercase tracking-widest text-blue-400 font-bold">
               Modern Technology Ecosystem
             </span>
             <h2 className="font-outfit font-black text-3xl sm:text-4xl text-white">
@@ -763,8 +763,8 @@ export const LandingPage = () => {
                   onClick={() => setActiveTab(tab.id)}
                   className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
                     activeTab === tab.id
-                      ? 'bg-gradient-to-r from-[#C59B27] to-[#E5C058] text-[#051A3B] shadow-md shadow-[#C59B27]/20'
-                      : 'bg-[#0B1426] text-slate-400 hover:text-white border border-[#1F2E4D]'
+                      ? 'bg-gradient-to-r from-[#3B82F6] via-[#60A5FA] to-[#06B6D4] text-white font-extrabold shadow-md shadow-blue-600/30'
+                      : 'bg-[#0F172A] text-slate-400 hover:text-white border border-[#1E293B]'
                   }`}
                 >
                   {tab.label}
@@ -778,10 +778,10 @@ export const LandingPage = () => {
             {techCategories[activeTab].map((tech, idx) => (
               <div
                 key={idx}
-                className="bg-[#0B1426] border border-[#1F2E4D] p-5 rounded-xl hover:border-[#C59B27]/40 transition-all flex items-center justify-between"
+                className="bg-[#0F172A] border border-[#1E293B] p-5 rounded-xl hover:border-blue-500/40 transition-all flex items-center justify-between"
               >
                 <div className="flex items-center space-x-3.5">
-                  <div className="w-10 h-10 rounded-lg bg-[#C59B27]/10 text-[#E5C058] border border-[#C59B27]/20 flex items-center justify-center font-mono font-bold text-xs">
+                  <div className="w-10 h-10 rounded-lg bg-blue-500/10 text-sky-300 border border-blue-500/20 flex items-center justify-center font-mono font-bold text-xs">
                     {tech.icon}
                   </div>
                   <div>
@@ -789,7 +789,7 @@ export const LandingPage = () => {
                     <p className="text-[11px] text-slate-400 font-light">{tech.tag}</p>
                   </div>
                 </div>
-                <span className="text-[10px] uppercase font-mono text-[#E5C058] bg-[#070D19] px-2 py-0.5 rounded border border-[#C59B27]/30">
+                <span className="text-[10px] uppercase font-mono text-sky-300 bg-[#070A13] px-2 py-0.5 rounded border border-blue-500/30">
                   Verified
                 </span>
               </div>
@@ -800,11 +800,11 @@ export const LandingPage = () => {
       </section>
 
       {/* 7. DELIVERY LIFECYCLE (WORKFLOW) */}
-      <section className="py-20 bg-[#050A14] border-t border-[#1F2E4D]" id="process">
+      <section className="py-20 bg-[#050A14] border-t border-[#1E293B]" id="process">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
           <div className="text-center max-w-3xl mx-auto mb-14 space-y-3">
-            <span className="text-xs font-outfit uppercase tracking-widest text-[#C59B27] font-bold">
+            <span className="text-xs font-outfit uppercase tracking-widest text-blue-400 font-bold">
               Structured Engineering Process
             </span>
             <h2 className="font-outfit font-black text-3xl sm:text-4xl text-white">
@@ -819,13 +819,13 @@ export const LandingPage = () => {
             {deliveryStages.map((step, idx) => (
               <div
                 key={idx}
-                className="bg-[#0B1426] border border-[#1F2E4D] p-6 rounded-2xl relative flex flex-col justify-between group hover:border-[#C59B27]/40 transition-all"
+                className="bg-[#0F172A] border border-[#1E293B] p-6 rounded-2xl relative flex flex-col justify-between group hover:border-blue-500/40 transition-all"
               >
                 <div>
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#3F51B5] via-indigo-600 to-[#C59B27] text-white font-black flex items-center justify-center font-mono text-sm mb-5 shadow-md shadow-[#3F51B5]/25">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#2563EB] via-indigo-600 to-[#06B6D4] text-white font-black flex items-center justify-center font-mono text-sm mb-5 shadow-md shadow-[#2563EB]/25">
                     {step.num}
                   </div>
-                  <h3 className="font-outfit font-bold text-base text-white mb-2.5 group-hover:text-[#E5C058] transition-colors">
+                  <h3 className="font-outfit font-bold text-base text-white mb-2.5 group-hover:text-sky-300 transition-colors">
                     {step.title}
                   </h3>
                   <p className="text-slate-400 text-xs leading-relaxed font-light">
@@ -840,11 +840,11 @@ export const LandingPage = () => {
       </section>
 
       {/* 8. ENGAGEMENT PLANS & PRICING */}
-      <section className="py-20 bg-[#070D19] border-t border-[#1F2E4D]" id="plans">
+      <section className="py-20 bg-[#070A13] border-t border-[#1E293B]" id="plans">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
           <div className="text-center max-w-3xl mx-auto mb-14 space-y-3">
-            <span className="text-xs font-outfit uppercase tracking-widest text-[#C59B27] font-bold">
+            <span className="text-xs font-outfit uppercase tracking-widest text-blue-400 font-bold">
               Flexible Partnership Models
             </span>
             <h2 className="font-outfit font-black text-3xl sm:text-4xl text-white">
@@ -861,16 +861,16 @@ export const LandingPage = () => {
                 key={idx}
                 className={`rounded-2xl p-6 flex flex-col justify-between transition-all ${
                   plan.highlight
-                    ? 'bg-gradient-to-b from-[#0B1426] via-[#0B1426] to-[#122038] border-2 border-[#C59B27] shadow-2xl shadow-[#C59B27]/10 lg:-translate-y-2'
-                    : 'bg-[#0B1426] border border-[#1F2E4D] hover:border-slate-700'
+                    ? 'bg-gradient-to-b from-[#0F172A] via-[#0F172A] to-[#1E293B] border-2 border-blue-500 shadow-2xl shadow-blue-600/20 lg:-translate-y-2'
+                    : 'bg-[#0F172A] border border-[#1E293B] hover:border-slate-700'
                 }`}
               >
                 <div className="space-y-6">
                   <div>
                     <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded inline-block mb-3 ${
                       plan.highlight
-                        ? 'bg-[#C59B27] text-[#051A3B]'
-                        : 'bg-[#070D19] text-slate-300 border border-[#1F2E4D]'
+                        ? 'bg-blue-600 text-white font-extrabold'
+                        : 'bg-[#070A13] text-slate-300 border border-[#1E293B]'
                     }`}>
                       {plan.badge}
                     </span>
@@ -882,11 +882,11 @@ export const LandingPage = () => {
                     </p>
                   </div>
 
-                  <div className="py-2 border-y border-[#1F2E4D]">
+                  <div className="py-2 border-y border-[#1E293B]">
                     <div className="text-2xl font-black font-outfit text-white">
                       {plan.price}
                     </div>
-                    <div className="text-[11px] text-[#C59B27] font-light">
+                    <div className="text-[11px] text-blue-400 font-light">
                       {plan.period}
                     </div>
                   </div>
@@ -894,21 +894,21 @@ export const LandingPage = () => {
                   <ul className="space-y-2.5">
                     {plan.features.map((feat, fIdx) => (
                       <li key={fIdx} className="flex items-start space-x-2 text-xs text-slate-300">
-                        <CheckIcon className="text-xs text-[#C59B27] mt-0.5 flex-shrink-0" />
+                        <CheckIcon className="text-xs text-blue-400 mt-0.5 flex-shrink-0" />
                         <span className="font-light">{feat}</span>
                       </li>
                     ))}
                   </ul>
                 </div>
 
-                <div className="mt-8 pt-4 border-t border-[#1F2E4D]">
+                <div className="mt-8 pt-4 border-t border-[#1E293B]">
                   <a
                     href="#contact"
                     onClick={(e) => handleScroll(e, 'contact')}
                     className={`block w-full py-2.5 text-center text-xs font-bold rounded-xl transition-all ${
                       plan.highlight
-                        ? 'bg-gradient-to-r from-[#C59B27] via-amber-400 to-[#E5C058] text-[#051A3B] hover:brightness-110 shadow-lg'
-                        : 'bg-[#122038] hover:bg-[#1A2E50] text-white border border-[#1F2E4D]'
+                        ? 'bg-gradient-to-r from-[#2563EB] via-blue-600 to-[#6366F1] text-white font-extrabold hover:brightness-110 shadow-lg'
+                        : 'bg-[#1E293B] hover:bg-[#1A2E50] text-white border border-[#1E293B]'
                     }`}
                   >
                     Select Partnership
@@ -922,11 +922,11 @@ export const LandingPage = () => {
       </section>
 
       {/* 9. CASE STUDIES / TESTIMONIALS */}
-      <section className="py-20 bg-[#050A14] border-t border-[#1F2E4D]" id="case-studies">
+      <section className="py-20 bg-[#050A14] border-t border-[#1E293B]" id="case-studies">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
           <div className="text-center max-w-3xl mx-auto mb-14 space-y-3">
-            <span className="text-xs font-outfit uppercase tracking-widest text-[#C59B27] font-bold">
+            <span className="text-xs font-outfit uppercase tracking-widest text-blue-400 font-bold">
               Engineering Impact
             </span>
             <h2 className="font-outfit font-black text-3xl sm:text-4xl text-white">
@@ -941,17 +941,17 @@ export const LandingPage = () => {
             {caseStudies.map((study, idx) => (
               <div
                 key={idx}
-                className="bg-[#0B1426] border border-[#1F2E4D] p-6 rounded-2xl flex flex-col justify-between hover:border-[#C59B27]/40 transition-all"
+                className="bg-[#0F172A] border border-[#1E293B] p-6 rounded-2xl flex flex-col justify-between hover:border-blue-500/40 transition-all"
               >
                 <div className="space-y-4">
-                  <div className="flex items-center space-x-1 text-[#C59B27]">
+                  <div className="flex items-center space-x-1 text-blue-400">
                     {[...Array(5)].map((_, i) => (
                       <StarIcon key={i} className="text-sm!" />
                     ))}
                   </div>
 
                   <div>
-                    <div className="text-xs uppercase tracking-wider font-mono text-[#E5C058] font-bold">
+                    <div className="text-xs uppercase tracking-wider font-mono text-sky-300 font-bold">
                       {study.service}
                     </div>
                     <div className="text-2xl font-black font-outfit text-white mt-1">
@@ -964,11 +964,11 @@ export const LandingPage = () => {
                   </p>
                 </div>
 
-                <div className="mt-6 pt-4 border-t border-[#1F2E4D] flex items-center justify-between">
+                <div className="mt-6 pt-4 border-t border-[#1E293B] flex items-center justify-between">
                   <span className="text-xs font-bold text-white">{study.client}</span>
                   <div className="flex space-x-1">
                     {study.tags.map((tag, tIdx) => (
-                      <span key={tIdx} className="text-[9px] font-mono bg-[#070D19] border border-[#1F2E4D] px-1.5 py-0.5 rounded text-slate-300">
+                      <span key={tIdx} className="text-[9px] font-mono bg-[#070A13] border border-[#1E293B] px-1.5 py-0.5 rounded text-slate-300">
                         {tag}
                       </span>
                     ))}
@@ -982,11 +982,11 @@ export const LandingPage = () => {
       </section>
 
       {/* 10. FAQ SECTION */}
-      <section className="py-20 bg-[#070D19] border-t border-[#1F2E4D]" id="faqs">
+      <section className="py-20 bg-[#070A13] border-t border-[#1E293B]" id="faqs">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           
           <div className="text-center mb-12 space-y-3">
-            <span className="text-xs font-outfit uppercase tracking-widest text-[#C59B27] font-bold">
+            <span className="text-xs font-outfit uppercase tracking-widest text-blue-400 font-bold">
               Got Questions?
             </span>
             <h2 className="font-outfit font-black text-3xl sm:text-4xl text-white">
@@ -1003,7 +1003,7 @@ export const LandingPage = () => {
               return (
                 <div
                   key={idx}
-                  className="bg-[#0B1426] border border-[#1F2E4D] rounded-xl overflow-hidden transition-all"
+                  className="bg-[#0F172A] border border-[#1E293B] rounded-xl overflow-hidden transition-all"
                 >
                   <button
                     onClick={() => setActiveFaq(isOpen ? null : idx)}
@@ -1012,7 +1012,7 @@ export const LandingPage = () => {
                     <span className="font-outfit font-bold text-sm text-white">
                       {faq.q}
                     </span>
-                    <span className="text-[#C59B27]">
+                    <span className="text-blue-400">
                       {isOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
                     </span>
                   </button>
@@ -1025,7 +1025,7 @@ export const LandingPage = () => {
                         exit={{ height: 0, opacity: 0 }}
                         transition={{ duration: 0.2 }}
                       >
-                        <div className="px-6 pb-5 text-xs text-slate-300 leading-relaxed font-light border-t border-[#1F2E4D] pt-3">
+                        <div className="px-6 pb-5 text-xs text-slate-300 leading-relaxed font-light border-t border-[#1E293B] pt-3">
                           {faq.a}
                         </div>
                       </motion.div>
@@ -1040,29 +1040,29 @@ export const LandingPage = () => {
       </section>
 
       {/* 11. TECHNICAL CONSULTATION & DISCOVERY FORM */}
-      <section className="py-20 bg-[#050A14] border-t border-[#1F2E4D] relative overflow-hidden" id="contact">
-        <div className="absolute top-1/2 right-1/4 w-[500px] h-[300px] bg-[#C59B27]/10 rounded-full blur-[140px] pointer-events-none" />
+      <section className="py-20 bg-[#050A14] border-t border-[#1E293B] relative overflow-hidden" id="contact">
+        <div className="absolute top-1/2 right-1/4 w-[500px] h-[300px] bg-blue-500/10 rounded-full blur-[140px] pointer-events-none" />
         
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
             
             {/* Left Contact Info */}
             <div className="lg:col-span-5 space-y-6">
-              <span className="text-xs font-outfit uppercase tracking-widest text-[#C59B27] font-bold">
+              <span className="text-xs font-outfit uppercase tracking-widest text-blue-400 font-bold">
                 Direct Engineering Collaboration
               </span>
               <h2 className="font-outfit font-black text-3xl sm:text-4xl text-white">
                 Let's Build Your Next Digital Product
               </h2>
-              <div className="h-1 w-12 bg-[#C59B27] rounded" />
+              <div className="h-1 w-12 bg-blue-600 rounded" />
               
               <p className="text-slate-300 text-sm font-light leading-relaxed">
                 Connect with our senior engineering architects. We evaluate your requirements, suggest optimal tech stacks, and provide a detailed architectural roadmap within 24 business hours.
               </p>
 
               <div className="space-y-4 pt-2">
-                <div className="flex items-center space-x-3.5 bg-[#0B1426] border border-[#1F2E4D] p-4 rounded-xl">
-                  <div className="w-10 h-10 rounded-lg bg-[#C59B27]/10 text-[#C59B27] flex items-center justify-center">
+                <div className="flex items-center space-x-3.5 bg-[#0F172A] border border-[#1E293B] p-4 rounded-xl">
+                  <div className="w-10 h-10 rounded-lg bg-blue-500/10 text-blue-400 flex items-center justify-center">
                     <EmailIcon className="text-lg!" />
                   </div>
                   <div>
@@ -1071,7 +1071,7 @@ export const LandingPage = () => {
                   </div>
                 </div>
 
-                <div className="flex items-center space-x-3.5 bg-[#0B1426] border border-[#1F2E4D] p-4 rounded-xl">
+                <div className="flex items-center space-x-3.5 bg-[#0F172A] border border-[#1E293B] p-4 rounded-xl">
                   <div className="w-10 h-10 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center">
                     <PhoneIcon className="text-lg!" />
                   </div>
@@ -1081,8 +1081,8 @@ export const LandingPage = () => {
                   </div>
                 </div>
 
-                <div className="flex items-center space-x-3.5 bg-[#0B1426] border border-[#1F2E4D] p-4 rounded-xl">
-                  <div className="w-10 h-10 rounded-lg bg-[#3F51B5]/20 text-[#3F51B5] flex items-center justify-center">
+                <div className="flex items-center space-x-3.5 bg-[#0F172A] border border-[#1E293B] p-4 rounded-xl">
+                  <div className="w-10 h-10 rounded-lg bg-[#2563EB]/20 text-[#2563EB] flex items-center justify-center">
                     <LocationOnIcon className="text-lg!" />
                   </div>
                   <div>
@@ -1094,7 +1094,7 @@ export const LandingPage = () => {
             </div>
 
             {/* Right Project Inquiry Form */}
-            <div className="lg:col-span-7 bg-[#0B1426] border border-[#1F2E4D] p-8 rounded-2xl shadow-2xl backdrop-blur-md">
+            <div className="lg:col-span-7 bg-[#0F172A] border border-[#1E293B] p-8 rounded-2xl shadow-2xl backdrop-blur-md">
               <h3 className="font-outfit font-black text-xl text-white mb-1">
                 Request a Technical Discovery Call
               </h3>
@@ -1113,7 +1113,7 @@ export const LandingPage = () => {
                       onChange={handleFormChange}
                       required
                       placeholder="Jane"
-                      className="w-full bg-[#070D19] border border-[#1F2E4D] rounded-lg px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-[#C59B27]"
+                      className="w-full bg-[#070A13] border border-[#1E293B] rounded-lg px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
                     />
                   </div>
                   <div>
@@ -1125,7 +1125,7 @@ export const LandingPage = () => {
                       onChange={handleFormChange}
                       required
                       placeholder="Doe"
-                      className="w-full bg-[#070D19] border border-[#1F2E4D] rounded-lg px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-[#C59B27]"
+                      className="w-full bg-[#070A13] border border-[#1E293B] rounded-lg px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
                     />
                   </div>
                 </div>
@@ -1140,7 +1140,7 @@ export const LandingPage = () => {
                       onChange={handleFormChange}
                       required
                       placeholder="jane@company.com"
-                      className="w-full bg-[#070D19] border border-[#1F2E4D] rounded-lg px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-[#C59B27]"
+                      className="w-full bg-[#070A13] border border-[#1E293B] rounded-lg px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
                     />
                   </div>
                   <div>
@@ -1152,7 +1152,7 @@ export const LandingPage = () => {
                       onChange={handleFormChange}
                       required
                       placeholder="+1 (555) 000-0000"
-                      className="w-full bg-[#070D19] border border-[#1F2E4D] rounded-lg px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-[#C59B27]"
+                      className="w-full bg-[#070A13] border border-[#1E293B] rounded-lg px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
                     />
                   </div>
                 </div>
@@ -1166,7 +1166,7 @@ export const LandingPage = () => {
                       value={formData.companyName}
                       onChange={handleFormChange}
                       placeholder="Acme Corp"
-                      className="w-full bg-[#070D19] border border-[#1F2E4D] rounded-lg px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-[#C59B27]"
+                      className="w-full bg-[#070A13] border border-[#1E293B] rounded-lg px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
                     />
                   </div>
                   <div>
@@ -1175,7 +1175,7 @@ export const LandingPage = () => {
                       name="serviceType"
                       value={formData.serviceType}
                       onChange={handleFormChange}
-                      className="w-full bg-[#070D19] border border-[#1F2E4D] rounded-lg px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-[#C59B27]"
+                      className="w-full bg-[#070A13] border border-[#1E293B] rounded-lg px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500"
                     >
                       <option value="Custom Software & SaaS Development">Custom Software &amp; SaaS Development</option>
                       <option value="Web & Mobile App Development">Web &amp; Mobile App Development</option>
@@ -1195,7 +1195,7 @@ export const LandingPage = () => {
                       name="budget"
                       value={formData.budget}
                       onChange={handleFormChange}
-                      className="w-full bg-[#070D19] border border-[#1F2E4D] rounded-lg px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-[#C59B27]"
+                      className="w-full bg-[#070A13] border border-[#1E293B] rounded-lg px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500"
                     >
                       <option value="$5,000 - $15,000">$5,000 - $15,000 (MVP Prototype)</option>
                       <option value="$15,000 - $50,000">$15,000 - $50,000 (Production Launch)</option>
@@ -1209,7 +1209,7 @@ export const LandingPage = () => {
                       name="timeline"
                       value={formData.timeline}
                       onChange={handleFormChange}
-                      className="w-full bg-[#070D19] border border-[#1F2E4D] rounded-lg px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-[#C59B27]"
+                      className="w-full bg-[#070A13] border border-[#1E293B] rounded-lg px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500"
                     >
                       <option value="Immediate (< 1 Month)">Immediate (&lt; 1 Month)</option>
                       <option value="1 - 3 Months">1 - 3 Months</option>
@@ -1227,14 +1227,14 @@ export const LandingPage = () => {
                     onChange={handleFormChange}
                     rows="3"
                     placeholder="Briefly describe your product goals, tech preferences, or current challenges..."
-                    className="w-full bg-[#070D19] border border-[#1F2E4D] rounded-lg p-3 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-[#C59B27] resize-none"
+                    className="w-full bg-[#070A13] border border-[#1E293B] rounded-lg p-3 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 resize-none"
                   />
                 </div>
 
                 <button
                   type="submit"
                   disabled={leadMutation.isPending}
-                  className="w-full bg-gradient-to-r from-[#C59B27] via-amber-400 to-[#E5C058] hover:brightness-110 text-[#051A3B] font-extrabold py-3.5 rounded-xl shadow-lg shadow-[#C59B27]/25 transition-all text-xs uppercase tracking-wider flex items-center justify-center space-x-2 cursor-pointer disabled:opacity-50"
+                  className="w-full bg-gradient-to-r from-[#2563EB] via-blue-600 to-[#6366F1] hover:brightness-110 text-white font-extrabold font-extrabold py-3.5 rounded-xl shadow-lg shadow-blue-600/35 transition-all text-xs uppercase tracking-wider flex items-center justify-center space-x-2 cursor-pointer disabled:opacity-50"
                 >
                   {leadMutation.isPending ? (
                     <span>Submitting Discovery Request...</span>
@@ -1253,15 +1253,15 @@ export const LandingPage = () => {
       </section>
 
       {/* 12. FOOTER */}
-      <footer className="bg-[#050A14] text-slate-400 border-t border-[#1F2E4D] pt-14 pb-8">
+      <footer className="bg-[#050A14] text-slate-400 border-t border-[#1E293B] pt-14 pb-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 pb-12 border-b border-[#1F2E4D]">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 pb-12 border-b border-[#1E293B]">
             
             {/* Column 1: Brand Info */}
             <div className="space-y-4">
               <div className="flex items-center space-x-2.5">
-                <div className="w-9 h-9 bg-gradient-to-tr from-[#3F51B5] to-[#C59B27] rounded-lg flex items-center justify-center text-white font-black font-outfit text-lg">
+                <div className="w-9 h-9 bg-gradient-to-tr from-[#2563EB] to-[#6366F1] rounded-lg flex items-center justify-center text-white font-black font-outfit text-lg">
                   K
                 </div>
                 <span className="font-outfit font-black text-base text-white tracking-tight">
@@ -1271,7 +1271,7 @@ export const LandingPage = () => {
               <p className="text-xs font-light leading-relaxed text-slate-400">
                 Full-stack digital engineering, cloud infrastructure modernization, and AI systems architecture for high-growth enterprises worldwide.
               </p>
-              <div className="text-[11px] font-mono text-[#C59B27]">
+              <div className="text-[11px] font-mono text-blue-400">
                 SOC2 Type II • ISO 27001 Ready • AWS Advanced Partner
               </div>
             </div>
@@ -1280,11 +1280,11 @@ export const LandingPage = () => {
             <div className="space-y-3">
               <h4 className="font-outfit font-bold text-xs text-white uppercase tracking-wider">Capabilities</h4>
               <ul className="space-y-2 text-xs">
-                <li><a href="#services" onClick={(e) => handleScroll(e, 'services')} className="hover:text-[#E5C058] transition-colors">Custom Software &amp; SaaS</a></li>
-                <li><a href="#services" onClick={(e) => handleScroll(e, 'services')} className="hover:text-[#E5C058] transition-colors">Web &amp; Mobile Applications</a></li>
-                <li><a href="#services" onClick={(e) => handleScroll(e, 'services')} className="hover:text-[#E5C058] transition-colors">AI &amp; Intelligent Automation</a></li>
-                <li><a href="#services" onClick={(e) => handleScroll(e, 'services')} className="hover:text-[#E5C058] transition-colors">Cloud &amp; DevOps Engineering</a></li>
-                <li><a href="#services" onClick={(e) => handleScroll(e, 'services')} className="hover:text-[#E5C058] transition-colors">Enterprise CRM &amp; ERP</a></li>
+                <li><a href="#services" onClick={(e) => handleScroll(e, 'services')} className="hover:text-sky-300 transition-colors">Custom Software &amp; SaaS</a></li>
+                <li><a href="#services" onClick={(e) => handleScroll(e, 'services')} className="hover:text-sky-300 transition-colors">Web &amp; Mobile Applications</a></li>
+                <li><a href="#services" onClick={(e) => handleScroll(e, 'services')} className="hover:text-sky-300 transition-colors">AI &amp; Intelligent Automation</a></li>
+                <li><a href="#services" onClick={(e) => handleScroll(e, 'services')} className="hover:text-sky-300 transition-colors">Cloud &amp; DevOps Engineering</a></li>
+                <li><a href="#services" onClick={(e) => handleScroll(e, 'services')} className="hover:text-sky-300 transition-colors">Enterprise CRM &amp; ERP</a></li>
               </ul>
             </div>
 
@@ -1292,10 +1292,10 @@ export const LandingPage = () => {
             <div className="space-y-3">
               <h4 className="font-outfit font-bold text-xs text-white uppercase tracking-wider">Access &amp; Legal</h4>
               <ul className="space-y-2 text-xs">
-                <li><Link to="/login" className="hover:text-[#E5C058] transition-colors">Client &amp; Staff CRM Portal</Link></li>
-                <li><a href="#plans" onClick={(e) => handleScroll(e, 'plans')} className="hover:text-[#E5C058] transition-colors">Engagement Plans</a></li>
-                <li><a href="#case-studies" onClick={(e) => handleScroll(e, 'case-studies')} className="hover:text-[#E5C058] transition-colors">Engineering Case Studies</a></li>
-                <li><a href="#faqs" onClick={(e) => handleScroll(e, 'faqs')} className="hover:text-[#E5C058] transition-colors">Technical FAQs</a></li>
+                <li><Link to="/login" className="hover:text-sky-300 transition-colors">Client &amp; Staff CRM Portal</Link></li>
+                <li><a href="#plans" onClick={(e) => handleScroll(e, 'plans')} className="hover:text-sky-300 transition-colors">Engagement Plans</a></li>
+                <li><a href="#case-studies" onClick={(e) => handleScroll(e, 'case-studies')} className="hover:text-sky-300 transition-colors">Engineering Case Studies</a></li>
+                <li><a href="#faqs" onClick={(e) => handleScroll(e, 'faqs')} className="hover:text-sky-300 transition-colors">Technical FAQs</a></li>
               </ul>
             </div>
 

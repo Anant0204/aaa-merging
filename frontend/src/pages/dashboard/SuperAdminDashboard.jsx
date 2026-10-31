@@ -653,26 +653,52 @@ export const SuperAdminDashboard = () => {
         }
       />
 
-      {/* AI CEO Dashboard Section */}
+      {/* AI CEO Dashboard Section — Fintech AI Glassmorphic Banner */}
       <Box sx={{
-        mb: 4,
-        p: 3,
+        mb: 3.5,
+        p: { xs: 2.5, sm: 3 },
         borderRadius: '16px',
-        background: 'linear-gradient(135deg, rgba(30, 27, 58, 0.75) 0%, rgba(15, 12, 38, 0.85) 100%)',
-        backdropFilter: 'blur(10px)',
-        border: '1px solid rgba(255, 255, 255, 0.1)',
-        boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.4)',
+        background: 'linear-gradient(135deg, #0B1120 0%, #0F172A 50%, #131E36 100%)',
+        border: '1px solid rgba(59, 130, 246, 0.25)',
+        boxShadow: '0 12px 36px -8px rgba(15, 23, 42, 0.4), 0 0 24px -6px rgba(37, 99, 235, 0.2)',
         display: 'flex',
         flexDirection: 'column',
-        gap: 2
+        gap: 2,
+        position: 'relative',
+        overflow: 'hidden',
+        '&::before': {
+          content: '""',
+          position: 'absolute',
+          top: '-50%',
+          right: '-10%',
+          width: '300px',
+          height: '300px',
+          background: 'radial-gradient(circle, rgba(37, 99, 235, 0.18) 0%, rgba(99, 102, 241, 0.05) 50%, transparent 70%)',
+          pointerEvents: 'none',
+        }
       }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2, position: 'relative', zIndex: 1 }}>
           <Box>
-            <Typography variant="h6" sx={{ fontWeight: 800, color: '#fff', display: 'flex', alignItems: 'center', gap: 1 }}>
-              <span>✨</span> AI CEO Dashboard
-            </Typography>
-            <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.6)', fontWeight: 500 }}>
-              Get a personalized executive summary based on live CRM data.
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.2 }}>
+              <Typography variant="h6" sx={{ fontWeight: 800, color: '#FFFFFF', display: 'flex', alignItems: 'center', gap: 1, letterSpacing: '-0.015em' }}>
+                <span>✨</span> AI CEO Dashboard
+              </Typography>
+              <Box sx={{
+                px: 1,
+                py: 0.25,
+                borderRadius: '6px',
+                bgcolor: 'rgba(37, 99, 235, 0.2)',
+                border: '1px solid rgba(59, 130, 246, 0.4)',
+                color: '#60A5FA',
+                fontSize: '0.65rem',
+                fontWeight: 800,
+                letterSpacing: '0.04em'
+              }}>
+                24/7 AI SUPERVISOR
+              </Box>
+            </Box>
+            <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.65)', fontWeight: 500, mt: 0.5, display: 'block' }}>
+              Autonomous executive intelligence & strategic briefing based on live CRM operations.
             </Typography>
           </Box>
           <Button
@@ -680,29 +706,30 @@ export const SuperAdminDashboard = () => {
             onClick={handleBriefMyDay}
             disabled={loadingBrief}
             sx={{
-              background: 'linear-gradient(45deg, #FF512F 0%, #DD2476 50%, #8E2DE2 100%)',
-              backgroundSize: '200% auto',
+              background: 'linear-gradient(135deg, #2563EB 0%, #6366F1 100%)',
               color: '#fff',
               fontWeight: 800,
+              fontSize: '0.82rem',
               px: 3,
-              py: 1,
-              borderRadius: '8px',
-              boxShadow: '0 4px 15px rgba(221, 36, 118, 0.4)',
-              transition: 'all 0.3s ease',
-              animation: loadingBrief ? 'none' : 'pulse-gold 2s infinite',
+              py: 1.1,
+              borderRadius: '10px',
+              border: '1px solid rgba(255, 255, 255, 0.2)',
+              boxShadow: '0 4px 16px rgba(37, 99, 235, 0.35)',
+              transition: 'all 0.25s ease',
+              animation: loadingBrief ? 'none' : 'pulse-fintech 2.5s infinite',
               '&:hover': {
-                backgroundPosition: 'right center',
-                boxShadow: '0 6px 20px rgba(221, 36, 118, 0.6)',
+                background: 'linear-gradient(135deg, #1D4ED8 0%, #4F46E5 100%)',
+                boxShadow: '0 6px 22px rgba(37, 99, 235, 0.55)',
                 transform: 'translateY(-2px)'
               },
-              '@keyframes pulse-gold': {
-                '0%': { boxShadow: '0 0 0 0 rgba(221, 36, 118, 0.7)' },
-                '70%': { boxShadow: '0 0 0 10px rgba(221, 36, 118, 0)' },
-                '100%': { boxShadow: '0 0 0 0 rgba(221, 36, 118, 0)' }
+              '@keyframes pulse-fintech': {
+                '0%': { boxShadow: '0 0 0 0 rgba(37, 99, 235, 0.5)' },
+                '70%': { boxShadow: '0 0 0 10px rgba(37, 99, 235, 0)' },
+                '100%': { boxShadow: '0 0 0 0 rgba(37, 99, 235, 0)' }
               }
             }}
           >
-            {loadingBrief ? '🤖 Briefing Your Day...' : '💼 Brief My Day'}
+            {loadingBrief ? '🤖 Generating Briefing...' : '💼 Brief My Day'}
           </Button>
         </Box>
 

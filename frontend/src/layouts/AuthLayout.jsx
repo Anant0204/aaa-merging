@@ -131,7 +131,7 @@ export const AuthLayout = () => {
                 width: 38,
                 height: 38,
                 borderRadius: 1.5,
-                background: 'linear-gradient(135deg, #3F51B5 0%, #C59B27 100%)',
+                background: 'linear-gradient(135deg, #2563EB 0%, #6366F1 100%)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',

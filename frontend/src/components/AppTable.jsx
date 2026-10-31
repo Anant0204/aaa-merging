@@ -211,7 +211,7 @@ export const AppTable = ({
                       '&:last-child td, &:last-child th': { border: 0 },
                       ...(isSwornRow ? {
                         bgcolor: 'rgba(197, 155, 39, 0.08)',
-                        borderLeft: '4px solid #C59B27',
+                        borderLeft: '4px solid #2563EB',
                         '&:hover': { bgcolor: 'rgba(197, 155, 39, 0.16) !important' }
                       } : {})
                     }}
@@ -233,7 +233,7 @@ export const AppTable = ({
                             label={`📜 ${labelText.replace(/^📜\s*/, '')}`}
                             size="small"
                             sx={{
-                              bgcolor: '#C59B27',
+                              bgcolor: '#2563EB',
                               color: '#051A3B',
                               fontWeight: 900,
                               fontSize: '0.78rem',

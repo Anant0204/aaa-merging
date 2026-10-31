@@ -21,7 +21,7 @@ export const AppCard = ({
   const CardComponent = hoverable ? motion(Card) : Card;
   const hoverProps = hoverable
     ? {
-      whileHover: { y: -4, boxShadow: '0px 10px 15px -3px rgba(15, 23, 42, 0.08), 0px 4px 6px -4px rgba(15, 23, 42, 0.08)' },
+      whileHover: { y: -3, boxShadow: '0px 12px 24px -4px rgba(15, 23, 42, 0.08)' },
       transition: { duration: 0.2 },
     }
     : {};
@@ -29,8 +29,20 @@ export const AppCard = ({
   return (
     <CardComponent
       {...hoverProps}
-      className="flex flex-col h-full relative overflow-visible border border-solid border-divider shadow-none rounded-[8px]"
+      elevation={0}
       sx={{
+        borderRadius: '14px',
+        border: '1px solid',
+        borderColor: (theme) => theme.palette.mode === 'light' ? '#E2E8F0' : 'rgba(255, 255, 255, 0.08)',
+        bgcolor: 'background.paper',
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
+        position: 'relative',
+        overflow: 'hidden',
+        boxShadow: (theme) => theme.palette.mode === 'light'
+          ? '0 1px 3px rgba(15, 23, 42, 0.04), 0 4px 12px -2px rgba(15, 23, 42, 0.02)'
+          : '0 4px 20px rgba(0, 0, 0, 0.25)',
         ...sx,
       }}
     >
@@ -39,7 +51,7 @@ export const AppCard = ({
           <CardHeader
             title={
               typeof title === 'string' ? (
-                <Typography variant="h5" className="font-semibold text-h5 text-primary">
+                <Typography variant="h5" sx={{ fontWeight: 800, color: 'text.primary', letterSpacing: '-0.015em' }}>
                   {title}
                 </Typography>
               ) : (
@@ -48,20 +60,27 @@ export const AppCard = ({
             }
             subheader={subheader}
             action={action}
-            className="px-3 pt-2 pb-1.5"
+            sx={{ px: 2.5, pt: 2, pb: 1.5 }}
           />
-          <Divider />
+          <Divider sx={{ borderColor: (theme) => theme.palette.mode === 'light' ? '#F1F5F9' : 'rgba(255,255,255,0.06)' }} />
         </>
       )}
       <CardContent
-        className={`flex-grow flex flex-col min-w-0 ${noPadding ? 'p-0!' : 'p-2! pb-4!'}`}
+        sx={{
+          flexGrow: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          minWidth: 0,
+          p: noPadding ? 0 : 2.5,
+          '&:last-child': { pb: noPadding ? 0 : 2.5 }
+        }}
       >
         {children}
       </CardContent>
       {actions && (
         <>
-          <Divider />
-          <CardActions className="px-3 py-1.5 flex justify-end">
+          <Divider sx={{ borderColor: (theme) => theme.palette.mode === 'light' ? '#F1F5F9' : 'rgba(255,255,255,0.06)' }} />
+          <CardActions sx={{ px: 2.5, py: 1.5, display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
             {actions}
           </CardActions>
         </>

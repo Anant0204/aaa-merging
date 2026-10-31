@@ -60,6 +60,7 @@ import TwitterIcon from '@mui/icons-material/Twitter';
 import PinterestIcon from '@mui/icons-material/Pinterest';
 import RateReviewIcon from '@mui/icons-material/RateReview';
 import SmartToyIcon from '@mui/icons-material/SmartToy';
+import LanguageIcon from '@mui/icons-material/Language';
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
 import ChatIcon from '@mui/icons-material/Chat';
 import { io } from 'socket.io-client';
@@ -184,7 +185,6 @@ export const DashboardLayout = () => {
   const { mode, toggleTheme } = useThemeMode();
   const { currentUser, changeRole, logout, isAdmin, isConsultant, isFinance, isOperations } = useAuth();
   const { showAlert } = useAlert();
-  const { currency, currencySymbol, toggleCurrency, exchangeRate } = useCurrency();
   const navigate = useNavigate();
   const location = useLocation();
   const queryClient = useQueryClient();
@@ -964,7 +964,8 @@ export const DashboardLayout = () => {
               width: 32,
               height: 32,
               borderRadius: 1,
-              background: 'linear-gradient(135deg, #2563EB 0%, #14B8A6 100%)',
+              background: 'linear-gradient(135deg, #2563EB 0%, #6366F1 100%)',
+              boxShadow: '0 4px 14px rgba(37, 99, 235, 0.35)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -1159,52 +1160,27 @@ export const DashboardLayout = () => {
 
           {/* Right: Tools & Profile */}
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-            <FormControl size="small" sx={{ minWidth: 90 }}>
+            <FormControl size="small" sx={{ minWidth: 120 }}>
               <Select
                 value={adminLang}
                 onChange={(e) => changeAdminLanguage(e.target.value)}
+                displayEmpty
+                renderValue={(selected) => (
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8 }}>
+                    <LanguageIcon sx={{ fontSize: 16, color: 'primary.main' }} />
+                    <span>{selected}</span>
+                  </Box>
+                )}
                 sx={{ borderRadius: 2, height: 32, bgcolor: 'background.paper', fontSize: '0.8rem', fontWeight: 600 }}
               >
-                <MenuItem value="English">EN 🇺🇸</MenuItem>
-                <MenuItem value="Arabic">AR 🇦🇪</MenuItem>
-                <MenuItem value="Spanish">ES 🇪🇸</MenuItem>
-                <MenuItem value="French">FR 🇫🇷</MenuItem>
-                <MenuItem value="German">DE 🇩🇪</MenuItem>
-                <MenuItem value="Urdu">UR 🇵🇰</MenuItem>
+                <MenuItem value="English">English</MenuItem>
+                <MenuItem value="Arabic">العربية (Arabic)</MenuItem>
+                <MenuItem value="Spanish">Español (Spanish)</MenuItem>
+                <MenuItem value="French">Français (French)</MenuItem>
+                <MenuItem value="German">Deutsch (German)</MenuItem>
+                <MenuItem value="Urdu">اردو (Urdu)</MenuItem>
               </Select>
             </FormControl>
-
-            {/* Quick Live Currency Switcher (USD $ / INR ₹) */}
-            <Tooltip title={`Active Currency: ${currency} (${currencySymbol}) • Live Rate: 1 USD = ₹${exchangeRate.toFixed(2)} INR (open.er-api.com) • Click to switch to ${currency === 'USD' ? 'INR (₹)' : 'USD ($)'}`}>
-              <Box
-                onClick={toggleCurrency}
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 0.6,
-                  px: 1.2,
-                  height: 32,
-                  borderRadius: 2,
-                  cursor: 'pointer',
-                  userSelect: 'none',
-                  bgcolor: currency === 'INR' ? '#DCFCE7' : '#EFF6FF',
-                  border: '1.5px solid',
-                  borderColor: currency === 'INR' ? '#86EFAC' : '#BFDBFE',
-                  color: currency === 'INR' ? '#166534' : '#1E40AF',
-                  boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
-                  transition: 'all 0.15s ease',
-                  '&:hover': {
-                    transform: 'translateY(-1px)',
-                    boxShadow: '0 3px 8px rgba(0,0,0,0.1)'
-                  }
-                }}
-              >
-                <Typography sx={{ fontSize: '0.78rem', fontWeight: 800, letterSpacing: '0.02em', display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                  {currency === 'INR' ? '🇮🇳 ₹ INR' : '🇺🇸 $ USD'}
-                </Typography>
-                <SwapHorizIcon sx={{ fontSize: 16, opacity: 0.8 }} />
-              </Box>
-            </Tooltip>
 
             {/* Quick Role Switcher removed from header - available on Login page */}
 
@@ -1242,7 +1218,7 @@ export const DashboardLayout = () => {
                   🔔 Notifications {unreadCount > 0 && `(${unreadCount})`}
                 </Typography>
                 {unreadCount > 0 && (
-                  <Button size="small" onClick={handleMarkAllRead} sx={{ fontSize: '0.7rem', color: '#C59B27', fontWeight: 700 }}>
+                  <Button size="small" onClick={handleMarkAllRead} sx={{ fontSize: '0.7rem', color: '#2563EB', fontWeight: 700 }}>
                     Mark all read
                   </Button>
                 )}
@@ -1283,7 +1259,7 @@ export const DashboardLayout = () => {
                           backgroundColor: notif.isRead ? 'transparent' : 'rgba(197, 155, 39, 0.06)',
                           borderBottom: '1px solid',
                           borderColor: 'divider',
-                          borderLeft: notif.isRead ? 'none' : '3px solid #C59B27',
+                          borderLeft: notif.isRead ? 'none' : '3px solid #2563EB',
                           '&:last-child': { border: 0 },
                           '&:hover': { bgcolor: 'rgba(197, 155, 39, 0.08)' }
                         }}
@@ -1294,7 +1270,7 @@ export const DashboardLayout = () => {
                               {notif.title}
                             </Typography>
                             {!notif.isRead && (
-                              <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: '#C59B27', flexShrink: 0, ml: 1 }} />
+                              <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: '#2563EB', flexShrink: 0, ml: 1 }} />
                             )}
                           </Box>
                           <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.75rem', lineHeight: 1.4 }}>
