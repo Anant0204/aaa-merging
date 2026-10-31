@@ -103,14 +103,32 @@ export const FinanceDashboard = () => {
     { title: 'Completed Invoices', value: completedPayments.length, icon: <ReceiptIcon />, color: '#10B981', onClick: () => navigate('/payments/invoices', { state: { filterStatus: 'Paid', cardInfo: { title: 'Completed Invoices', value: completedPayments.length, color: '#10B981', iconType: 'Receipt' } } }) }
   ];
 
-  // CHART 1: Monthly Revenue vs Invoiced Chart
-  const revenueData = [
-    { name: 'Jan', revenue: 12000, invoiced: 13000 },
-    { name: 'Feb', revenue: 15500, invoiced: 16000 },
-    { name: 'Mar', revenue: 19800, invoiced: 21000 },
-    { name: 'Apr', revenue: 22000, invoiced: 24000 },
-    { name: 'May', revenue: 31000, invoiced: 33000 },
-    { name: 'Jun', revenue: totalRevenue, invoiced: totalInvoiced },
+  // CHART 1: Monthly Revenue vs Invoiced Chart — computed dynamically from live database payments
+  const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const monthlyFinanceMap = allPayments.reduce((acc, p) => {
+    const rawDate = p.paidAt || p.paymentDate || p.billingDate || p.dueDate || p.createdAt;
+    if (!rawDate) return acc;
+    const d = new Date(rawDate);
+    if (isNaN(d.getTime())) return acc;
+    const key = `${d.getFullYear()}-${d.getMonth()}`;
+    if (!acc[key]) {
+      acc[key] = {
+        name: `${monthNames[d.getMonth()]} ${d.getFullYear()}`,
+        revenue: 0,
+        invoiced: 0
+      };
+    }
+    const invAmt = (p.amount || 0) - (p.discount || 0);
+    acc[key].invoiced += invAmt;
+    if (p.status === 'Paid' || p.status === 'Completed') {
+      acc[key].revenue += (p.totalPaid || p.amount || 0);
+    }
+    return acc;
+  }, {});
+
+  const dynamicFinanceData = Object.values(monthlyFinanceMap).slice(-6);
+  const revenueData = dynamicFinanceData.length > 0 ? dynamicFinanceData : [
+    { name: monthNames[new Date().getMonth()], revenue: 0, invoiced: 0 }
   ];
 
   // CHART 2: Payment Gateway Distribution

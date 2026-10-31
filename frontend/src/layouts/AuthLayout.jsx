@@ -26,7 +26,7 @@ export const AuthLayout = () => {
           width: '55%',
           height: '100%',
           position: 'relative',
-          backgroundImage: 'url("https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=1600")',
+          backgroundImage: 'url("/software-bg.jpg")',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           flexDirection: 'column',
@@ -40,7 +40,7 @@ export const AuthLayout = () => {
             left: 0,
             width: '100%',
             height: '100%',
-            background: 'linear-gradient(135deg, rgba(7, 10, 19, 0.92) 0%, rgba(15, 23, 42, 0.85) 100%)',
+            background: 'linear-gradient(135deg, rgba(7, 10, 19, 0.82) 0%, rgba(15, 23, 42, 0.75) 100%)',
             zIndex: 1,
           },
         }}

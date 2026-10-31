@@ -88,10 +88,10 @@ export const MarketingDashboard = () => {
 
   // LEAD SOURCE PERFORMANCE STATS
   const marketingStats = [
-    { title: 'Total Leads Generated', value: totalLeads.toString(), icon: <PeopleAltIcon />, color: '#3F51B5', trend: '12%' },
-    { title: 'Total Consultations Booked', value: totalConsultations.toString(), icon: <TrendingUpIcon />, color: '#14B8A6', trend: '5%' },
-    { title: 'Active Campaigns', value: activeCampaigns.toString(), icon: <CampaignIcon />, color: '#F59E0B', trend: '2' },
-    { title: 'Avg Conversion Rate', value: `${avgConversion}%`, icon: <AssessmentIcon />, color: '#8B5CF6', trend: '1.2%' },
+    { title: 'Total Leads Generated', value: totalLeads.toString(), icon: <PeopleAltIcon />, color: '#3F51B5', trend: null },
+    { title: 'Total Consultations Booked', value: totalConsultations.toString(), icon: <TrendingUpIcon />, color: '#14B8A6', trend: null },
+    { title: 'Active Campaigns', value: activeCampaigns.toString(), icon: <CampaignIcon />, color: '#F59E0B', trend: null },
+    { title: 'Avg Conversion Rate', value: `${avgConversion}%`, icon: <AssessmentIcon />, color: '#8B5CF6', trend: null },
   ];
 
   const handleExportReport = () => {

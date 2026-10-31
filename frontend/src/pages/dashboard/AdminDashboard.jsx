@@ -210,18 +210,18 @@ export const AdminDashboard = () => {
 
   // Render quick stats data — titles must exactly match AVAILABLE_CARDS keys
   const statsList = [
-    { title: 'Total Clients', value: clients.length, icon: <PeopleAltIcon />, color: '#3F51B5', trend: '12%', onClick: () => navigate('/admin/leads', { state: { filterStatus: '', cardInfo: { title: 'Total Clients', value: clients.length, color: '#3F51B5', trend: '12%', iconType: 'PeopleAlt' } } }) },
-    { title: "Today's Clients", value: clientsTodayCount, icon: <AddIcon />, color: '#14B8A6', trend: '24%', onClick: () => navigate('/admin/leads', { state: { filterStatus: '', cardInfo: { title: "Today's Clients", value: clientsTodayCount, color: '#14B8A6', trend: '24%', iconType: 'Add' } } }) },
-    { title: 'Total Inquiries', value: totalLeads, icon: <PeopleAltIcon />, color: '#8B5CF6', trend: '12%', onClick: () => navigate('/admin/leads', { state: { filterToday: false, filterStatus: '', cardInfo: { title: 'Total Inquiries', value: totalLeads, color: '#8B5CF6', trend: '12%', iconType: 'PeopleAlt' } } }) },
-    { title: "Today's Inquiries", value: todayLeadsCount, icon: <AddIcon />, color: '#EC4899', trend: '24%', onClick: () => navigate('/admin/leads', { state: { filterToday: true, filterStatus: '', cardInfo: { title: "Today's Inquiries", value: todayLeadsCount, color: '#EC4899', trend: '24%', iconType: 'Add' } } }) },
-    { title: 'Pending Payments', value: pendingPaymentsCount, icon: <PaymentsIcon />, color: '#F59E0B', trend: '-5%' },
-    { title: 'Total Revenue', value: formatAmount(currency === 'INR' ? convertAmount(revenueTotal, 'USD', 'INR') : revenueTotal), icon: <TrendingUpIcon />, color: '#22C55E', trend: '18%' },
-    { title: 'Active Projects', value: activeCasesCount, icon: <AssignmentIcon />, color: '#3B82F6', trend: '14%', onClick: () => navigate('/admin/leads', { state: { filterStatus: 'Under Process', cardInfo: { title: 'Active Projects', value: activeCasesCount, color: '#3B82F6', trend: '14%', iconType: 'Assignment' } } }) },
-    { title: 'Completed Projects', value: completedCasesCount, icon: <CheckCircleOutlinedIcon />, color: '#10B981', trend: '20%', onClick: () => navigate('/admin/leads', { state: { filterStatus: 'Completed', cardInfo: { title: 'Completed Projects', value: completedCasesCount, color: '#10B981', trend: '20%', iconType: 'CheckCircleOutlined' } } }) },
-    { title: 'Lost Inquiries', value: lostLeadsCount, icon: <WarningAmberIcon />, color: '#EF4444', trend: '2%', onClick: () => navigate('/admin/leads', { state: { filterStatus: 'Lost Lead', filterToday: false, cardInfo: { title: 'Lost Inquiries', value: lostLeadsCount, color: '#EF4444', trend: '2%', iconType: 'WarningAmber' } } }) },
-    { title: 'Revenue Today', value: formatAmount(currency === 'INR' ? convertAmount(revenueTodayTotal, 'USD', 'INR') : revenueTodayTotal), icon: <TrendingUpIcon />, color: '#14B8A6', trend: '8%' },
-    { title: 'Outstanding Revenue', value: formatAmount(currency === 'INR' ? convertAmount(outstandingRevenue, 'USD', 'INR') : outstandingRevenue), icon: <AccountBalanceWalletIcon />, color: '#F59E0B', trend: '-2%' },
-    { title: 'Refunded (Guarantee Claims)', value: formatAmount(currency === 'INR' ? convertAmount(refundedTotal, 'USD', 'INR') : refundedTotal), icon: <CancelIcon />, color: '#EF4444', trend: '4%' },
+    { title: 'Total Clients', value: clients.length, icon: <PeopleAltIcon />, color: '#3F51B5', trend: null, onClick: () => navigate('/admin/leads', { state: { filterStatus: '', cardInfo: { title: 'Total Clients', value: clients.length, color: '#3F51B5', trend: null, iconType: 'PeopleAlt' } } }) },
+    { title: "Today's Clients", value: clientsTodayCount, icon: <AddIcon />, color: '#14B8A6', trend: null, onClick: () => navigate('/admin/leads', { state: { filterStatus: '', cardInfo: { title: "Today's Clients", value: clientsTodayCount, color: '#14B8A6', trend: null, iconType: 'Add' } } }) },
+    { title: 'Total Inquiries', value: totalLeads, icon: <PeopleAltIcon />, color: '#8B5CF6', trend: null, onClick: () => navigate('/admin/leads', { state: { filterToday: false, filterStatus: '', cardInfo: { title: 'Total Inquiries', value: totalLeads, color: '#8B5CF6', trend: null, iconType: 'PeopleAlt' } } }) },
+    { title: "Today's Inquiries", value: todayLeadsCount, icon: <AddIcon />, color: '#EC4899', trend: null, onClick: () => navigate('/admin/leads', { state: { filterToday: true, filterStatus: '', cardInfo: { title: "Today's Inquiries", value: todayLeadsCount, color: '#EC4899', trend: null, iconType: 'Add' } } }) },
+    { title: 'Pending Payments', value: pendingPaymentsCount, icon: <PaymentsIcon />, color: '#F59E0B', trend: null },
+    { title: 'Total Revenue', value: formatAmount(currency === 'INR' ? convertAmount(revenueTotal, 'USD', 'INR') : revenueTotal), icon: <TrendingUpIcon />, color: '#22C55E', trend: null },
+    { title: 'Active Projects', value: activeCasesCount, icon: <AssignmentIcon />, color: '#3B82F6', trend: null, onClick: () => navigate('/admin/leads', { state: { filterStatus: 'Under Process', cardInfo: { title: 'Active Projects', value: activeCasesCount, color: '#3B82F6', trend: null, iconType: 'Assignment' } } }) },
+    { title: 'Completed Projects', value: completedCasesCount, icon: <CheckCircleOutlinedIcon />, color: '#10B981', trend: null, onClick: () => navigate('/admin/leads', { state: { filterStatus: 'Completed', cardInfo: { title: 'Completed Projects', value: completedCasesCount, color: '#10B981', trend: null, iconType: 'CheckCircleOutlined' } } }) },
+    { title: 'Lost Inquiries', value: lostLeadsCount, icon: <WarningAmberIcon />, color: '#EF4444', trend: null, onClick: () => navigate('/admin/leads', { state: { filterStatus: 'Lost Lead', filterToday: false, cardInfo: { title: 'Lost Inquiries', value: lostLeadsCount, color: '#EF4444', trend: null, iconType: 'WarningAmber' } } }) },
+    { title: 'Revenue Today', value: formatAmount(currency === 'INR' ? convertAmount(revenueTodayTotal, 'USD', 'INR') : revenueTodayTotal), icon: <TrendingUpIcon />, color: '#14B8A6', trend: null },
+    { title: 'Outstanding Revenue', value: formatAmount(currency === 'INR' ? convertAmount(outstandingRevenue, 'USD', 'INR') : outstandingRevenue), icon: <AccountBalanceWalletIcon />, color: '#F59E0B', trend: null },
+    { title: 'Refunded (Guarantee Claims)', value: formatAmount(currency === 'INR' ? convertAmount(refundedTotal, 'USD', 'INR') : refundedTotal), icon: <CancelIcon />, color: '#EF4444', trend: null },
   ];
 
   // CHART 1: Lead Source Chart
@@ -237,24 +237,43 @@ export const AdminDashboard = () => {
 
   const COLORS = ['#2563EB', '#14B8A6', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899', '#10B981', '#3B82F6'];
 
-  // CHART 2: Revenue Chart
-  const revenueData = [
-    { name: 'Jan', revenue: 12000, target: 10000 },
-    { name: 'Feb', revenue: 15500, target: 12000 },
-    { name: 'Mar', revenue: 19800, target: 15000 },
-    { name: 'Apr', revenue: 22000, target: 18000 },
-    { name: 'May', revenue: 31000, target: 22000 },
-    { name: 'Jun', revenue: revenueTotal, target: 25000 },
+  // CHART 2: Revenue Chart — computed dynamically from live database payments
+  const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const revenueByMonth = payments
+    .filter(p => (p.status === 'Paid' || p.status === 'Completed') && (p.paymentDate || p.paidAt || p.dueDate || p.createdAt))
+    .reduce((acc, p) => {
+      const d = new Date(p.paymentDate || p.paidAt || p.dueDate || p.createdAt);
+      if (isNaN(d.getTime())) return acc;
+      const key = `${d.getFullYear()}-${d.getMonth()}`;
+      if (!acc[key]) acc[key] = { name: `${monthNames[d.getMonth()]} ${d.getFullYear()}`, revenue: 0, target: 25000 };
+      acc[key].revenue += (p.totalPaid || p.amount || 0);
+      return acc;
+    }, {});
+  const dynamicRevenueList = Object.values(revenueByMonth).slice(-6);
+  const revenueData = dynamicRevenueList.length > 0 ? dynamicRevenueList : [
+    { name: monthNames[new Date().getMonth()], revenue: 0, target: 25000 }
   ];
 
-  // CHART 3: Monthly Conversion Chart
-  const conversionData = [
-    { name: 'Jan', rate: 45 },
-    { name: 'Feb', rate: 52 },
-    { name: 'Mar', rate: 58 },
-    { name: 'Apr', rate: 61 },
-    { name: 'May', rate: 68 },
-    { name: 'Jun', rate: 71 },
+  // CHART 3: Monthly Conversion Chart — computed dynamically from live database leads
+  const conversionByMonth = leads.reduce((acc, l) => {
+    const rawDate = l.createdDate || l.createdAt;
+    if (!rawDate) return acc;
+    const d = new Date(rawDate);
+    if (isNaN(d.getTime())) return acc;
+    const key = `${d.getFullYear()}-${d.getMonth()}`;
+    if (!acc[key]) acc[key] = { name: monthNames[d.getMonth()], total: 0, converted: 0 };
+    acc[key].total += 1;
+    if (l.clientId || l.status === 'Converted' || l.status === 'Completed' || l.status === 'Client') {
+      acc[key].converted += 1;
+    }
+    return acc;
+  }, {});
+  const dynamicConversionList = Object.values(conversionByMonth).slice(-6).map(m => ({
+    name: m.name,
+    rate: m.total > 0 ? Math.round((m.converted / m.total) * 100) : 0
+  }));
+  const conversionData = dynamicConversionList.length > 0 ? dynamicConversionList : [
+    { name: monthNames[new Date().getMonth()], rate: 0 }
   ];
 
   // CHART 4: Consultant Performance Chart
