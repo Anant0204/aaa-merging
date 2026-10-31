@@ -101,8 +101,8 @@ const SOCIAL_PLATFORMS = [
 import { SERVICES } from '../../constants/mockData';
 
 const QUICK_TEMPLATES = [
-  { id: 'aaa_greeting', label: 'Greet', text: 'Hello👋 \n\nWelcome to AAA Business Consultancy Services! \n\nWe’re here to help you with your Spain Visa, Residency & Relocation requirements. \n\nReply Hi to get started.' },
-  { id: 'booking_form', label: '⚡ Booking & Assessment Form', text: 'Hello! 🇪🇸✈️ Thank you for connecting with AAA Business Consultancy LLC.\n\nTo check your full eligibility for Spain Visa & Residency (Digital Nomad, NLV, Golden Visa) and schedule your consultation, please complete our quick assessment form here:\n👉 https://aaa-crm-service.netlify.app/#/public/lead-form?source=Social_Comment\n\nOur team looks forward to assisting you!' }
+  { id: 'kt_greeting', label: 'Greet', text: 'Hello! 👋\n\nWelcome to Kiaan Technology!\n\nWe provide modern IT Services, Custom Software Development, Web & Mobile App Solutions.\n\nHow can we help you today?' },
+  { id: 'booking_form', label: '⚡ Consultation & Project Form', text: 'Hello! 👋 Thank you for connecting with Kiaan Technology.\n\nTo share your project requirements and schedule a technical discovery session with our team, please complete our quick form here:\n👉 https://kiaantechnology.com/#/public/lead-form?source=Social_Message\n\nOur team looks forward to assisting you!' }
 ];
 
 const displayName = (name, phone) => {
