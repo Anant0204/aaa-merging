@@ -5,21 +5,22 @@
 const express = require('express');
 const router = express.Router();
 const aiEmployeeController = require('../controllers/aiEmployeeController');
-const { verifyToken, checkRole } = require('../middlewares/auth');
+const { authMiddleware, rbacMiddleware } = require('../middlewares/authMiddleware');
 
-// Public or token-verified access (allowing super_admin, admin, operations)
+// Roles permitted to view AI control center
 const allowedRoles = ['super_admin', 'admin', 'operations', 'marketing', 'consultant'];
 
-router.get('/overview', verifyToken, checkRole(allowedRoles), (req, res) => aiEmployeeController.getOverview(req, res));
-router.get('/agents', verifyToken, checkRole(allowedRoles), (req, res) => aiEmployeeController.getAgents(req, res));
-router.patch('/agents/:id/status', verifyToken, checkRole(['super_admin', 'admin']), (req, res) => aiEmployeeController.updateAgentStatus(req, res));
-router.post('/agents/:id/trigger', verifyToken, checkRole(allowedRoles), (req, res) => aiEmployeeController.triggerAgentNow(req, res));
+router.get('/overview', authMiddleware, rbacMiddleware(allowedRoles), (req, res) => aiEmployeeController.getOverview(req, res));
+router.get('/agents', authMiddleware, rbacMiddleware(allowedRoles), (req, res) => aiEmployeeController.getAgents(req, res));
+router.patch('/agents/:id/status', authMiddleware, rbacMiddleware(['super_admin', 'admin']), (req, res) => aiEmployeeController.updateAgentStatus(req, res));
+router.post('/agents/:id/trigger', authMiddleware, rbacMiddleware(allowedRoles), (req, res) => aiEmployeeController.triggerAgentNow(req, res));
 
-router.get('/tasks', verifyToken, checkRole(allowedRoles), (req, res) => aiEmployeeController.getTasks(req, res));
-router.get('/approvals', verifyToken, checkRole(allowedRoles), (req, res) => aiEmployeeController.getApprovals(req, res));
-router.post('/approvals/:id/decide', verifyToken, checkRole(['super_admin', 'admin', 'operations']), (req, res) => aiEmployeeController.decideApproval(req, res));
+router.get('/tasks', authMiddleware, rbacMiddleware(allowedRoles), (req, res) => aiEmployeeController.getTasks(req, res));
+router.get('/approvals', authMiddleware, rbacMiddleware(allowedRoles), (req, res) => aiEmployeeController.getApprovals(req, res));
+router.post('/approvals/:id/decide', authMiddleware, rbacMiddleware(['super_admin', 'admin', 'operations']), (req, res) => aiEmployeeController.decideApproval(req, res));
 
-router.get('/health', verifyToken, checkRole(allowedRoles), (req, res) => aiEmployeeController.getHealth(req, res));
-router.post('/ceo-briefing', verifyToken, checkRole(allowedRoles), (req, res) => aiEmployeeController.getCeoBriefing(req, res));
+router.get('/health', authMiddleware, rbacMiddleware(allowedRoles), (req, res) => aiEmployeeController.getHealth(req, res));
+router.post('/ceo-briefing', authMiddleware, rbacMiddleware(allowedRoles), (req, res) => aiEmployeeController.getCeoBriefing(req, res));
 
 module.exports = router;
+

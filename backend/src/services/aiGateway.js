@@ -192,9 +192,15 @@ class AiGateway {
           })
         });
         const data = await response.json();
-        textResponse = data.choices[0].message.content;
-        promptTokens = data.usage?.prompt_tokens || promptTokens;
-        completionTokens = data.usage?.completion_tokens || Math.ceil(textResponse.length / 4);
+        if (data.choices && data.choices[0]?.message?.content) {
+          textResponse = data.choices[0].message.content;
+          promptTokens = data.usage?.prompt_tokens || promptTokens;
+          completionTokens = data.usage?.completion_tokens || Math.ceil(textResponse.length / 4);
+        } else {
+          console.warn('[AiGateway] Groq response invalid or rate-limited. Falling back to internal engine.', data.error?.message || data);
+          parsedResult = this.generateFallbackResult(agentCode, taskType, contextData, userPrompt);
+          textResponse = JSON.stringify(parsedResult);
+        }
       } else if (provider === 'gemini') {
         const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${this.geminiKey}`, {
           method: 'POST',
@@ -205,9 +211,15 @@ class AiGateway {
           })
         });
         const data = await response.json();
-        textResponse = data.candidates[0].content.parts[0].text;
-        promptTokens = data.usageMetadata?.promptTokenCount || promptTokens;
-        completionTokens = data.usageMetadata?.candidatesTokenCount || Math.ceil(textResponse.length / 4);
+        if (data.candidates && data.candidates[0]?.content?.parts[0]?.text) {
+          textResponse = data.candidates[0].content.parts[0].text;
+          promptTokens = data.usageMetadata?.promptTokenCount || promptTokens;
+          completionTokens = data.usageMetadata?.candidatesTokenCount || Math.ceil(textResponse.length / 4);
+        } else {
+          console.warn('[AiGateway] Gemini response invalid or rate-limited. Falling back to internal engine.', data.error?.message || data);
+          parsedResult = this.generateFallbackResult(agentCode, taskType, contextData, userPrompt);
+          textResponse = JSON.stringify(parsedResult);
+        }
       } else if (provider === 'openai') {
         const response = await fetch('https://api.openai.com/v1/chat/completions', {
           method: 'POST',
@@ -226,9 +238,15 @@ class AiGateway {
           })
         });
         const data = await response.json();
-        textResponse = data.choices[0].message.content;
-        promptTokens = data.usage?.prompt_tokens || promptTokens;
-        completionTokens = data.usage?.completion_tokens || Math.ceil(textResponse.length / 4);
+        if (data.choices && data.choices[0]?.message?.content) {
+          textResponse = data.choices[0].message.content;
+          promptTokens = data.usage?.prompt_tokens || promptTokens;
+          completionTokens = data.usage?.completion_tokens || Math.ceil(textResponse.length / 4);
+        } else {
+          console.warn('[AiGateway] OpenAI response invalid or quota exceeded. Falling back to internal engine.', data.error?.message || data);
+          parsedResult = this.generateFallbackResult(agentCode, taskType, contextData, userPrompt);
+          textResponse = JSON.stringify(parsedResult);
+        }
       } else {
         // Fallback: Intelligent Deterministic IT CRM Engine
         parsedResult = this.generateFallbackResult(agentCode, taskType, contextData, userPrompt);
