@@ -4,9 +4,8 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from './contexts/AuthContext';
 import { ThemeModeProvider } from './contexts/ThemeContext';
 import { AlertProvider } from './contexts/AlertContext';
+import { CurrencyProvider } from './contexts/CurrencyContext';
 import AppRoutes from './routes/AppRoutes';
-
-
 
 // Create a client
 const queryClient = new QueryClient({
@@ -24,9 +23,11 @@ function App() {
       <QueryClientProvider client={queryClient}>
         <ThemeModeProvider>
           <AlertProvider>
-            <HashRouter>
-              <AppRoutes />
-            </HashRouter>
+            <CurrencyProvider>
+              <HashRouter>
+                <AppRoutes />
+              </HashRouter>
+            </CurrencyProvider>
           </AlertProvider>
         </ThemeModeProvider>
       </QueryClientProvider>

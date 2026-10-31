@@ -13,6 +13,7 @@ import ListItemText from '@mui/material/ListItemText';
 import Paper from '@mui/material/Paper';
 
 import { useAuth } from '../../hooks/useAuth';
+import { useCurrency } from '../../contexts/CurrencyContext';
 import PageHeader from '../../components/PageHeader';
 import StatCard from '../../components/StatCard';
 import AppCard from '../../components/AppCard';
@@ -32,6 +33,7 @@ import { SERVICES } from '../../constants/mockData';
 export const AgentDashboard = () => {
   const navigate = useNavigate();
   const { currentUser } = useAuth();
+  const { currency, currencySymbol, formatAmount, convertAmount } = useCurrency();
 
   const { data: allLeads = [] } = useQuery({ queryKey: ['leads'], queryFn: dbService.getLeads });
   const { data: allClients = [] } = useQuery({ queryKey: ['clients'], queryFn: dbService.getClients });
@@ -103,7 +105,7 @@ export const AgentDashboard = () => {
   const statsList = [
     { title: 'My Total Inquiries', value: totalConsultations, icon: <AssignmentIcon />, color: '#3F51B5', onClick: () => navigate('/agent/consultations', { state: { filterStatus: '', cardInfo: { title: 'My Total Inquiries', value: totalConsultations, color: '#3F51B5', iconType: 'Assignment' } } }) },
     { title: 'My Performance (%)', value: `${performancePercent}%`, icon: <TrendingUpIcon />, color: '#10B981' },
-    { title: 'Commission Earned', value: `€${commissionEarned.toLocaleString()}`, icon: <PaymentsIcon />, color: '#F59E0B' },
+    { title: 'Commission Earned', value: formatAmount(currency === 'INR' ? convertAmount(commissionEarned, 'USD', 'INR') : commissionEarned), icon: <PaymentsIcon />, color: '#F59E0B' },
     { title: 'My Active Projects', value: activeCases, icon: <AssignmentIcon />, color: '#3B82F6', onClick: () => navigate('/agent/leads', { state: { filterStatus: 'Active', cardInfo: { title: 'My Active Projects', value: activeCases, color: '#3B82F6', iconType: 'Assignment' } } }) },
     { title: 'Closed Cases', value: closedCases, icon: <CheckCircleOutlinedIcon />, color: '#22C55E', onClick: () => navigate('/agent/leads', { state: { filterStatus: 'Closed', cardInfo: { title: 'Closed Cases', value: closedCases, color: '#22C55E', iconType: 'CheckCircleOutlined' } } }) },
     { title: 'My Assigned Leads', value: myLeads.length, icon: <WarningAmberIcon />, color: '#EF4444', onClick: () => navigate('/agent/leads', { state: { filterStatus: '', filterToday: false, cardInfo: { title: 'My Assigned Leads', value: myLeads.length, color: '#EF4444', iconType: 'WarningAmber' } } }) }
@@ -221,7 +223,7 @@ export const AgentDashboard = () => {
           </Typography>
         </Box>
         <Typography variant="h3" color="amber.900" sx={{ fontWeight: 900 }}>
-          €{commissionEarned.toLocaleString()}
+          {formatAmount(currency === 'INR' ? convertAmount(commissionEarned, 'USD', 'INR') : commissionEarned)}
         </Typography>
       </Paper>
 

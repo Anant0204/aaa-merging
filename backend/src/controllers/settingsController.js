@@ -628,7 +628,58 @@ const purgeFinanceData = async (req, res) => {
   }
 };
 
-module.exports = { 
+
+let exchangeRatesCache = {
+  data: null,
+  timestamp: 0
+};
+
+const getExchangeRates = async (req, res) => {
+  const ONE_HOUR = 60 * 60 * 1000;
+  const now = Date.now();
+
+  if (exchangeRatesCache.data && (now - exchangeRatesCache.timestamp < ONE_HOUR)) {
+    return res.json({ success: true, cached: true, ...exchangeRatesCache.data });
+  }
+
+  try {
+    const response = await fetch('https://open.er-api.com/v6/latest/USD');
+    const data = await response.json();
+    if (data && data.result === 'success') {
+      const payload = {
+        base: 'USD',
+        usdToInr: data.rates?.INR || 86.5,
+        usdToEur: data.rates?.EUR || 0.90,
+        usdToAed: data.rates?.AED || 3.6725,
+        rates: {
+          USD: 1,
+          INR: data.rates?.INR || 86.5,
+          EUR: data.rates?.EUR || 0.90,
+          AED: data.rates?.AED || 3.6725
+        },
+        timeLastUpdateUtc: data.time_last_update_utc || new Date().toISOString()
+      };
+      exchangeRatesCache = { data: payload, timestamp: now };
+      return res.json({ success: true, cached: false, ...payload });
+    }
+  } catch (err) {
+    console.warn('[Exchange Rates API Error] Falling back to default rates:', err.message);
+  }
+
+  const fallback = {
+    base: 'USD',
+    usdToInr: 86.50,
+    usdToEur: 0.90,
+    usdToAed: 3.6725,
+    rates: { USD: 1, INR: 86.50, EUR: 0.90, AED: 3.6725 },
+    timeLastUpdateUtc: new Date().toISOString(),
+    isFallback: true
+  };
+  return res.json({ success: true, ...fallback });
+};
+
+module.exports = {
+  getExchangeRates, 
   getCustomizationSettings, 
   updateCustomizationSettings,
   getCustomization: () => DEFAULT_CUSTOMIZATION,

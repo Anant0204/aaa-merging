@@ -60,12 +60,14 @@ import TwitterIcon from '@mui/icons-material/Twitter';
 import PinterestIcon from '@mui/icons-material/Pinterest';
 import RateReviewIcon from '@mui/icons-material/RateReview';
 import SmartToyIcon from '@mui/icons-material/SmartToy';
+import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
 import ChatIcon from '@mui/icons-material/Chat';
 import { io } from 'socket.io-client';
 
 // Contexts & Hooks
 import { useThemeMode } from '../contexts/ThemeContext';
 import { useAlert } from '../contexts/AlertContext';
+import { useCurrency } from '../contexts/CurrencyContext';
 import { useAuth } from '../hooks/useAuth';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { dbService } from '../services/dbService';
@@ -182,6 +184,7 @@ export const DashboardLayout = () => {
   const { mode, toggleTheme } = useThemeMode();
   const { currentUser, changeRole, logout, isAdmin, isConsultant, isFinance, isOperations } = useAuth();
   const { showAlert } = useAlert();
+  const { currency, currencySymbol, toggleCurrency, exchangeRate } = useCurrency();
   const navigate = useNavigate();
   const location = useLocation();
   const queryClient = useQueryClient();
@@ -440,6 +443,7 @@ export const DashboardLayout = () => {
     if (item.path === '/integrations') return '/integrations';
     if (item.path === '/settings') return '/settings';
     if (item.path === '/reviews') return '/reviews';
+    if (item.path === '/ai-employees') return '/ai-employees';
 
     if (item.path.startsWith(`/${prefix}`)) return item.path;
 
@@ -473,6 +477,12 @@ export const DashboardLayout = () => {
       label: 'Dashboard',
       icon: <DashboardIcon />,
       path: '/dashboard',
+      roles: ['admin', 'consultant', 'operations', 'finance', 'super_admin', 'marketing'],
+    },
+    {
+      label: 'AI Employees (24/7)',
+      icon: <SmartToyIcon sx={{ color: '#2563EB' }} />,
+      path: '/ai-employees',
       roles: ['admin', 'consultant', 'operations', 'finance', 'super_admin', 'marketing'],
     },
     {
@@ -1163,6 +1173,38 @@ export const DashboardLayout = () => {
                 <MenuItem value="Urdu">UR 🇵🇰</MenuItem>
               </Select>
             </FormControl>
+
+            {/* Quick Live Currency Switcher (USD $ / INR ₹) */}
+            <Tooltip title={`Active Currency: ${currency} (${currencySymbol}) • Live Rate: 1 USD = ₹${exchangeRate.toFixed(2)} INR (open.er-api.com) • Click to switch to ${currency === 'USD' ? 'INR (₹)' : 'USD ($)'}`}>
+              <Box
+                onClick={toggleCurrency}
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 0.6,
+                  px: 1.2,
+                  height: 32,
+                  borderRadius: 2,
+                  cursor: 'pointer',
+                  userSelect: 'none',
+                  bgcolor: currency === 'INR' ? '#DCFCE7' : '#EFF6FF',
+                  border: '1.5px solid',
+                  borderColor: currency === 'INR' ? '#86EFAC' : '#BFDBFE',
+                  color: currency === 'INR' ? '#166534' : '#1E40AF',
+                  boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
+                  transition: 'all 0.15s ease',
+                  '&:hover': {
+                    transform: 'translateY(-1px)',
+                    boxShadow: '0 3px 8px rgba(0,0,0,0.1)'
+                  }
+                }}
+              >
+                <Typography sx={{ fontSize: '0.78rem', fontWeight: 800, letterSpacing: '0.02em', display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                  {currency === 'INR' ? '🇮🇳 ₹ INR' : '🇺🇸 $ USD'}
+                </Typography>
+                <SwapHorizIcon sx={{ fontSize: 16, opacity: 0.8 }} />
+              </Box>
+            </Tooltip>
 
             {/* Quick Role Switcher removed from header - available on Login page */}
 

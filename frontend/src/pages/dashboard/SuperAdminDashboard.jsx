@@ -19,6 +19,7 @@ import MenuItem from '@mui/material/MenuItem';
 
 import { useAuth } from '../../hooks/useAuth';
 import { useAlert } from '../../contexts/AlertContext';
+import { useCurrency } from '../../contexts/CurrencyContext';
 import { dbService } from '../../services/dbService';
 
 // Recharts components
@@ -67,6 +68,7 @@ export const SuperAdminDashboard = () => {
   const { isConsultant, isFinance, isAdmin, isOperations, currentUser, isViewOnlyMenu } = useAuth();
   const queryClient = useQueryClient();
   const { showAlert } = useAlert();
+  const { currency, currencySymbol, formatAmount, convertAmount, exchangeRate } = useCurrency();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [startDate, setStartDate] = useState('');
@@ -468,12 +470,12 @@ export const SuperAdminDashboard = () => {
     },
     {
       title: 'Total Revenue',
-      value: `€${revenueInRange.toLocaleString()}`,
+      value: formatAmount(currency === 'INR' ? convertAmount(revenueInRange, 'USD', 'INR') : revenueInRange),
       icon: <TrendingUpIcon />,
       color: '#22C55E',
       trend: getTrend(revenueInRange, revenueInPrevRange),
       trendLabel: period.trendLabel,
-      onClick: () => navigate('/payments/invoices', { state: { filterStatus: 'Paid', startDate: period.start, endDate: period.end, cardInfo: { title: 'Total Revenue', value: `€${revenueInRange.toLocaleString()}`, color: '#22C55E', trend: getTrend(revenueInRange, revenueInPrevRange), iconType: 'TrendingUp' } } })
+      onClick: () => navigate('/payments/invoices', { state: { filterStatus: 'Paid', startDate: period.start, endDate: period.end, cardInfo: { title: 'Total Revenue', value: formatAmount(currency === 'INR' ? convertAmount(revenueInRange, 'USD', 'INR') : revenueInRange), color: '#22C55E', trend: getTrend(revenueInRange, revenueInPrevRange), iconType: 'TrendingUp' } } })
     },
     {
       title: 'Active Projects',
@@ -562,10 +564,10 @@ export const SuperAdminDashboard = () => {
   const outstandingRevenue = (Array.isArray(payments) ? payments : []).filter(p => p && (p.status === 'Pending' || p.status === 'Pending Payment')).reduce((s, p) => s + (Number(p.amount) || 0), 0);
   const refundedRevenue = totalRefundsAmount;
   const revenueStats = [
-    { title: 'Total Revenue', value: `€${totalRevenue.toLocaleString()}`, icon: <AccountBalanceWalletIcon />, color: '#3F51B5', trend: null, onClick: () => navigate('/payments/invoices', { state: { filterStatus: 'Paid' } }) },
-    { title: 'Revenue Today', value: `€${revenueToday.toLocaleString()}`, icon: <TrendingUpIcon />, color: '#14B8A6', trend: null, onClick: () => navigate('/payments/invoices', { state: { filterStatus: 'Paid', startDate: todayDateStr, endDate: todayDateStr } }) },
-    { title: 'Outstanding Revenue', value: `€${outstandingRevenue.toLocaleString()}`, icon: <AccountBalanceWalletIcon />, color: '#F59E0B', trend: null, onClick: () => navigate('/payments/invoices', { state: { filterStatus: 'Pending' } }) },
-    { title: 'Refunded (Guarantee Claims)', value: `€${refundedRevenue.toLocaleString()}`, icon: <CancelIcon />, color: '#EF4444', trend: null, onClick: () => navigate('/super_admin/payments/refund-commission') },
+    { title: 'Total Revenue', value: formatAmount(currency === 'INR' ? convertAmount(totalRevenue, 'USD', 'INR') : totalRevenue), icon: <AccountBalanceWalletIcon />, color: '#3F51B5', trend: null, onClick: () => navigate('/payments/invoices', { state: { filterStatus: 'Paid' } }) },
+    { title: 'Revenue Today', value: formatAmount(currency === 'INR' ? convertAmount(revenueToday, 'USD', 'INR') : revenueToday), icon: <TrendingUpIcon />, color: '#14B8A6', trend: null, onClick: () => navigate('/payments/invoices', { state: { filterStatus: 'Paid', startDate: todayDateStr, endDate: todayDateStr } }) },
+    { title: 'Outstanding Revenue', value: formatAmount(currency === 'INR' ? convertAmount(outstandingRevenue, 'USD', 'INR') : outstandingRevenue), icon: <AccountBalanceWalletIcon />, color: '#F59E0B', trend: null, onClick: () => navigate('/payments/invoices', { state: { filterStatus: 'Pending' } }) },
+    { title: 'Refunded (Guarantee Claims)', value: formatAmount(currency === 'INR' ? convertAmount(refundedRevenue, 'USD', 'INR') : refundedRevenue), icon: <CancelIcon />, color: '#EF4444', trend: null, onClick: () => navigate('/super_admin/payments/refund-commission') },
   ];
 
   // FINANCIAL TABLE — from real clients + payments
@@ -582,9 +584,9 @@ export const SuperAdminDashboard = () => {
       client: `${c.firstName || ''} ${c.lastName || ''}`.trim(),
       service: c.serviceType || c.serviceId || '—',
       consultant: c.assignedTo?.fullName || '—',
-      totalFee: `€${totalFee.toLocaleString()}`,
-      paid: `€${paid.toLocaleString()}`,
-      balance: `€${balance.toLocaleString()}`,
+      totalFee: formatAmount(currency === 'INR' ? convertAmount(totalFee, 'USD', 'INR') : totalFee),
+      paid: formatAmount(currency === 'INR' ? convertAmount(paid, 'USD', 'INR') : paid),
+      balance: formatAmount(currency === 'INR' ? convertAmount(balance, 'USD', 'INR') : balance),
       paymentStatus
     };
   });
@@ -750,7 +752,7 @@ export const SuperAdminDashboard = () => {
               {loadingBrief ? (
                 <Box sx={{ py: 3, display: 'flex', flexDirection: 'column', gap: 1.5 }}>
                   <Typography variant="body1" sx={{ color: 'rgba(255, 255, 255, 0.7)', fontStyle: 'italic', display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <span style={{ display: 'inline-block', animation: 'spin 1.5s linear infinite' }}>🔄</span> Scanning active leads, consultations, and payment logs...
+                    <span style={{ display: 'inline-block', animation: 'spin 1.5s linear infinite' }}>🔄</span> Scanning active leads, software projects, and revenue logs...
                   </Typography>
                   <style>
                     {`
@@ -987,8 +989,8 @@ export const SuperAdminDashboard = () => {
                 <YAxis fontSize={12} />
                 <ChartTooltip />
                 <Legend />
-                <Bar dataKey="earned" name="Commission Earned (€)" fill="#2563EB" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="paid" name="Commission Paid (€)" fill="#10B981" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="earned" name={`Commission Earned (${currencySymbol})`} fill="#2563EB" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="paid" name={`Commission Paid (${currencySymbol})`} fill="#10B981" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </ChartCard>
@@ -1051,10 +1053,10 @@ export const SuperAdminDashboard = () => {
                 <CartesianGrid strokeDasharray="3 3" vertical={false} />
                 <XAxis dataKey="name" stroke="#94A3B8" fontSize={11} />
                 <YAxis stroke="#94A3B8" fontSize={11} />
-                <ChartTooltip formatter={(value) => [`€${value}`, 'Revenue']} />
+                <ChartTooltip formatter={(value) => [`${currencySymbol}${Number(value).toLocaleString()}`, 'Revenue']} />
                 <Legend iconSize={8} iconType="circle" />
-                <Area type="monotone" dataKey="revenue" name="Actual Revenue (€)" stroke="#2563EB" strokeWidth={2.5} fillOpacity={1} fill="url(#colorRevenue)" />
-                <Area type="monotone" dataKey="target" name="Target Revenue (€)" stroke="#94A3B8" strokeWidth={1.5} strokeDasharray="5 5" fill="none" />
+                <Area type="monotone" dataKey="revenue" name={`Actual Revenue (${currencySymbol})`} stroke="#2563EB" strokeWidth={2.5} fillOpacity={1} fill="url(#colorRevenue)" />
+                <Area type="monotone" dataKey="target" name={`Target Revenue (${currencySymbol})`} stroke="#94A3B8" strokeWidth={1.5} strokeDasharray="5 5" fill="none" />
               </AreaChart>
             </ResponsiveContainer>
           </ChartCard>

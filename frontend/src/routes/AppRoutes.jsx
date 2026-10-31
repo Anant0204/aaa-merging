@@ -997,6 +997,49 @@ export const AppRoutes = () => {
         />
 
         {/* Reviews & Reputation (Super Admin, Admin, Operations, Marketing) */}
+        
+        {/* 7 Autonomous AI Employees Control Center */}
+        <Route
+          path="/ai-employees"
+          element={
+            <ProtectedRoute allowedRoles={['admin', 'super_admin', 'operations', 'marketing', 'consultant']}>
+              <AiEmployeeControlCenter />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/super_admin/ai-employees"
+          element={
+            <ProtectedRoute allowedRoles={['super_admin', 'admin']}>
+              <AiEmployeeControlCenter />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/ai-employees"
+          element={
+            <ProtectedRoute allowedRoles={['admin', 'super_admin']}>
+              <AiEmployeeControlCenter />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/operations/ai-employees"
+          element={
+            <ProtectedRoute allowedRoles={['operations', 'super_admin']}>
+              <AiEmployeeControlCenter />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/:rolePrefix/ai-employees"
+          element={
+            <ProtectedRoute allowedRoles={['admin', 'super_admin', 'operations', 'marketing', 'consultant']}>
+              <AiEmployeeControlCenter />
+            </ProtectedRoute>
+          }
+        />
+
         <Route
           path="/reviews"
           element={
