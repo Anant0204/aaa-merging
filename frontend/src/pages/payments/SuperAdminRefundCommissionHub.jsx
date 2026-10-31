@@ -425,7 +425,7 @@ export const SuperAdminRefundCommissionHub = () => {
     <Box>
       <PageHeader
         title="Refund & Commission Hub"
-        subtitle="Manage consultant commission percentages, track payouts, request service refunds, and audit visa rejections."
+        subtitle="Manage solutions consultant commission percentages, track payouts, request service refunds, and audit milestone guarantees."
       />
 
       <Tabs
@@ -749,7 +749,7 @@ export const SuperAdminRefundCommissionHub = () => {
                           />
                         </TableCell>
                         <TableCell>
-                          <Chip label={ref.category} variant="outlined" color={ref.category === 'Visa Rejection' ? 'error' : 'default'} size="small" sx={{ fontWeight: 700 }} />
+                          <Chip label={ref.category} variant="outlined" color={ref.category === 'Milestone Guarantee Claim' ? 'error' : 'default'} size="small" sx={{ fontWeight: 700 }} />
                         </TableCell>
                         <TableCell sx={{ fontWeight: 700, color: 'error.main' }}>€{(Number(ref.amount) || 0).toLocaleString()}</TableCell>
                         <TableCell sx={{ fontWeight: 600, whiteSpace: 'nowrap' }}>{formatDateDDMMYYYY(ref.date || ref.createdAt)}</TableCell>

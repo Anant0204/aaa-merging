@@ -210,13 +210,13 @@ export const OperationsDashboard = () => {
   const statsList = [
     { title: 'Total Clients', value: clients.length, icon: <PeopleAltIcon />, color: '#3F51B5', trend: '12%', onClick: () => navigate('/operations/leads', { state: { filterStatus: '', cardInfo: { title: 'Total Clients', value: clients.length, color: '#3F51B5', trend: '12%', iconType: 'PeopleAlt' } } }) },
     { title: "Today's Clients", value: clientsTodayCount, icon: <AddIcon />, color: '#14B8A6', trend: '24%', onClick: () => navigate('/operations/leads', { state: { filterStatus: '', cardInfo: { title: "Today's Clients", value: clientsTodayCount, color: '#14B8A6', trend: '24%', iconType: 'Add' } } }) },
-    { title: 'Total Consultations', value: totalLeads, icon: <PeopleAltIcon />, color: '#8B5CF6', trend: '12%', onClick: () => navigate('/operations/leads', { state: { filterToday: false, filterStatus: '', cardInfo: { title: 'Total Consultations', value: totalLeads, color: '#8B5CF6', trend: '12%', iconType: 'PeopleAlt' } } }) },
-    { title: "Today's Consultations", value: todayLeadsCount, icon: <AddIcon />, color: '#EC4899', trend: '24%', onClick: () => navigate('/operations/leads', { state: { filterToday: true, filterStatus: '', cardInfo: { title: "Today's Consultations", value: todayLeadsCount, color: '#EC4899', trend: '24%', iconType: 'Add' } } }) },
+    { title: 'Total Inquiries', value: totalLeads, icon: <PeopleAltIcon />, color: '#8B5CF6', trend: '12%', onClick: () => navigate('/operations/leads', { state: { filterToday: false, filterStatus: '', cardInfo: { title: 'Total Inquiries', value: totalLeads, color: '#8B5CF6', trend: '12%', iconType: 'PeopleAlt' } } }) },
+    { title: "Today's Inquiries", value: todayLeadsCount, icon: <AddIcon />, color: '#EC4899', trend: '24%', onClick: () => navigate('/operations/leads', { state: { filterToday: true, filterStatus: '', cardInfo: { title: "Today's Inquiries", value: todayLeadsCount, color: '#EC4899', trend: '24%', iconType: 'Add' } } }) },
     { title: 'Pending Payments', value: pendingPaymentsCount, icon: <PaymentsIcon />, color: '#F59E0B', trend: '-5%' },
     { title: 'Total Revenue', value: `€${revenueTotal.toLocaleString()}`, icon: <TrendingUpIcon />, color: '#22C55E', trend: '18%' },
-    { title: 'Active Cases', value: activeCasesCount, icon: <AssignmentIcon />, color: '#3B82F6', trend: '14%', onClick: () => navigate('/operations/leads', { state: { filterStatus: 'Under Process', cardInfo: { title: 'Active Cases', value: activeCasesCount, color: '#3B82F6', trend: '14%', iconType: 'Assignment' } } }) },
-    { title: 'Completed Cases', value: completedCasesCount, icon: <CheckCircleOutlinedIcon />, color: '#10B981', trend: '20%', onClick: () => navigate('/operations/leads', { state: { filterStatus: 'Completed', cardInfo: { title: 'Completed Cases', value: completedCasesCount, color: '#10B981', trend: '20%', iconType: 'CheckCircleOutlined' } } }) },
-    { title: 'Lost Consultations', value: lostLeadsCount, icon: <WarningAmberIcon />, color: '#EF4444', trend: '2%', onClick: () => navigate('/operations/leads', { state: { filterStatus: 'Lost Lead', filterToday: false, cardInfo: { title: 'Lost Consultations', value: lostLeadsCount, color: '#EF4444', trend: '2%', iconType: 'WarningAmber' } } }) },
+    { title: 'Active Projects', value: activeCasesCount, icon: <AssignmentIcon />, color: '#3B82F6', trend: '14%', onClick: () => navigate('/operations/leads', { state: { filterStatus: 'Under Process', cardInfo: { title: 'Active Projects', value: activeCasesCount, color: '#3B82F6', trend: '14%', iconType: 'Assignment' } } }) },
+    { title: 'Completed Projects', value: completedCasesCount, icon: <CheckCircleOutlinedIcon />, color: '#10B981', trend: '20%', onClick: () => navigate('/operations/leads', { state: { filterStatus: 'Completed', cardInfo: { title: 'Completed Projects', value: completedCasesCount, color: '#10B981', trend: '20%', iconType: 'CheckCircleOutlined' } } }) },
+    { title: 'Lost Inquiries', value: lostLeadsCount, icon: <WarningAmberIcon />, color: '#EF4444', trend: '2%', onClick: () => navigate('/operations/leads', { state: { filterStatus: 'Lost Lead', filterToday: false, cardInfo: { title: 'Lost Inquiries', value: lostLeadsCount, color: '#EF4444', trend: '2%', iconType: 'WarningAmber' } } }) },
     { title: 'Revenue Today', value: `€${revenueTodayTotal.toLocaleString()}`, icon: <TrendingUpIcon />, color: '#14B8A6', trend: '8%' },
     { title: 'Outstanding Revenue', value: `€${outstandingRevenue.toLocaleString()}`, icon: <AccountBalanceWalletIcon />, color: '#F59E0B', trend: '-2%' },
     { title: 'Refunded (Guarantee Claims)', value: `€${refundedTotal.toLocaleString()}`, icon: <CancelIcon />, color: '#EF4444', trend: '4%' },
@@ -276,7 +276,7 @@ export const OperationsDashboard = () => {
       render: (row) => `${row.firstName} ${row.lastName}` },
     {
       id: 'service',
-      label: 'Visa Service',
+      label: 'IT Service',
       render: (row) => SERVICES.find((s) => s.id === row.serviceId)?.name || row.serviceId 
     },
     { id: 'status', label: 'Status' },
@@ -288,7 +288,7 @@ export const OperationsDashboard = () => {
     <Box>
       <PageHeader
         title="Operations Dashboard"
-        subtitle="Operational metrics tracking for AAA Business Consultancy Spain Visa Operations."
+        subtitle="Operational engineering metrics and project delivery tracking for Kiaan Technology."
         action={
           !isViewOnly && (
             <Button variant="contained" color="primary" startIcon={<AddIcon />} onClick={() => navigate('/operations/leads')}>
@@ -398,7 +398,7 @@ export const OperationsDashboard = () => {
 
         {/* Monthly Conversion Rate */}
         <Box className="col-span-1">
-          <ChartCard title="Visa Conversion Efficiency" subheader="Percentage of leads successfully onboarding as clients">
+          <ChartCard title="Deal Conversion Efficiency" subheader="Percentage of qualified leads converted to active project clients">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={conversionData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <defs>
@@ -419,7 +419,7 @@ export const OperationsDashboard = () => {
 
         {/* Consultant Performance Chart */}
         <Box className="col-span-1">
-          <ChartCard title="Agent Leaderboard" subheader="Active cases handled vs conversion efficiency">
+          <ChartCard title="Team Leaderboard" subheader="Active projects delivered vs conversion rate">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={performanceData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} />
@@ -427,7 +427,7 @@ export const OperationsDashboard = () => {
                 <YAxis stroke="#94A3B8" fontSize={11} />
                 <ChartTooltip />
                 <Legend iconSize={8} iconType="circle" />
-                <Bar dataKey="cases" name="Cases Handled" fill="#2563EB" radius={[4, 4, 0, 0]} barSize={16} />
+                <Bar dataKey="cases" name="Projects Handled" fill="#2563EB" radius={[4, 4, 0, 0]} barSize={16} />
                 <Bar dataKey="rate" name="Conversion Rate (%)" fill="#14B8A6" radius={[4, 4, 0, 0]} barSize={16} />
               </BarChart>
             </ResponsiveContainer>

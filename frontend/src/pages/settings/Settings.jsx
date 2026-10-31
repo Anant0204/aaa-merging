@@ -712,7 +712,7 @@ export const Settings = () => {
         sx={{ borderBottom: '1px solid', borderColor: 'divider', mb: 4, width: '100%' }}
       >
         <Tab icon={<BusinessIcon />} iconPosition="start" label="General Info" sx={{ fontWeight: 700, minHeight: 48 }} />
-        <Tab icon={<MonetizationOnIcon />} iconPosition="start" label="Visa Settings" sx={{ fontWeight: 700, minHeight: 48 }} />
+        <Tab icon={<MonetizationOnIcon />} iconPosition="start" label="IT Service Settings" sx={{ fontWeight: 700, minHeight: 48 }} />
         <Tab icon={<CardMembershipIcon />} iconPosition="start" label="Relocation Packages" sx={{ fontWeight: 700, minHeight: 48 }} />
         <Tab icon={<PaymentIcon />} iconPosition="start" label="Stripe Config" sx={{ fontWeight: 700, minHeight: 48 }} />
         <Tab icon={<GTranslateIcon />} iconPosition="start" label="Sworn Translation" sx={{ fontWeight: 700, minHeight: 48 }} />
@@ -1001,8 +1001,8 @@ export const Settings = () => {
       {/* TAB 1: VISA SETTINGS */}
       {activeTab === 1 && (
         <AppCard
-          title="Visa Services & Pathway Pricing"
-          subheader="Configure base processing and application fees for Spain residency and study visa streams."
+          title="IT Services & Package Pricing"
+          subheader="Configure base engineering and service fees for custom software, web/mobile, and cloud solutions."
           action={
             <Button
               variant="contained"
@@ -1024,7 +1024,7 @@ export const Settings = () => {
               <Box className="grid grid-cols-12 gap-5" alignItems="center">
                 <Box className="col-span-12 sm:col-span-4">
                   <TextField
-                    label="Visa Pathway Name"
+                    label="IT Service Name"
                     value={newServiceName}
                     onChange={(e) => setNewServiceName(e.target.value)}
                     placeholder="e.g. Golden Visa Investment"

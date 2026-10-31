@@ -475,20 +475,20 @@ export const DashboardLayout = () => {
       roles: ['admin', 'consultant', 'operations', 'finance', 'super_admin', 'marketing'],
     },
     {
-      label: 'Agents',
+      label: 'Team',
       icon: <GroupsIcon />,
       path: '/agents',
       roles: ['admin', 'operations', 'super_admin'],
     },
     {
-      label: 'Active Cases',
+      label: 'Projects',
       icon: <GroupsIcon />,
       path: '/active-cases',
       roles: ['admin', 'operations', 'super_admin'],
     },
 
     {
-      label: 'Closed Cases',
+      label: 'Archived Projects',
       icon: <AssignmentTurnedInIcon />,
       path: '/closed-cases',
       roles: ['admin', 'operations', 'super_admin'],
@@ -530,7 +530,7 @@ export const DashboardLayout = () => {
       roles: ['admin', 'consultant', 'operations', 'super_admin'],
     },
     {
-      label: 'All Agents Performance',
+      label: 'Team Performance',
       icon: <AssessmentIcon />,
       path: '/agents/performance',
       roles: ['admin', 'operations', 'super_admin'],

@@ -71,9 +71,9 @@ import useAuth from '../../hooks/useAuth';
 
 const AVAILABLE_MENUS = [
   'Dashboard',
-  'Agents',
-  'Active Cases',
-  'Closed Cases',
+  'Team',
+  'Active Projects',
+  'Archived Projects',
   'Clients',
   'Leads',
   'Social Inbox',
@@ -87,13 +87,13 @@ const AVAILABLE_MENUS = [
 const AVAILABLE_CARDS = [
   'Total Clients',
   'Today\'s Clients',
-  'Total Consultations',
-  'Today\'s Consultations',
+  'Total Inquiries',
+  'Today\'s Inquiries',
   'Pending Payments',
   'Total Revenue',
-  'Active Cases',
-  'Completed Cases',
-  'Lost Consultations',
+  'Active Projects',
+  'Completed Projects',
+  'Lost Inquiries',
   'Revenue Today',
   'Outstanding Revenue',
   'Refunded (Guarantee Claims)'
@@ -131,17 +131,17 @@ const ALL_CLIENT_COLUMNS = [
   { id: 'clientCode', label: 'Client ID' },
   { id: 'name', label: 'Name' },
   { id: 'nationality', label: 'Nationality' },
-  { id: 'service', label: 'Target Visa' },
+  { id: 'service', label: 'Service Category' },
   { id: 'package', label: 'Selected Package' },
   { id: 'status', label: 'Billing Status' },
-  { id: 'visaStatus', label: 'Immigration Progress' },
+  { id: 'projectStage', label: 'Project Delivery Stage' },
   { id: 'assignedConsultant', label: 'Case Manager' }
 ];
 
 const DEFAULT_ACTIONS = {
   leads: { canCreate: true, canDelete: true, canAssignAgent: true },
   clients: {
-    canChangeVisaStatus: true,
+    canChangeProjectStatus: true,
     canVerifyDocs: true,
     canDelete: true,
     canManageCredentials: true,
@@ -166,16 +166,16 @@ const DEFAULT_COLUMNS = {
 
 const DEFAULT_CUSTOMIZATION = {
   admin: {
-    menus: ['Dashboard', 'Agents', 'Active Cases', 'Closed Cases', 'Clients', 'Leads', 'Social Inbox', 'Marketing', 'Calendar', 'Customization', 'General Settings'],
-    cards: ['Total Consultations', 'Today\'s Consultations', 'Pending Payments', 'Revenue Closed'],
+    menus: ['Dashboard', 'Team', 'Active Projects', 'Archived Projects', 'Clients', 'Leads', 'Social Inbox', 'Marketing', 'Calendar', 'Customization', 'General Settings'],
+    cards: ['Total Inquiries', 'Today\'s Inquiries', 'Pending Payments', 'Revenue Closed'],
     viewOnlyMenus: [],
     features: ['canEditTranslationRates', 'canManagePaymentSettings'],
     actions: JSON.parse(JSON.stringify(DEFAULT_ACTIONS)),
     columns: JSON.parse(JSON.stringify(DEFAULT_COLUMNS))
   },
   operations: {
-    menus: ['Dashboard', 'Active Cases', 'Closed Cases', 'Clients', 'Calendar', 'General Settings'],
-    cards: ['Active Cases', 'Closed Cases'],
+    menus: ['Dashboard', 'Active Projects', 'Archived Projects', 'Clients', 'Calendar', 'General Settings'],
+    cards: ['Active Projects', 'Archived Projects'],
     viewOnlyMenus: [],
     features: [],
     actions: JSON.parse(JSON.stringify(DEFAULT_ACTIONS)),
@@ -191,7 +191,7 @@ const DEFAULT_CUSTOMIZATION = {
   },
   consultant: {
     menus: ['Dashboard', 'Leads', 'Clients', 'Calendar'],
-    cards: ['Total Consultations', 'Today\'s Consultations'],
+    cards: ['Total Inquiries', 'Today\'s Inquiries'],
     viewOnlyMenus: [],
     features: [],
     actions: JSON.parse(JSON.stringify(DEFAULT_ACTIONS)),
@@ -199,7 +199,7 @@ const DEFAULT_CUSTOMIZATION = {
   },
   marketing: {
     menus: ['Dashboard', 'Leads', 'Marketing', 'General Settings'],
-    cards: ['Total Consultations', 'Today\'s Consultations'],
+    cards: ['Total Inquiries', 'Today\'s Inquiries'],
     viewOnlyMenus: [],
     features: [],
     actions: JSON.parse(JSON.stringify(DEFAULT_ACTIONS)),
@@ -259,16 +259,16 @@ export const SuperAdminCustomization = () => {
     { id: 'admin', label: 'Admin (General Manager)' },
     { id: 'operations', label: 'Operations Admin' },
     { id: 'finance', label: 'Finance Officer' },
-    { id: 'consultant', label: 'Consultant / Visa Agent' },
+    { id: 'consultant', label: 'Project Lead / Account Mgr' },
     { id: 'marketing', label: 'Marketing Executive' }
   ]).filter(r => r.id !== 'finance');
 
-  // Top level tabs: 0 = Role Permissions, 1 = Stage Manager, 2 = Visa Document Checklists
+  // Top level tabs: 0 = Role Permissions, 1 = Stage Manager, 2 = Project Deliverables Checklists
   const [topTab, setTopTab] = useState(0);
   const [activeTab, setActiveTab] = useState(0);
   const currentRoleId = dynamicRoles[activeTab]?.id || 'admin';
 
-  const [selectedVisaId, setSelectedVisaId] = useState('dnv');
+  const [selectedServiceId, setSelectedVisaId] = useState('dnv');
   const [newDocText, setNewDocText] = useState({
     main: '',
     spouse: '',
@@ -736,7 +736,7 @@ export const SuperAdminCustomization = () => {
     if (!docName) return;
 
     const checklists = localSettings.documentChecklists || {};
-    const serviceChecklist = checklists[selectedVisaId] || {};
+    const serviceChecklist = checklists[selectedServiceId] || {};
     const categoryList = serviceChecklist[category] || [];
 
     if (categoryList.includes(docName)) {
@@ -746,7 +746,7 @@ export const SuperAdminCustomization = () => {
 
     const updatedChecklist = {
       ...checklists,
-      [selectedVisaId]: {
+      [selectedServiceId]: {
         ...serviceChecklist,
         [category]: [...categoryList, docName]
       }
@@ -762,12 +762,12 @@ export const SuperAdminCustomization = () => {
 
   const handleRemoveDoc = (category, docName) => {
     const checklists = localSettings.documentChecklists || {};
-    const serviceChecklist = checklists[selectedVisaId] || {};
+    const serviceChecklist = checklists[selectedServiceId] || {};
     const categoryList = serviceChecklist[category] || [];
 
     const updatedChecklist = {
       ...checklists,
-      [selectedVisaId]: {
+      [selectedServiceId]: {
         ...serviceChecklist,
         [category]: categoryList.filter(d => d !== docName)
       }
@@ -1077,7 +1077,7 @@ export const SuperAdminCustomization = () => {
                     onChange={() => handleToggleAction('clients', 'canChangeVisaStatus')}
                   />
                 }
-                label={<Typography sx={{ fontSize: '0.8rem', fontWeight: 600 }}>Visa Status</Typography>}
+                label={<Typography sx={{ fontSize: '0.8rem', fontWeight: 600 }}>Project Status</Typography>}
               />
               <FormControlLabel
                 control={
@@ -1222,7 +1222,7 @@ export const SuperAdminCustomization = () => {
           </Box>
         );
 
-      case 'Agents':
+      case 'Team':
         return (
           <Box sx={{ mt: 1, p: 1.5, borderRadius: 1.5, bgcolor: 'action.hover', border: '1px solid', borderColor: 'divider' }}>
             <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.secondary', display: 'block', mb: 0.5 }}>
@@ -1339,7 +1339,7 @@ export const SuperAdminCustomization = () => {
           >
             <Tab label="👤 Role Permissions" sx={{ fontWeight: 800, px: 3, py: 2 }} />
             <Tab label="⚡ Lifecycle Stages Manager" sx={{ fontWeight: 800, px: 3, py: 2 }} />
-            <Tab label="📂 Visa Document Checklists" sx={{ fontWeight: 800, px: 3, py: 2 }} />
+            <Tab label="📂 Project Deliverables Checklists" sx={{ fontWeight: 800, px: 3, py: 2 }} />
             <Tab label="⚙️ Flow Settings" sx={{ fontWeight: 800, px: 3, py: 2 }} />
             <Tab label="💬 WhatsApp Templates" sx={{ fontWeight: 800, px: 3, py: 2 }} />
           </Tabs>
@@ -1481,7 +1481,7 @@ export const SuperAdminCustomization = () => {
                   <Box className="col-span-12 md:col-span-6 flex flex-col gap-2">
                     {AVAILABLE_MENUS.filter((_, idx) => idx % 2 === 0).map((menu) => {
                       const isExpanded = !!expandedMenus[menu];
-                      const hasSubsettings = ['Dashboard', 'Leads', 'Clients', 'Calendar', 'Marketing', 'Agents'].includes(menu);
+                      const hasSubsettings = ['Dashboard', 'Leads', 'Clients', 'Calendar', 'Marketing', 'Team'].includes(menu);
 
                       return (
                         <Box
@@ -1551,7 +1551,7 @@ export const SuperAdminCustomization = () => {
                   <Box className="col-span-12 md:col-span-6 flex flex-col gap-2">
                     {AVAILABLE_MENUS.filter((_, idx) => idx % 2 === 1).map((menu) => {
                       const isExpanded = !!expandedMenus[menu];
-                      const hasSubsettings = ['Dashboard', 'Leads', 'Clients', 'Calendar', 'Marketing', 'Agents'].includes(menu);
+                      const hasSubsettings = ['Dashboard', 'Leads', 'Clients', 'Calendar', 'Marketing', 'Team'].includes(menu);
 
                       return (
                         <Box
@@ -1835,13 +1835,13 @@ export const SuperAdminCustomization = () => {
         </Box>
       )}
 
-      {/* ─── TAB 2: Visa Document Checklists ─── */}
+      {/* ─── TAB 2: Project Deliverables Checklists ─── */}
       {topTab === 2 && (
         <Box>
           <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, justifyContent: 'space-between', gap: 2, mb: 3 }}>
             <Box>
               <Typography variant="h6" sx={{ fontWeight: 800, mb: 0.5 }}>
-                📂 Visa Document Checklists Editor
+                📂 Project Deliverables Checklists Editor
               </Typography>
               <Typography variant="body2" color="text.secondary">
                 Configure required documents checklist globally by visa type. These rules will apply dynamically in the customer portals.
@@ -1866,8 +1866,8 @@ export const SuperAdminCustomization = () => {
               <InputLabel id="visa-select-label">Select Visa Program</InputLabel>
               <Select
                 labelId="visa-select-label"
-                value={selectedVisaId}
-                label="Select Visa Program"
+                value={selectedServiceId}
+                label="Select IT Service"
                 onChange={(e) => setSelectedVisaId(e.target.value)}
                 sx={{ borderRadius: 2 }}
               >
@@ -1890,7 +1890,7 @@ export const SuperAdminCustomization = () => {
               { key: 'other', label: '👥 Other Dependents Requirements', color: '#6B7280' }
             ].map((cat) => {
               const checklists = localSettings.documentChecklists || {};
-              const serviceChecklist = checklists[selectedVisaId] || {};
+              const serviceChecklist = checklists[selectedServiceId] || {};
               const docList = serviceChecklist[cat.key] || [];
 
               return (

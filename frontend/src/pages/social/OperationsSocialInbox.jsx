@@ -98,7 +98,7 @@ import { SERVICES } from '../../constants/mockData';
 
 const QUICK_TEMPLATES = [
   { id: 'aaa_greeting', label: 'Greet', text: 'Hello👋 \n\nWelcome to AAA Business Consultancy Services! \n\nWe’re here to help you with your Spain Visa, Residency & Relocation requirements. \n\nReply Hi to get started.' },
-  { id: 'booking_form', label: '⚡ Booking & Assessment Form', text: 'Hello! 🇪🇸✈️ Thank you for connecting with AAA Business Consultancy LLC.\n\nTo check your full eligibility for Spain Visa & Residency (Digital Nomad, NLV, Golden Visa) and schedule your consultation, please complete our quick assessment form here:\n👉 https://aaa-crm-service.netlify.app/#/public/lead-form?source=Social_Comment\n\nOur team looks forward to assisting you!' }
+  { id: 'booking_form', label: '⚡ Booking & Assessment Form', text: 'Hello! 🇪🇸✈️ Thank you for connecting with Kiaan Technology.\n\nTo schedule your Free 20-Minute Technical Discovery & Project Scoping Session with a Solutions Consultant, please complete our quick assessment form here:\n👉 https://aaa-crm-service.netlify.app/#/public/lead-form?source=Social_Comment\n\nOur team looks forward to assisting you!' }
 ];
 
 const displayName = (name, phone) => {
@@ -355,9 +355,9 @@ export const OperationsSocialInbox = () => {
     if (!activeConv) return;
 
     const mockCustomerQueries = [
-      "Hi, I want to apply for the Spain visa",
-      "Is my NIE application submitted?",
-      "What documents do I need for DNV?",
+      "Can you provide a quotation for a SaaS MVP?",
+      "What is your hourly rate for full-stack engineers?",
+      "Do you build native iOS and Android apps?",
       "Hi, when can we schedule our next meeting?"
     ];
 

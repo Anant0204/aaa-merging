@@ -75,7 +75,7 @@ export const OperationsClientDetails = () => {
 
   const roleConfig = (customizationSettings?.[currentUser?.id] || customizationSettings?.[currentUser?.role]) || {};
   const clientsActions = roleConfig.actions?.clients || { 
-    canChangeVisaStatus: true, 
+    canChangeProjectStatus: true, 
     canVerifyDocs: true, 
     canDelete: currentUser?.role === 'super_admin',
     canManageCredentials: true,
@@ -96,7 +96,7 @@ export const OperationsClientDetails = () => {
 
   const [activeTab, setActiveTab] = useState(defaultTab);
   const [statusModalOpen, setStatusModalOpen] = useState(false);
-  const [selectedVisaStatus, setSelectedVisaStatus] = useState('');
+  const [selectedProjectStage, setSelectedProjectStage] = useState('');
   const [selectedBillingStatus, setSelectedBillingStatus] = useState('');
   const [selectedPackageId, setSelectedPackageId] = useState('');
 
@@ -149,7 +149,7 @@ export const OperationsClientDetails = () => {
   // Mutations
   const updateStatusMutation = useMutation({
     mutationFn: ({ clientId, visaStatus, status, packageId }) =>
-      dbService.updateClientVisaStatus(clientId, visaStatus, status, null, packageId),
+      dbService.updateClientProjectStage(clientId, visaStatus, status, null, packageId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['clients'] });
       queryClient.invalidateQueries({ queryKey: ['client', id] });
@@ -206,7 +206,7 @@ export const OperationsClientDetails = () => {
   });
 
   const handleOpenStatusModal = () => {
-    setSelectedVisaStatus(client.visaStatus);
+    setSelectedProjectStage(client.visaStatus);
     setSelectedBillingStatus(client.status);
     setSelectedPackageId(client.packageId || '');
     setStatusModalOpen(true);
@@ -215,7 +215,7 @@ export const OperationsClientDetails = () => {
   const handleStatusSubmit = () => {
     updateStatusMutation.mutate({
       clientId: client.id,
-      visaStatus: selectedVisaStatus,
+      visaStatus: selectedProjectStage,
       status: selectedBillingStatus,
       packageId: selectedPackageId
     });
@@ -226,15 +226,17 @@ export const OperationsClientDetails = () => {
   };
 
   const visaStatuses = [
-    'Not Started',
-    'Document Preparation',
-    'Document Review',
-    'Apostille & Translations',
-    'Submitted - Pending Decision',
-    'NIE / Local Registration',
-    'Visa Approved',
-    'Rejected',
-    'Closed',
+    'Discovery & Scoping',
+    'Proposal & SOW',
+    'UI/UX Design',
+    'Development (Sprint)',
+    'QA & Testing',
+    'Client UAT & Staging',
+    'Deployed (Production)',
+    'Completed & Handover',
+    'Maintenance & Retainer',
+    'On Hold',
+    'Cancelled'
   ];
 
   const billingStatuses = [
@@ -272,7 +274,7 @@ export const OperationsClientDetails = () => {
                 {client?.hasCredentials ? "View/Reset Credentials" : "Generate Credentials"}
               </Button>
             )}
-            {clientsActions.canChangeVisaStatus !== false && (
+            {clientsActions.canChangeProjectStatus !== false && (
               <Button variant="contained" onClick={handleOpenStatusModal} sx={{ textTransform: 'none' }}>
                 Update Progression Status
               </Button>
@@ -300,7 +302,7 @@ export const OperationsClientDetails = () => {
               </Typography>
               <Stack direction="column" spacing={1} sx={{ alignItems: 'center' }}>
                 <Box>
-                  <Typography variant="caption" color="text.secondary" display="block">Visa Process</Typography>
+                  <Typography variant="caption" color="text.secondary" display="block">Project Status</Typography>
                   <StatusBadge status={client.visaStatus} />
                 </Box>
                 <Box>
@@ -426,7 +428,7 @@ export const OperationsClientDetails = () => {
                         </List>
                       ) : (
                         <Typography variant="body2" color="text.secondary">
-                          No active visa processing cycles registered for this client.
+                          No active project delivery milestones registered for this client.
                         </Typography>
                       )}
                     </Paper>
@@ -820,12 +822,12 @@ export const OperationsClientDetails = () => {
       >
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5, pt: 1 }}>
           <FormControl fullWidth size="small">
-            <InputLabel id="ops-visa-status-select-label">Spain Visa Progression</InputLabel>
+            <InputLabel id="ops-visa-status-select-label">Project Delivery Stage</InputLabel>
             <Select
               labelId="ops-visa-status-select-label"
-              value={selectedVisaStatus || ''}
-              onChange={(e) => setSelectedVisaStatus(e.target.value)}
-              label="Spain Visa Progression"
+              value={selectedProjectStage || ''}
+              onChange={(e) => setSelectedProjectStage(e.target.value)}
+              label="Project Delivery Stage"
               MenuProps={{
                 anchorOrigin: { vertical: 'bottom', horizontal: 'left' },
                 transformOrigin: { vertical: 'top', horizontal: 'left' },

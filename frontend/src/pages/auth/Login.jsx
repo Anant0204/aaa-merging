@@ -56,10 +56,10 @@ export const Login = () => {
 
   const QUICK_ROLES = [
     { id: 'super_admin', label: 'CEO 👑', email: 'superadmin@aaaconsultancy.com' },
-    { id: 'admin', label: 'Manager 💼', email: 'admin@aaaconsultancy.com' },
-    { id: 'operations', label: 'Ops ⚙️', email: 'operations@aaaconsultancy.com' },
-    { id: 'marketing', label: 'Marketing 📣', email: 'marketing@aaaconsultancy.com' },
-    { id: 'consultant', label: 'Agent 🧑‍💼', email: 'agent@aaaconsultancy.com' }
+    { id: 'admin', label: 'Project Manager 💼', email: 'admin@aaaconsultancy.com' },
+    { id: 'operations', label: 'Tech Lead / DevOps ⚙️', email: 'operations@aaaconsultancy.com' },
+    { id: 'marketing', label: 'Growth / Marketing 📣', email: 'marketing@aaaconsultancy.com' },
+    { id: 'consultant', label: 'Solutions Consultant 🧑‍💼', email: 'agent@aaaconsultancy.com' }
   ];
 
   React.useEffect(() => {

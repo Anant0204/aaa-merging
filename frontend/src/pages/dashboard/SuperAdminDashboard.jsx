@@ -440,22 +440,22 @@ export const SuperAdminDashboard = () => {
       onClick: () => navigate('/super_admin/clients', { state: { filterStatus: '', startDate: todayDateStr, endDate: todayDateStr, cardInfo: { title: "Today's Clients", value: clientsToday.length, color: '#14B8A6', trend: getTrend(clientsToday.length, clientsYesterday.length), iconType: 'PersonAdd' } } })
     },
     {
-      title: 'Total Consultations',
+      title: 'Total Inquiries',
       value: leadsInRange.length,
       icon: <PeopleAltIcon />,
       color: '#8B5CF6',
       trend: getTrend(leadsInRange.length, leadsInPrevRange.length),
       trendLabel: period.trendLabel,
-      onClick: () => navigate('/super_admin/leads', { state: { filterToday: false, filterStatus: '', startDate: period.start, endDate: period.end, cardInfo: { title: 'Total Consultations', value: leadsInRange.length, color: '#8B5CF6', trend: getTrend(leadsInRange.length, leadsInPrevRange.length), iconType: 'PeopleAlt' } } })
+      onClick: () => navigate('/super_admin/leads', { state: { filterToday: false, filterStatus: '', startDate: period.start, endDate: period.end, cardInfo: { title: 'Total Inquiries', value: leadsInRange.length, color: '#8B5CF6', trend: getTrend(leadsInRange.length, leadsInPrevRange.length), iconType: 'PeopleAlt' } } })
     },
     {
-      title: "Today's Consultations",
+      title: "Today's Inquiries",
       value: leadsToday.length,
       icon: <CalendarTodayIcon />,
       color: '#EC4899',
       trend: getTrend(leadsToday.length, leadsYesterday.length),
       trendLabel: 'vs yesterday',
-      onClick: () => navigate('/super_admin/leads', { state: { filterToday: true, filterStatus: '', startDate: todayDateStr, endDate: todayDateStr, cardInfo: { title: "Today's Consultations", value: leadsToday.length, color: '#EC4899', trend: getTrend(leadsToday.length, leadsYesterday.length), iconType: 'CalendarToday' } } })
+      onClick: () => navigate('/super_admin/leads', { state: { filterToday: true, filterStatus: '', startDate: todayDateStr, endDate: todayDateStr, cardInfo: { title: "Today's Inquiries", value: leadsToday.length, color: '#EC4899', trend: getTrend(leadsToday.length, leadsYesterday.length), iconType: 'CalendarToday' } } })
     },
     {
       title: 'Pending Payments',
@@ -476,31 +476,31 @@ export const SuperAdminDashboard = () => {
       onClick: () => navigate('/payments/invoices', { state: { filterStatus: 'Paid', startDate: period.start, endDate: period.end, cardInfo: { title: 'Total Revenue', value: `€${revenueInRange.toLocaleString()}`, color: '#22C55E', trend: getTrend(revenueInRange, revenueInPrevRange), iconType: 'TrendingUp' } } })
     },
     {
-      title: 'Active Cases',
+      title: 'Active Projects',
       value: activeCasesInRange.length,
       icon: <AssignmentIcon />,
       color: '#3B82F6',
       trend: getTrend(activeCasesInRange.length, activeCasesInPrevRange.length),
       trendLabel: period.trendLabel,
-      onClick: () => navigate('/super_admin/clients', { state: { filterStatus: 'Under Process', startDate: period.start, endDate: period.end, cardInfo: { title: 'Active Cases', value: activeCasesInRange.length, color: '#3B82F6', trend: getTrend(activeCasesInRange.length, activeCasesInPrevRange.length), iconType: 'Assignment' } } })
+      onClick: () => navigate('/super_admin/clients', { state: { filterStatus: 'Under Process', startDate: period.start, endDate: period.end, cardInfo: { title: 'Active Projects', value: activeCasesInRange.length, color: '#3B82F6', trend: getTrend(activeCasesInRange.length, activeCasesInPrevRange.length), iconType: 'Assignment' } } })
     },
     {
-      title: 'Completed Cases',
+      title: 'Completed Projects',
       value: completedCasesInRange.length,
       icon: <CheckCircleOutlinedIcon />,
       color: '#10B981',
       trend: getTrend(completedCasesInRange.length, completedCasesInPrevRange.length),
       trendLabel: period.trendLabel,
-      onClick: () => navigate('/super_admin/clients', { state: { filterStatus: 'Completed', startDate: period.start, endDate: period.end, cardInfo: { title: 'Completed Cases', value: completedCasesInRange.length, color: '#10B981', trend: getTrend(completedCasesInRange.length, completedCasesInPrevRange.length), iconType: 'CheckCircleOutlined' } } })
+      onClick: () => navigate('/super_admin/clients', { state: { filterStatus: 'Completed', startDate: period.start, endDate: period.end, cardInfo: { title: 'Completed Projects', value: completedCasesInRange.length, color: '#10B981', trend: getTrend(completedCasesInRange.length, completedCasesInPrevRange.length), iconType: 'CheckCircleOutlined' } } })
     },
     {
-      title: 'Lost Consultations',
+      title: 'Lost Inquiries',
       value: lostLeadsInRange.length,
       icon: <WarningAmberIcon />,
       color: '#EF4444',
       trend: getTrend(lostLeadsInRange.length, lostLeadsInPrevRange.length),
       trendLabel: period.trendLabel,
-      onClick: () => navigate('/super_admin/leads', { state: { filterStatus: 'Lost Lead', filterToday: false, startDate: period.start, endDate: period.end, cardInfo: { title: 'Lost Consultations', value: lostLeadsInRange.length, color: '#EF4444', trend: getTrend(lostLeadsInRange.length, lostLeadsInPrevRange.length), iconType: 'WarningAmber' } } })
+      onClick: () => navigate('/super_admin/leads', { state: { filterStatus: 'Lost Lead', filterToday: false, startDate: period.start, endDate: period.end, cardInfo: { title: 'Lost Inquiries', value: lostLeadsInRange.length, color: '#EF4444', trend: getTrend(lostLeadsInRange.length, lostLeadsInPrevRange.length), iconType: 'WarningAmber' } } })
     },
   ];
 
@@ -629,7 +629,7 @@ export const SuperAdminDashboard = () => {
       render: (row) => `${row.firstName} ${row.lastName}` },
     {
       id: 'service',
-      label: 'Visa Service',
+      label: 'IT Service',
       render: (row) => SERVICES.find((s) => s.id === row.serviceId)?.name || row.serviceId 
     },
     { id: 'status', label: 'Status' },
@@ -1090,7 +1090,7 @@ export const SuperAdminDashboard = () => {
 
         {/* Monthly Conversion Rate */}
         <Box className="col-span-1">
-          <ChartCard title="Visa Conversion Efficiency" subheader="Percentage of leads successfully onboarding as clients">
+          <ChartCard title="Deal Conversion Efficiency" subheader="Percentage of qualified leads converted to active project clients">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={conversionData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <defs>
@@ -1111,7 +1111,7 @@ export const SuperAdminDashboard = () => {
 
         {/* Consultant Performance Chart */}
         <Box className="col-span-1">
-          <ChartCard title="Agent Leaderboard" subheader="Active cases handled vs conversion efficiency">
+          <ChartCard title="Team Leaderboard" subheader="Active projects delivered vs conversion rate">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={performanceData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} />
@@ -1119,7 +1119,7 @@ export const SuperAdminDashboard = () => {
                 <YAxis stroke="#94A3B8" fontSize={11} />
                 <ChartTooltip />
                 <Legend iconSize={8} iconType="circle" />
-                <Bar dataKey="cases" name="Cases Handled" fill="#2563EB" radius={[4, 4, 0, 0]} barSize={16} />
+                <Bar dataKey="cases" name="Projects Handled" fill="#2563EB" radius={[4, 4, 0, 0]} barSize={16} />
                 <Bar dataKey="rate" name="Conversion Rate (%)" fill="#14B8A6" radius={[4, 4, 0, 0]} barSize={16} />
               </BarChart>
             </ResponsiveContainer>

@@ -59,8 +59,8 @@ export const AdminClosedCases = () => {
 
   // The 5 Closed Case Statuses
   const CLOSED_STATUSES = [
-    'Visa Approved',
-    'Visa Rejected',
+    'Delivered & Live',
+    'Project Cancelled',
     'Client Withdrawn',
     'Refund Completed',
     'Case Cancelled'
@@ -68,12 +68,12 @@ export const AdminClosedCases = () => {
 
   // Map old mock data to new statuses for demo purposes if they don't exactly match
   const getNormalizedStatus = (client) => {
-    if (client.visaStatus === 'Visa Approved') return 'Visa Approved';
-    if (client.visaStatus === 'Rejected' || client.status === 'Rejected' || client.visaStatus === 'Visa Rejected') return 'Visa Rejected';
+    if (client.visaStatus === 'Delivered & Live') return 'Delivered & Live';
+    if (client.visaStatus === 'Rejected' || client.status === 'Rejected' || client.visaStatus === 'Project Cancelled') return 'Project Cancelled';
     if (client.visaStatus === 'Client Withdraw' || client.visaStatus === 'Client Withdrawn') return 'Client Withdrawn';
     if (client.visaStatus === 'Refund Completed') return 'Refund Completed';
     if (client.visaStatus === 'Case Canceled' || client.visaStatus === 'Case Cancelled') return 'Case Cancelled';
-    if (client.status === 'Completed' && client.visaStatus !== 'Visa Approved') return 'Visa Approved';
+    if (client.status === 'Completed' && client.visaStatus !== 'Delivered & Live') return 'Delivered & Live';
     if (CLOSED_STATUSES.includes(client.visaStatus)) return client.visaStatus;
     if (CLOSED_STATUSES.includes(client.status)) return client.status;
 
@@ -91,8 +91,8 @@ export const AdminClosedCases = () => {
   }));
 
   const stats = {
-    'Visa Approved': allClosedCases.filter(c => c.displayStatus === 'Visa Approved').length,
-    'Visa Rejected': allClosedCases.filter(c => c.displayStatus === 'Visa Rejected').length,
+    'Delivered & Live': allClosedCases.filter(c => c.displayStatus === 'Delivered & Live').length,
+    'Project Cancelled': allClosedCases.filter(c => c.displayStatus === 'Project Cancelled').length,
     'Client Withdrawn': allClosedCases.filter(c => c.displayStatus === 'Client Withdrawn').length,
     'Refund Completed': allClosedCases.filter(c => c.displayStatus === 'Refund Completed').length,
     'Case Cancelled': allClosedCases.filter(c => c.displayStatus === 'Case Cancelled').length
@@ -186,11 +186,11 @@ export const AdminClosedCases = () => {
       />
 
       <Box className="grid grid-cols-2 md:grid-cols-5 gap-3" sx={{ mb: 4 }}>
-        <Box className="col-span-1" onClick={() => handleCardClick('Visa Approved')} sx={{ cursor: 'pointer', display: 'flex', flexDirection: 'column', height: '100%', transform: activeFilterStatus === 'Visa Approved' ? 'scale(1.02)' : 'none', transition: 'all 0.2s', opacity: activeFilterStatus && activeFilterStatus !== 'Visa Approved' ? 0.5 : 1 }}>
-          <StatCard title="Visa Approved" value={stats['Visa Approved']} icon={<CheckCircleOutlinedIcon />} color="#10B981" />
+        <Box className="col-span-1" onClick={() => handleCardClick('Delivered & Live')} sx={{ cursor: 'pointer', display: 'flex', flexDirection: 'column', height: '100%', transform: activeFilterStatus === 'Delivered & Live' ? 'scale(1.02)' : 'none', transition: 'all 0.2s', opacity: activeFilterStatus && activeFilterStatus !== 'Delivered & Live' ? 0.5 : 1 }}>
+          <StatCard title="Projects Delivered" value={stats['Delivered & Live']} icon={<CheckCircleOutlinedIcon />} color="#10B981" />
         </Box>
-        <Box className="col-span-1" onClick={() => handleCardClick('Visa Rejected')} sx={{ cursor: 'pointer', display: 'flex', flexDirection: 'column', height: '100%', transform: activeFilterStatus === 'Visa Rejected' ? 'scale(1.02)' : 'none', transition: 'all 0.2s', opacity: activeFilterStatus && activeFilterStatus !== 'Visa Rejected' ? 0.5 : 1 }}>
-          <StatCard title="Visa Rejected" value={stats['Visa Rejected']} icon={<CancelOutlinedIcon />} color="#EF4444" />
+        <Box className="col-span-1" onClick={() => handleCardClick('Project Cancelled')} sx={{ cursor: 'pointer', display: 'flex', flexDirection: 'column', height: '100%', transform: activeFilterStatus === 'Project Cancelled' ? 'scale(1.02)' : 'none', transition: 'all 0.2s', opacity: activeFilterStatus && activeFilterStatus !== 'Project Cancelled' ? 0.5 : 1 }}>
+          <StatCard title="Projects Cancelled" value={stats['Project Cancelled']} icon={<CancelOutlinedIcon />} color="#EF4444" />
         </Box>
         <Box className="col-span-1" onClick={() => handleCardClick('Client Withdrawn')} sx={{ cursor: 'pointer', display: 'flex', flexDirection: 'column', height: '100%', transform: activeFilterStatus === 'Client Withdrawn' ? 'scale(1.02)' : 'none', transition: 'all 0.2s', opacity: activeFilterStatus && activeFilterStatus !== 'Client Withdrawn' ? 0.5 : 1 }}>
           <StatCard title="Client Withdrawn" value={stats['Client Withdrawn']} icon={<PersonRemoveOutlinedIcon />} color="#F59E0B" />

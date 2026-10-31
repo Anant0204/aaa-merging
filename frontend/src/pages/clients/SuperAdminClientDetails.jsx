@@ -115,7 +115,7 @@ export const SuperAdminClientDetails = () => {
   const canViewDeps = hasFeature(customizationSettings, 'canViewDependents');
 
   const roleConfig = (customizationSettings?.[currentUser?.id] || customizationSettings?.[currentUser?.role]) || {};
-  const clientsActions = roleConfig.actions?.clients || { canChangeVisaStatus: true, canVerifyDocs: true, canDelete: currentUser?.role === 'super_admin' };
+  const clientsActions = roleConfig.actions?.clients || { canChangeProjectStatus: true, canVerifyDocs: true, canDelete: currentUser?.role === 'super_admin' };
 
   const queryParams = new URLSearchParams(location.search);
   const tabParam = queryParams.get('tab');
@@ -129,7 +129,7 @@ export const SuperAdminClientDetails = () => {
 
   const [activeTab, setActiveTab] = useState(defaultTab);
   const [statusModalOpen, setStatusModalOpen] = useState(false);
-  const [selectedVisaStatus, setSelectedVisaStatus] = useState('');
+  const [selectedProjectStage, setSelectedProjectStage] = useState('');
   const [selectedBillingStatus, setSelectedBillingStatus] = useState('');
   const [selectedPackageId, setSelectedPackageId] = useState('');
   const [aiSummaryOpen, setAiSummaryOpen] = useState(false);
@@ -228,7 +228,7 @@ export const SuperAdminClientDetails = () => {
     mutationFn: ({ cycleId, data }) => dbService.recordGovernmentDecision(cycleId, data),
     onSuccess: (res) => {
       queryClient.invalidateQueries({ queryKey: ['clients'] });
-      showAlert(`Government Decision recorded: ${res.clientVisaStatus}!`, 'success');
+      showAlert(`Project Milestone recorded: ${res.clientVisaStatus}!`, 'success');
     },
     onError: (err) => {
       showAlert(err.response?.data?.message || 'Failed to record government decision', 'error');
@@ -315,7 +315,7 @@ export const SuperAdminClientDetails = () => {
 
   // Refund Modal State
   const [createRefundModalOpen, setCreateRefundModalOpen] = useState(false);
-  const [profileRefundCategory, setProfileRefundCategory] = useState('Visa Rejection');
+  const [profileRefundCategory, setProfileRefundCategory] = useState('Project Cancellation');
   const [profileRefundReason, setProfileRefundReason] = useState('');
   const [profileRefundAmount, setProfileRefundAmount] = useState('');
   const [profileRefundBankName, setProfileRefundBankName] = useState('');
@@ -352,7 +352,7 @@ export const SuperAdminClientDetails = () => {
         const uploadedDoc = await dbService.uploadDocument({
           file: profileRefundFile,
           clientId: client.id,
-          category: 'Visa Rejection Letter',
+          category: 'Project Termination Notice',
           fileName: profileRefundFile.name
         });
         proofUrl = uploadedDoc?.fileUrl || null;
@@ -378,7 +378,7 @@ export const SuperAdminClientDetails = () => {
       clientId: client.id,
       category: profileRefundCategory,
       reason: profileRefundReason,
-      amount: profileRefundCategory === 'Visa Rejection' ? undefined : Number(profileRefundAmount),
+      amount: profileRefundCategory === 'Project Cancellation' ? undefined : Number(profileRefundAmount),
       bankAccountName: profileRefundBankName || undefined,
       bankIban: normalizedIban,
       proofUrl: proofUrl || undefined
@@ -387,7 +387,7 @@ export const SuperAdminClientDetails = () => {
 
   const updateStatusMutation = useMutation({
     mutationFn: ({ clientId, visaStatus, status, nextFollowUpDate, packageId }) =>
-      dbService.updateClientVisaStatus(clientId, visaStatus, status, nextFollowUpDate, packageId),
+      dbService.updateClientProjectStage(clientId, visaStatus, status, nextFollowUpDate, packageId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['client', id] });
       queryClient.invalidateQueries({ queryKey: ['clients'] });
@@ -447,7 +447,7 @@ export const SuperAdminClientDetails = () => {
   const consultantObj = consultants.find((c) => c.id === client.assignedConsultantId);
 
   const handleOpenStatusModal = () => {
-    setSelectedVisaStatus(client.visaStatus);
+    setSelectedProjectStage(client.visaStatus);
     setSelectedBillingStatus(client.status);
     setSelectedPackageId(client.packageId || '');
     setStatusModalOpen(true);
@@ -456,7 +456,7 @@ export const SuperAdminClientDetails = () => {
   const handleStatusSubmit = () => {
     updateStatusMutation.mutate({
       clientId: client.id,
-      visaStatus: selectedVisaStatus,
+      visaStatus: selectedProjectStage,
       status: selectedBillingStatus,
       packageId: selectedPackageId
     });
@@ -467,15 +467,17 @@ export const SuperAdminClientDetails = () => {
   };
 
   const visaStatuses = [
-    'Not Started',
-    'Document Preparation',
-    'Document Review',
-    'Apostille & Translations',
-    'Submitted - Pending Decision',
-    'NIE / Local Registration',
-    'Visa Approved',
-    'Rejected',
-    'Closed',
+    'Discovery & Scoping',
+    'Proposal & SOW',
+    'UI/UX Design',
+    'Development (Sprint)',
+    'QA & Testing',
+    'Client UAT & Staging',
+    'Deployed (Production)',
+    'Completed & Handover',
+    'Maintenance & Retainer',
+    'On Hold',
+    'Cancelled'
   ];
 
   const billingStatuses = [
@@ -522,7 +524,7 @@ export const SuperAdminClientDetails = () => {
                 {client?.hasCredentials ? "View/Reset Credentials" : "Generate Credentials"}
               </Button>
             )}
-            {clientsActions.canChangeVisaStatus !== false && (
+            {clientsActions.canChangeProjectStatus !== false && (
               <Button variant="contained" onClick={handleOpenStatusModal} sx={{ textTransform: 'none' }}>
                 Update Progression Status
               </Button>
@@ -550,7 +552,7 @@ export const SuperAdminClientDetails = () => {
               </Typography>
               <Stack direction="column" spacing={1} sx={{ alignItems: 'center' }}>
                 <Box>
-                  <Typography variant="caption" color="text.secondary" display="block">Visa Process</Typography>
+                  <Typography variant="caption" color="text.secondary" display="block">Project Status</Typography>
                   <StatusBadge status={client.visaStatus} />
                 </Box>
                 <Box>
@@ -1113,12 +1115,12 @@ export const SuperAdminClientDetails = () => {
       >
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5, pt: 1 }}>
           <FormControl fullWidth size="small">
-            <InputLabel id="visa-status-select-label">Spain Visa Progression</InputLabel>
+            <InputLabel id="visa-status-select-label">Project Delivery Stage</InputLabel>
             <Select
               labelId="visa-status-select-label"
-              value={selectedVisaStatus || ''}
-              onChange={(e) => setSelectedVisaStatus(e.target.value)}
-              label="Spain Visa Progression"
+              value={selectedProjectStage || ''}
+              onChange={(e) => setSelectedProjectStage(e.target.value)}
+              label="Project Delivery Stage"
               MenuProps={{
                 anchorOrigin: { vertical: 'bottom', horizontal: 'left' },
                 transformOrigin: { vertical: 'top', horizontal: 'left' },
@@ -1315,14 +1317,14 @@ export const SuperAdminClientDetails = () => {
               onChange={(e) => setProfileRefundCategory(e.target.value)}
               label="Category"
             >
-              <MenuItem value="Visa Rejection">Visa Rejection (Auto 100% Refund)</MenuItem>
+              <MenuItem value="Project Cancellation">Project Cancellation (Auto 100% Refund)</MenuItem>
               <MenuItem value="Customer Discontent">Customer Discontent</MenuItem>
               <MenuItem value="Service Cancellation">Service Cancellation</MenuItem>
               <MenuItem value="Other">Other</MenuItem>
             </Select>
           </FormControl>
 
-          {profileRefundCategory !== 'Visa Rejection' && (
+          {profileRefundCategory !== 'Project Cancellation' && (
             <TextField
               label="Refund Amount (€)"
               type="number"
@@ -1333,7 +1335,7 @@ export const SuperAdminClientDetails = () => {
             />
           )}
 
-          {profileRefundCategory === 'Visa Rejection' && (
+          {profileRefundCategory === 'Project Cancellation' && (
             <Box sx={{ p: 2, bgcolor: '#FEF2F2', borderRadius: 2, border: '1px solid', borderColor: '#FCA5A5' }}>
               <Typography variant="caption" color="error.dark" sx={{ fontWeight: 700, display: 'block', mb: 0.5 }}>
                 VISA REJECTION CLAUSE (100% GUARANTEE):
@@ -1397,7 +1399,7 @@ export const SuperAdminClientDetails = () => {
 
           <Box sx={{ p: 2, border: '1px dashed', borderColor: 'divider', borderRadius: 2, bgcolor: 'background.neutral' }}>
             <Typography variant="caption" sx={{ fontWeight: 700, display: 'block', mb: 1 }}>
-              Attach Visa Rejection Letter / Bank Proof (Optional PDF/Image)
+              Attach Project Termination Notice / Bank Proof (Optional PDF/Image)
             </Typography>
             <Button
               variant="outlined"

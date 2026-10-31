@@ -102,7 +102,7 @@ export const getLeadStatusOptions = (leadOrRow, leadStages = []) => {
 };
 
 export const RELOCATION_SERVICES = [
-  { id: 'nie', name: 'NIE Assistance & Guidance' },
+  { id: 'devops', name: 'DevOps & Cloud Infrastructure' },
   { id: 'tie', name: 'TIE & Fingerprint Appointment' },
   { id: 'empadronamiento', name: 'Empadronamiento Assistance' },
   { id: 'digital_cert', name: 'Digital Certificate Assistance' },
@@ -137,15 +137,15 @@ export const PACKAGES = [
     name: 'Option B: Full Processing Package – End-to-End Service',
     price: 3500,
     additionalApplicantPrice: 500,
-    refundable: '100% refundable if visa is rejected (Subject to T&C)',
+    refundable: '100% Milestone Satisfaction Guarantee',
     description: 'Complete, Professional & End-to-End Support for Spain Residency Applications from eligibility to submission.',
     includes: [
       'Eligibility Verification & Initial Assessment',
       'Professional Case Evaluation & Strategy',
       'Sworn Translation Management',
       'Digital Nomad / NLV File Assembly',
-      'Consulate & Embassy Appointment Booking',
-      '100% Refund Guarantee if visa is rejected (Subject to T&C)'
+      'Cloud Architecture & DevOps Setup',
+      'Milestone-based Quality Guarantee & SLA Protection'
     ]
   },
   {
@@ -155,7 +155,7 @@ export const PACKAGES = [
     price: 1750,
     additionalApplicantPrice: 500,
     refundable: 'Non-refundable',
-    description: 'Post-approval administrative relocation support for clients who already have their visa approved and need settlement help in Spain.',
+    description: 'Post-deployment maintenance and managed cloud infrastructure support.',
     includes: [
       'Post-Approval Residency Card (TIE) Fingerprint Booking',
       'Town Hall Registration (Empadronamiento)',
@@ -170,17 +170,17 @@ export const PACKAGES = [
     name: 'Option D: Premium Package – End-to-End Service + Administrative Relocation Package',
     price: 4750,
     additionalApplicantPrice: 750,
-    refundable: '100% refundable if visa is rejected (Subject to T&C)',
+    refundable: '100% Milestone Satisfaction Guarantee',
     isRecommended: true,
     description: 'Includes EVERYTHING in Full Processing Package + Complete In-Spain Relocation & Administrative Assistance.',
     includes: [
       'Everything in Full Processing Package (End-to-End)',
       'Everything in Administrative Relocation Package (In-Spain Setup)',
       'Spanish Bank Account Opening Assistance',
-      'NIE / TIE Fingerprint Appointment Booking',
+      'Production Deployment & Security Hardening',
       'Empadronamiento (Town Hall Registration)',
       'Spanish Social Security Registration',
-      '100% Refund Guarantee if visa is rejected (Subject to T&C)'
+      'Milestone-based Quality Guarantee & SLA Protection'
     ]
   }
 ];
@@ -199,7 +199,7 @@ export const AGENTS = [
     conversionRate: 68,
     revenueGenerated: 34500,
     avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150',
-    bio: 'Senior Spain immigration expert with 8 years of residency law expertise. Specializes in Digital Nomad and Business Visas.',
+    bio: 'Senior IT Solution Architect with 8 years of full-stack engineering and cloud infrastructure expertise.',
     joiningDate: '2024-03-12',
   },
   {
@@ -215,7 +215,7 @@ export const AGENTS = [
     conversionRate: 55,
     revenueGenerated: 22000,
     avatar: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=150',
-    bio: 'Fluent in Arabic and Spanish, specializing in GCC relocatees, Golden Visas, and Non-Lucrative applications.',
+    bio: 'Fluent in Arabic and Spanish, specializing in GCC relocatees, Enterprise SaaS Platforms, and Non-Lucrative applications.',
     joiningDate: '2024-08-20',
   },
   {
@@ -231,7 +231,7 @@ export const AGENTS = [
     conversionRate: 85,
     revenueGenerated: 45000,
     avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150',
-    bio: 'General Manager at AAA Business Consultancy. Oversees visa processing teams, client relations, and operational management.',
+    bio: 'General Manager at Kiaan Technology. Oversees engineering teams, project delivery, and enterprise client relations.',
     joiningDate: '2022-01-10',
   },
   {
@@ -247,7 +247,7 @@ export const AGENTS = [
     conversionRate: 60,
     revenueGenerated: 18500,
     avatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=150',
-    bio: 'Specialist for Eastern European relocations, student visa admissions, and family reunions in Spain.',
+    bio: 'Lead DevOps Engineer specializing in Kubernetes, AWS architectures, and CI/CD pipelines.',
   },
   {
     id: 'c5',
@@ -262,7 +262,7 @@ export const AGENTS = [
     conversionRate: 72,
     revenueGenerated: 29800,
     avatar: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=150',
-    bio: 'Focuses on UK, US, and Canadian clients seeking Spain Digital Nomad Visas (DNV) post-Brexit.',
+    bio: 'Focuses on UK, US, and Canadian clients seeking Spain Full-Stack Web Applications (DNV) post-Brexit.',
   }
 ];
 
@@ -302,7 +302,7 @@ export const MOCK_LEADS = [
     preferredLanguage: 'Arabic',
     serviceId: 'nlv',
     applicantsCount: 3, // Main + 2 dependents
-    status: 'Under Consultation',
+    status: 'In Discovery',
     assignedConsultantId: 'c2',
     source: 'Facebook Ads',
     createdDate: '2026-06-16T11:20:00Z',
@@ -315,7 +315,7 @@ export const MOCK_LEADS = [
     timeline: [
       { date: '2026-06-16T11:20:00Z', event: 'Lead Created', user: 'System' },
       { date: '2026-06-16T14:30:00Z', event: 'Assigned to Consultant Lucas Gomez', user: 'System' },
-      { date: '2026-06-17T10:00:00Z', event: 'Status updated to Under Consultation', user: 'Lucas Gomez' }
+      { date: '2026-06-17T10:00:00Z', event: 'Status updated to In Discovery', user: 'Lucas Gomez' }
     ]
   },
   {
@@ -337,10 +337,10 @@ export const MOCK_LEADS = [
       programType: 'Masters in Finance',
       duration: '1 Year'
     },
-    notes: 'Applying for Study Visa. Verification of university admission letter done.',
+    notes: 'Enterprise React & Node.js CRM project. Architectural review completed.',
     timeline: [
       { date: '2026-06-15T15:40:00Z', event: 'Lead Created via website form', user: 'System' },
-      { date: '2026-06-16T09:00:00Z', event: 'Consultation completed successfully', user: 'Elena Rostova' }
+      { date: '2026-06-16T09:00:00Z', event: 'Discovery completed successfully', user: 'Elena Rostova' }
     ]
   },
   {
@@ -361,10 +361,10 @@ export const MOCK_LEADS = [
       budget: '€550,000',
       propertyLocation: 'Malaga'
     },
-    notes: 'Wants Golden Visa. Selected Premium Package for main applicant + spouse. Waiting for deposit.',
+    notes: 'Wants Enterprise SaaS Platform. Selected Premium Package for main applicant + spouse. Waiting for deposit.',
     timeline: [
       { date: '2026-06-14T08:15:00Z', event: 'Lead Created', user: 'System' },
-      { date: '2026-06-15T11:00:00Z', event: 'Consultation Completed. Selected Premium Package', user: 'David Vance' },
+      { date: '2026-06-15T11:00:00Z', event: 'Discovery Completed. Selected Premium Package', user: 'David Vance' },
       { date: '2026-06-15T11:15:00Z', event: 'Invoice INV-2026-004 generated', user: 'Finance Bot' }
     ]
   },
@@ -393,27 +393,27 @@ export const MOCK_LEADS = [
   },
   // Adding more mock leads to reach 20
   { id: 'LD1006', firstName: 'John', lastName: 'Doe', email: 'john.doe@example.com', phone: '+1 555 123 4567', nationality: 'American', preferredLanguage: 'English', serviceId: 'dnv', applicantsCount: 1, status: 'Cold Lead', assignedConsultantId: 'c5', source: 'Google Ads', createdDate: '2026-06-01T12:00:00Z', notes: 'No response to follow up emails.', timeline: [] },
-  { id: 'LD1007', firstName: 'Maria', lastName: 'Ivanova', email: 'maria.i@example.ru', phone: '+7 901 222 3344', nationality: 'Russian', preferredLanguage: 'English', serviceId: 'nlv', applicantsCount: 2, status: 'Lost Lead', assignedConsultantId: 'c4', source: 'Facebook Ads', createdDate: '2026-05-20T10:30:00Z', notes: 'Denied. Insufficient passive income statement.', timeline: [] },
-  { id: 'LD1008', firstName: 'Yuki', lastName: 'Tanaka', email: 'y.tanaka@example.jp', phone: '+81 90 9999 8888', nationality: 'Japanese', preferredLanguage: 'English', serviceId: 'study', applicantsCount: 1, status: 'New Lead', assignedConsultantId: 'c4', source: 'Website Traffic', createdDate: '2026-06-18T06:45:00Z', notes: 'Interested in Spanish language school visa.', timeline: [] },
-  { id: 'LD1009', firstName: 'Fatima', lastName: 'Hassan', email: 'fatima.h@example.com', phone: '+971 52 333 4422', nationality: 'Egyptian', preferredLanguage: 'Arabic', serviceId: 'family', applicantsCount: 3, status: 'Under Consultation', assignedConsultantId: 'c2', source: 'WhatsApp Click Ads', createdDate: '2026-06-16T16:20:00Z', notes: 'Spouse of a Spanish resident. Wants family reunion assistance.', timeline: [] },
+  { id: 'LD1007', firstName: 'Maria', lastName: 'Ivanova', email: 'maria.i@example.ru', phone: '+7 901 222 3344', nationality: 'Russian', preferredLanguage: 'English', serviceId: 'nlv', applicantsCount: 2, status: 'Lost Lead', assignedConsultantId: 'c4', source: 'Facebook Ads', createdDate: '2026-05-20T10:30:00Z', notes: 'Lead closed. Budget not aligned with enterprise tier.', timeline: [] },
+  { id: 'LD1008', firstName: 'Yuki', lastName: 'Tanaka', email: 'y.tanaka@example.jp', phone: '+81 90 9999 8888', nationality: 'Japanese', preferredLanguage: 'English', serviceId: 'study', applicantsCount: 1, status: 'New Lead', assignedConsultantId: 'c4', source: 'Website Traffic', createdDate: '2026-06-18T06:45:00Z', notes: 'Interested in Mobile App Development for iOS & Android.', timeline: [] },
+  { id: 'LD1009', firstName: 'Fatima', lastName: 'Hassan', email: 'fatima.h@example.com', phone: '+971 52 333 4422', nationality: 'Egyptian', preferredLanguage: 'Arabic', serviceId: 'family', applicantsCount: 3, status: 'In Discovery', assignedConsultantId: 'c2', source: 'WhatsApp Click Ads', createdDate: '2026-06-16T16:20:00Z', notes: 'Fintech payment gateway integration & compliance.', timeline: [] },
   { id: 'LD1010', firstName: 'William', lastName: 'Smith', email: 'w.smith@example.ca', phone: '+1 604 111 2222', nationality: 'Canadian', preferredLanguage: 'English', serviceId: 'dnv', applicantsCount: 1, status: 'Documents Pending', assignedConsultantId: 'c5', source: 'Organic Social Media Content', createdDate: '2026-06-10T14:00:00Z', notes: 'Needs FBI background check with Apostille.', timeline: [] },
   { id: 'LD1011', firstName: 'Rajesh', lastName: 'Kumar', email: 'r.kumar@example.in', phone: '+91 98765 43210', nationality: 'Indian', preferredLanguage: 'English', serviceId: 'self_employed', applicantsCount: 2, status: 'New Lead', assignedConsultantId: 'c2', source: 'Google Ads', createdDate: '2026-06-18T08:15:00Z', notes: 'Consultant entrepreneur establishing SaaS office in Valencia.', timeline: [] },
-  { id: 'LD1012', firstName: 'Carlos', lastName: 'Silva', email: 'carlos.silva@example.br', phone: '+55 11 98888 7777', nationality: 'Brazilian', preferredLanguage: 'English', serviceId: 'property', applicantsCount: 1, status: 'Under Consultation', assignedConsultantId: 'c1', source: 'Instagram DM', createdDate: '2026-06-17T11:45:00Z', notes: 'Buying flat in Madrid for Golden Visa.', timeline: [] },
-  { id: 'LD1013', firstName: 'Zara', lastName: 'Ali', email: 'zara.ali@example.ae', phone: '+971 56 123 7890', nationality: 'Jordanian', preferredLanguage: 'Arabic', serviceId: 'tourism', applicantsCount: 2, status: 'Waiting for Payment', assignedConsultantId: 'c2', source: 'Website Forms', createdDate: '2026-06-15T09:12:00Z', notes: 'Schengen tourism visa guidance. Straightforward profile, no packages needed.', timeline: [] },
+  { id: 'LD1012', firstName: 'Carlos', lastName: 'Silva', email: 'carlos.silva@example.br', phone: '+55 11 98888 7777', nationality: 'Brazilian', preferredLanguage: 'English', serviceId: 'property', applicantsCount: 1, status: 'In Discovery', assignedConsultantId: 'c1', source: 'Instagram DM', createdDate: '2026-06-17T11:45:00Z', notes: 'Real estate listing portal with automated MLS syndication.', timeline: [] },
+  { id: 'LD1013', firstName: 'Zara', lastName: 'Ali', email: 'zara.ali@example.ae', phone: '+971 56 123 7890', nationality: 'Jordanian', preferredLanguage: 'Arabic', serviceId: 'tourism', applicantsCount: 2, status: 'Waiting for Payment', assignedConsultantId: 'c2', source: 'Website Forms', createdDate: '2026-06-15T09:12:00Z', notes: 'Custom WordPress to Next.js website migration.', timeline: [] },
   { id: 'LD1014', firstName: 'Oliver', lastName: 'Brown', email: 'oliver.brown@example.co.uk', phone: '+44 7711 445566', nationality: 'British', preferredLanguage: 'English', serviceId: 'dnv', applicantsCount: 3, status: 'New Lead', assignedConsultantId: 'c5', source: 'Google Ads', createdDate: '2026-06-18T11:00:00Z', notes: 'Applying for DNV with spouse and child.', timeline: [] },
-  { id: 'LD1015', firstName: 'Sophia', lastName: 'Miller', email: 's.miller@example.com', phone: '+1 202 555 0192', nationality: 'American', preferredLanguage: 'English', serviceId: 'nlv', applicantsCount: 1, status: 'Under Process', assignedConsultantId: 'c1', source: 'TikTok Ads', createdDate: '2026-06-05T10:00:00Z', notes: 'NLV filed at consulate. Waiting for response.', timeline: [] },
+  { id: 'LD1015', firstName: 'Sophia', lastName: 'Miller', email: 's.miller@example.com', phone: '+1 202 555 0192', nationality: 'American', preferredLanguage: 'English', serviceId: 'nlv', applicantsCount: 1, status: 'Under Process', assignedConsultantId: 'c1', source: 'TikTok Ads', createdDate: '2026-06-05T10:00:00Z', notes: 'Alpha version deployed on staging. Client review in progress.', timeline: [] },
   { id: 'LD1016', firstName: 'Hassan', lastName: 'El-Khoury', email: 'hassan.k@example.lb', phone: '+961 3 123 456', nationality: 'Lebanese', preferredLanguage: 'Arabic', serviceId: 'property', applicantsCount: 4, status: 'New Lead', assignedConsultantId: 'c3', source: 'Telegram', createdDate: '2026-06-18T05:30:00Z', notes: 'Family looking to relocate, buying a villa in Marbella.', timeline: [] },
   { id: 'LD1017', firstName: 'Li', lastName: 'Wei', email: 'li.wei@example.cn', phone: '+86 139 0101 2345', nationality: 'Chinese', preferredLanguage: 'English', serviceId: 'study', applicantsCount: 1, status: 'Documents Pending', assignedConsultantId: 'c4', source: 'WeChat', createdDate: '2026-06-12T13:45:00Z', notes: 'Awaiting Spanish language center payment receipt.', timeline: [] },
-  { id: 'LD1018', firstName: 'Emma', lastName: 'Nielsen', email: 'emma.n@example.dk', phone: '+45 30 40 50 60', nationality: 'Danish', preferredLanguage: 'English', serviceId: 'dnv', applicantsCount: 1, status: 'Under Consultation', assignedConsultantId: 'c1', source: 'Website Traffic', createdDate: '2026-06-17T15:20:00Z', notes: 'Software contractor, fully remote. Pre-qualified.', timeline: [] },
+  { id: 'LD1018', firstName: 'Emma', lastName: 'Nielsen', email: 'emma.n@example.dk', phone: '+45 30 40 50 60', nationality: 'Danish', preferredLanguage: 'English', serviceId: 'dnv', applicantsCount: 1, status: 'In Discovery', assignedConsultantId: 'c1', source: 'Website Traffic', createdDate: '2026-06-17T15:20:00Z', notes: 'Custom microservices architecture on Google Cloud Platform.', timeline: [] },
   { id: 'LD1019', firstName: 'Zuri', lastName: 'Adebayor', email: 'zuri.ade@example.ng', phone: '+234 803 111 2222', nationality: 'Nigerian', preferredLanguage: 'English', serviceId: 'study', applicantsCount: 1, status: 'Cold Lead', assignedConsultantId: 'c4', source: 'Facebook Comments', createdDate: '2026-05-25T08:00:00Z', notes: 'Non-responsive to email scheduling.', timeline: [] },
-  { id: 'LD1020', firstName: 'Nour', lastName: 'Dagher', email: 'nour.dagher@example.com', phone: '+971 54 443 2190', nationality: 'Syrian', preferredLanguage: 'Arabic', serviceId: 'family', applicantsCount: 2, status: 'Under Process', assignedConsultantId: 'c2', source: 'WhatsApp', createdDate: '2026-06-08T09:30:00Z', notes: 'Spouse residency renewal and child entry visa.', timeline: [] },
-  { id: 'LD1021', firstName: 'Liam', lastName: "O'Connor", email: 'liam.oc@example.ie', phone: '+353 1 496 0123', nationality: 'Irish', preferredLanguage: 'English', serviceId: 'study', applicantsCount: 1, status: 'New Lead', assignedConsultantId: 'c4', source: 'WeChat', createdDate: '2026-06-19T10:00:00Z', notes: 'Undergraduate student applying for Spain Study Visa.', timeline: [] },
-  { id: 'LD1022', firstName: 'Noah', lastName: 'Weber', email: 'noah.w@example.de', phone: '+49 89 2019 8273', nationality: 'German', preferredLanguage: 'English', serviceId: 'dnv', applicantsCount: 2, status: 'Under Consultation', assignedConsultantId: 'c5', source: 'Google Ads', createdDate: '2026-06-19T11:00:00Z', notes: 'Remote consultant, DNV eligibility review.', timeline: [] },
-  { id: 'LD1023', firstName: 'Isabella', lastName: 'Rossi', email: 'isabella.rossi@example.it', phone: '+39 02 8812 3456', nationality: 'Italian', preferredLanguage: 'English', serviceId: 'family', applicantsCount: 3, status: 'Processing', assignedConsultantId: 'c1', source: 'Facebook Ads', createdDate: '2026-06-19T12:00:00Z', notes: 'Husband is Spanish citizen. Family reunion visa.', timeline: [] },
+  { id: 'LD1020', firstName: 'Nour', lastName: 'Dagher', email: 'nour.dagher@example.com', phone: '+971 54 443 2190', nationality: 'Syrian', preferredLanguage: 'Arabic', serviceId: 'family', applicantsCount: 2, status: 'Under Process', assignedConsultantId: 'c2', source: 'WhatsApp', createdDate: '2026-06-08T09:30:00Z', notes: 'E-commerce platform with Stripe & automated invoicing.', timeline: [] },
+  { id: 'LD1021', firstName: 'Liam', lastName: "O'Connor", email: 'liam.oc@example.ie', phone: '+353 1 496 0123', nationality: 'Irish', preferredLanguage: 'English', serviceId: 'study', applicantsCount: 1, status: 'New Lead', assignedConsultantId: 'c4', source: 'WeChat', createdDate: '2026-06-19T10:00:00Z', notes: 'MVP development for AI-powered legal document search.', timeline: [] },
+  { id: 'LD1022', firstName: 'Noah', lastName: 'Weber', email: 'noah.w@example.de', phone: '+49 89 2019 8273', nationality: 'German', preferredLanguage: 'English', serviceId: 'dnv', applicantsCount: 2, status: 'In Discovery', assignedConsultantId: 'c5', source: 'Google Ads', createdDate: '2026-06-19T11:00:00Z', notes: 'B2B SaaS portal with multi-tenant architecture.', timeline: [] },
+  { id: 'LD1023', firstName: 'Isabella', lastName: 'Rossi', email: 'isabella.rossi@example.it', phone: '+39 02 8812 3456', nationality: 'Italian', preferredLanguage: 'English', serviceId: 'family', applicantsCount: 3, status: 'Processing', assignedConsultantId: 'c1', source: 'Facebook Ads', createdDate: '2026-06-19T12:00:00Z', notes: 'Healthcare patient portal with HIPAA compliance.', timeline: [] },
   { id: 'LD1024', firstName: 'Lucas', lastName: 'Dubois', email: 'lucas.d@example.fr', phone: '+33 1 4720 9811', nationality: 'French', preferredLanguage: 'English', serviceId: 'self_employed', applicantsCount: 1, status: 'New Lead', assignedConsultantId: 'c3', source: 'Website Forms', createdDate: '2026-06-19T13:00:00Z', notes: 'Autonomo registration in Barcelona.', timeline: [] },
   { id: 'LD1025', firstName: 'Emma', lastName: 'Novak', email: 'emma.n@example.pl', phone: '+48 22 555 0122', nationality: 'Polish', preferredLanguage: 'English', serviceId: 'nlv', applicantsCount: 1, status: 'Cold Lead', assignedConsultantId: 'c1', source: 'Instagram Ads', createdDate: '2026-06-19T14:00:00Z', notes: 'Passive income review.', timeline: [] },
   { id: 'LD1026', firstName: 'Sophia', lastName: 'Lindqvist', email: 'sophia.l@example.se', phone: '+46 8 123 4567', nationality: 'Swedish', preferredLanguage: 'English', serviceId: 'dnv', applicantsCount: 2, status: 'New Lead', assignedConsultantId: 'c5', source: 'WhatsApp', createdDate: '2026-06-19T15:00:00Z', notes: 'Tech company employee DNV.', timeline: [] },
-  { id: 'LD1027', firstName: 'Alexander', lastName: 'Pavlov', email: 'alex.p@example.ru', phone: '+7 495 111 2233', nationality: 'Russian', preferredLanguage: 'English', serviceId: 'property', applicantsCount: 4, status: 'Under Consultation', assignedConsultantId: 'c4', source: 'Telegram', createdDate: '2026-06-19T16:00:00Z', notes: 'Golden Visa investment in Alicante.', timeline: [] },
+  { id: 'LD1027', firstName: 'Alexander', lastName: 'Pavlov', email: 'alex.p@example.ru', phone: '+7 495 111 2233', nationality: 'Russian', preferredLanguage: 'English', serviceId: 'property', applicantsCount: 4, status: 'In Discovery', assignedConsultantId: 'c4', source: 'Telegram', createdDate: '2026-06-19T16:00:00Z', notes: 'Logistics fleet management dashboard with live IoT tracking.', timeline: [] },
   { id: 'LD1028', firstName: 'Daniel', lastName: 'Kim', email: 'daniel.k@example.kr', phone: '+82 2 999 8888', nationality: 'Korean', preferredLanguage: 'English', serviceId: 'study', applicantsCount: 1, status: 'Waiting for Payment', assignedConsultantId: 'c4', source: 'WeChat', createdDate: '2026-06-19T17:00:00Z', notes: 'Awaiting language school deposit confirmation.', timeline: [] },
   { id: 'LD1029', firstName: 'Gabriel', lastName: 'Martinez', email: 'gabriel.m@example.mx', phone: '+52 55 1234 5678', nationality: 'Mexican', preferredLanguage: 'Spanish', serviceId: 'self_employed', applicantsCount: 2, status: 'New Lead', assignedConsultantId: 'c1', source: 'Website Traffic', createdDate: '2026-06-19T18:00:00Z', notes: 'Wants to start a consultancy in Madrid.', timeline: [] },
   { id: 'LD1030', firstName: 'Mei', lastName: 'Chen', email: 'mei.chen@example.cn', phone: '+86 21 6666 8888', nationality: 'Chinese', preferredLanguage: 'English', serviceId: 'nlv', applicantsCount: 1, status: 'Under Process', assignedConsultantId: 'c1', source: 'WhatsApp Click Ads', createdDate: '2026-06-19T19:00:00Z', notes: 'NLV visa file submitted.', timeline: [] }
@@ -435,7 +435,7 @@ export const MOCK_CLIENTS = [
     status: 'Waiting for Payment',
     visaStatus: 'Not Started',
     onboardingDate: '2026-06-15T11:00:00Z',
-    profileSummary: 'Wants Spain Golden Visa for purchase of €550,000 property in Malaga. Enrolled in Premium Relocation package.'
+    profileSummary: 'Wants Spain Enterprise SaaS Platform for purchase of €550,000 property in Malaga. Enrolled in Premium Relocation package.'
   },
   {
     id: 'CL2002',
@@ -690,7 +690,7 @@ export const MOCK_CLIENTS = [
     status: 'Under Process',
     visaStatus: 'NIE / Local Registration',
     onboardingDate: '2026-06-19T16:00:00Z',
-    profileSummary: 'Golden Visa. Purchase complete. Undertaking local registration in Alicante.'
+    profileSummary: 'Enterprise SaaS Platform. Purchase complete. Undertaking local registration in Alicante.'
   },
   {
     id: 'CL2017',
@@ -810,7 +810,7 @@ export const MOCK_CONSULTATIONS = [
     outcome: {
       clientRequestedService: 'Property Investment Guidance',
       aaaRecommendedService: 'Property Investment Guidance',
-      notes: 'Strongly recommended the Premium Package to handle both the Golden Visa process and relocation tasks.'
+      notes: 'Strongly recommended the Premium Package to handle both the Enterprise SaaS Platform process and relocation tasks.'
     }
   },
   {
@@ -840,8 +840,8 @@ export const MOCK_CONSULTATIONS = [
     notes: 'Passive income details were unclear. Questionable source of dividends.',
     recordingUrl: 'https://storage.googleapis.com/aaa-consultancy-recordings/CS3005_recording.mp3',
     outcome: {
-      clientRequestedService: 'Non-Lucrative Visa (NLV)',
-      aaaRecommendedService: 'Non-Lucrative Visa (NLV)',
+      clientRequestedService: 'Mobile App Solution (iOS & Android)',
+      aaaRecommendedService: 'Mobile App Solution (iOS & Android)',
       notes: 'Warned client about high chance of consulate rejection unless dividend history is cleared. Client insisted on proceeding.'
     }
   },
@@ -855,7 +855,7 @@ export const MOCK_CONSULTATIONS = [
     assignedConsultantId: 'c1',
     status: 'Scheduled',
     meetingLink: null,
-    notes: 'Reviewing real estate investment options in Madrid and Golden Visa eligibility.',
+    notes: 'Reviewing real estate investment options in Madrid and Enterprise SaaS Platform eligibility.',
     recordingUrl: '',
     outcome: null
   },
@@ -1166,10 +1166,10 @@ export const EMAIL_TEMPLATES = [
   {
     id: 'et1',
     name: 'Appointment Confirmation',
-    subject: 'Your Consultation with AAA Business Consultancy is Scheduled',
+    subject: 'Your Project Discovery with Kiaan Technology is Scheduled',
     body: `Dear {clientName},
 
-Your Spain Visa & Residency consultation has been successfully booked.
+Your Custom Software & IT Architecture consultation has been successfully booked.
 
 Details:
 - Date: {meetingDate}
@@ -1182,16 +1182,16 @@ If you need to reschedule, please click here: {rescheduleLink}
 
 Best Regards,
 Client Relations Team
-AAA Business Consultancy LLC
+Kiaan Technology LLC
 clients@aaabusinessconsultancy.com`
   },
   {
     id: 'et2',
-    name: 'Consultation No-Show Follow Up',
-    subject: 'We missed you! Reschedule your Spain Visa Consultation',
+    name: 'Discovery Call No-Show Follow Up',
+    subject: 'We missed you! Reschedule your Technical Discovery Call',
     body: `Dear {clientName},
 
-We noticed you were unable to attend your scheduled Spain Visa & Residency Consultation on {meetingDate} at {meetingTime}.
+We noticed you were unable to attend your scheduled Custom Software & IT Architecture Consultation on {meetingDate} at {meetingTime}.
 
 We would love to help you build your future in Spain. Please click the link below to select a new date and time that works for you:
 
@@ -1200,15 +1200,15 @@ We would love to help you build your future in Spain. Please click the link belo
 If you have any questions, feel free to reply directly to this email or contact us via WhatsApp.
 
 Best Regards,
-AAA Business Consultancy LLC`
+Kiaan Technology LLC`
   },
   {
     id: 'et3',
     name: 'Payment Remainder & Invoice',
-    subject: 'Invoice {invoiceId} from AAA Business Consultancy LLC',
+    subject: 'Invoice {invoiceId} from Kiaan Technology LLC',
     body: `Dear {clientName},
 
-Thank you for choosing AAA Business Consultancy LLC for your Spain Visa & Residency journey.
+Thank you for choosing Kiaan Technology LLC for your Custom Software & IT Architecture journey.
 
 Please find attached Invoice {invoiceId} for your selected {packageName}.
 Total Amount Due: {amount}
@@ -1220,7 +1220,7 @@ Please make the payment before {dueDate} to avoid any delays in document draftin
 
 Best Regards,
 Finance Team
-AAA Business Consultancy LLC`
+Kiaan Technology LLC`
   }
 ];
 
@@ -1228,19 +1228,19 @@ export const WHATSAPP_TEMPLATES = [
   {
     id: 'wt1',
     name: 'Welcome & Qualification Ask',
-    body: `Greetings from AAA Business Consultancy LLC.
-Thank you for contacting us regarding Spain Visa & Residency Services.
+    body: `Greetings from Kiaan Technology LLC.
+Thank you for contacting us regarding Custom Software & IT Architecture Services.
 
 To help us guide you, please answer:
-1. Which service would you like to apply for? (DNV, NLV, Self-Employed, Study, Family, Schengen)
-2. How many applicants are included?
+1. Which service do you need? (Web App, Mobile App, SaaS MVP, AI/ML, Cloud DevOps)
+2. What is your target budget and timeline?
 
 For further assistance, we will continue our conversation here.`
   },
   {
     id: 'wt2',
     name: 'Consultation Invite Link',
-    body: `Congratulations! Based on your initial information, you are invited to book a FREE Assessment & Verification Consultation with one of our consultants.
+    body: `Congratulations! Based on your initial information, you are invited to book a FREE Technical Architecture & Feasibility Discovery Session with one of our consultants.
 
 Please use this booking link to select your preferred date and time:
 {bookingLink}`
@@ -1260,7 +1260,7 @@ export const ROLES = [
   { id: 'operations', name: 'Operations Staff', description: 'Oversee all leads and clients, document review pipeline, consultations, and consultant assignments.' }
 ];
 export const NOTIFICATIONS = [
-  { id: 'n1', title: 'New Lead Registered', message: 'Amelia Watson registered via Google Ads for Digital Nomad Visa.', type: 'lead', time: '5m ago', read: false },
+  { id: 'n1', title: 'New Lead Registered', message: 'Amelia Watson registered via Google Ads for Full-Stack Web Application.', type: 'lead', time: '5m ago', read: false },
   { id: 'n2', title: 'Payment Received', message: 'Invoice INV-2026-003 for Nour Dagher (€1,450) was paid.', type: 'payment', time: '1h ago', read: false },
   { id: 'n3', title: 'Document Uploaded', message: 'Chloe Dupont uploaded Bank Statement.', type: 'document', time: '2h ago', read: false },
   { id: 'n4', title: 'Meeting Confirmed', message: 'Tariq Mahmood confirmed attendance for today 3:00 PM.', type: 'meeting', time: '3h ago', read: true },

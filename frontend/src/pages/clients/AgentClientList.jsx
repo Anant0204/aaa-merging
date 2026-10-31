@@ -280,7 +280,7 @@ export const AgentClientList = () => {
       </Button>
       <PageHeader
         title="My Assigned Clients"
-        subtitle="Track onboarding contracts, payment schedules, and visa application submission lifecycles for your cases."
+        subtitle="Track client onboarding contracts, payment schedules, and project engineering lifecycles for your accounts."
       />
 
       {cardInfo && (

@@ -97,13 +97,13 @@ const TRANSLATIONS = {
     nationality: "Nationality",
     residence: "Country of Residence",
     step4: "Step 4: Consultation Objective",
-    notes_label: "What is your main goal for this visa consultation?",
+    notes_label: "What are the main requirements and objectives for your software project?",
     confirm_booking: "Confirm Consultation Booking",
     booked_consultations: "Your Consultations History",
     no_consultations: "No consultation records found.",
     checklist_title: "Required Documents Checklist",
-    checklist_desc: "Upload required visa application documents. Category-specific folders are automatically managed.",
-    upload_required: "Please upload the following documents to continue with your visa application.",
+    checklist_desc: "Upload project specification documents, wireframes, and design assets.",
+    upload_required: "Please upload the following technical specifications to proceed with sprint onboarding.",
     calculator_title: "Spanish Sworn Translation Word Counter & Price Calculator",
     calculator_desc: "Determine your translation costs instantly by entering your source language and word count. Upload documents directly for sworn certified Spanish translations.",
     select_source_lang: "Select Source Language",
@@ -163,13 +163,13 @@ const TRANSLATIONS = {
     nationality: "Nacionalidad",
     residence: "País de Residencia",
     step4: "Paso 4: Objetivo de la Consulta",
-    notes_label: "¿Cuál es su objetivo principal para esta consulta de visa?",
+    notes_label: "¿Cuáles son los objetivos principales para su proyecto de software?",
     confirm_booking: "Confirmar Reserva de Consulta",
     booked_consultations: "Historial de sus Consultas",
     no_consultations: "No se encontraron registros de consultas.",
     checklist_title: "Lista de Documentos Requeridos",
-    checklist_desc: "Suba los documentos requeridos para la solicitud de visa. Las carpetas específicas por categoría se gestionan automáticamente.",
-    upload_required: "Por favor, suba los siguientes documentos para continuar con su solicitud de visa.",
+    checklist_desc: "Suba las especificaciones del proyecto y requisitos de arquitectura.",
+    upload_required: "Por favor, suba los documentos requeridos para continuar con el desarrollo.",
     calculator_title: "Calculadora de Precios y Contador de Palabras de Traducción Jurada al Español",
     calculator_desc: "Determine los costos de traducción al instante ingresando el idioma de origen y el número de palabras. Suba documentos directamente para traducciones juradas certificadas al español.",
     select_source_lang: "Seleccionar Idioma de Origen",
@@ -196,13 +196,13 @@ const TRANSLATIONS = {
     nationality: "Nationalité",
     residence: "Pays de Résidence",
     step4: "Étape 4: Objectif de la Consultation",
-    notes_label: "Quel est votre objectif principal pour cette consultation de visa?",
+    notes_label: "Quel est votre objectif principal pour votre projet logiciel?",
     confirm_booking: "Confirmer la Réservation",
     booked_consultations: "Historique de vos Consultations",
     no_consultations: "Aucun dossier de consultation trouvé.",
     checklist_title: "Liste des Documents Requis",
-    checklist_desc: "Téléchargez les documents de demande de visa requis. Les dossiers spécifiques aux catégories sont gérés automatiquement.",
-    upload_required: "Veuillez télécharger les documents suivants pour continuer votre demande de visa.",
+    checklist_desc: "Téléchargez les spécifications techniques du projet.",
+    upload_required: "Veuillez télécharger les documents requis pour le projet.",
     calculator_title: "Calculateur de Prix & Compteur de Mots pour Traduction Assermentée en Espagnol",
     calculator_desc: "Déterminez instantanément vos coûts de traduction en saisissant votre langue source et le nombre de mots. Téléchargez les documents pour une traduction assermentée certifiée espagnole.",
     select_source_lang: "Sélectionner la Langue Source",
@@ -355,7 +355,7 @@ export const ClientPortalDocs = () => {
   const [translationFiles, setTranslationFiles] = useState([]);
 
   // Refund Claim Form State
-  const [claimCategory, setClaimCategory] = useState('Visa Rejection');
+  const [claimCategory, setClaimCategory] = useState('Scope Review / Cancellation');
   const [claimReason, setClaimReason] = useState('');
   const [claimProofUrl, setClaimProofUrl] = useState('');
   const [claimBankName, setClaimBankName] = useState('');
@@ -452,7 +452,7 @@ export const ClientPortalDocs = () => {
       doc.setTextColor(12, 35, 64);
       doc.setFont("helvetica", "bold");
       doc.setFontSize(9.5);
-      doc.text("Spain Visa 100% Money-Back Guarantee Refund Settlement", 18, 122);
+      doc.text("Spain project 100% Money-Back Guarantee Refund Settlement", 18, 122);
       
       doc.setFont("helvetica", "normal");
       doc.setFontSize(8);
@@ -462,7 +462,7 @@ export const ClientPortalDocs = () => {
       doc.setFont("helvetica", "normal");
       doc.setFontSize(9);
       doc.setTextColor(30, 41, 59);
-      doc.text(`${refund?.category || 'Visa Rejection'}`, 120, 122);
+      doc.text(`${refund?.category || 'Scope Review / Cancellation'}`, 120, 122);
 
       doc.setFont("helvetica", "bold");
       doc.setFontSize(10);
@@ -512,7 +512,7 @@ export const ClientPortalDocs = () => {
   // Staged Documents Batch Upload State (Main Applicant + Additional Applicants)
   const [stagedFiles, setStagedFiles] = useState({});
 
-  // Visa Package selection & Billing states
+  // project Package selection & Billing states
   const [selectedPackage, setSelectedPackage] = useState('OPTION_A');
   const [addApplicants, setAddApplicants] = useState(0);
   const [assessmentCredit, setAssessmentCredit] = useState(0);
@@ -578,7 +578,7 @@ export const ClientPortalDocs = () => {
       return true;
     }
 
-    // Explicit non-refundable services/packages: Case Assessment, Tourist Visa, Relocation Assistance
+    // Explicit non-refundable services/packages: Case Assessment, Tourist project, Relocation Assistance
     if (
       fullTarget.includes('assessment') ||
       fullTarget.includes('option_a') ||
@@ -597,24 +597,24 @@ export const ClientPortalDocs = () => {
 
   const getServicesProvidedText = (rawService) => {
     const service = String(rawService || '').trim();
-    if (!service) return 'Services Provided: Spain Visa & Relocation Service';
+    if (!service) return 'Services Provided: Spain project & Relocation Service';
 
     const s = service.toLowerCase();
     
     if (s.includes('dnv') || s.includes('digital nomad')) {
-      return 'Services Provided: Digital Nomad Visa (DNV)';
+      return 'Services Provided: Digital Nomad project (DNV)';
     }
     if (s.includes('nlv') || s.includes('non-lucrative')) {
-      return 'Services Provided: Non-Lucrative Visa (NLV)';
+      return 'Services Provided: Non-Lucrative project (NLV)';
     }
     if (s.includes('study') || s.includes('student')) {
-      return 'Services Provided: Spain Study Visa';
+      return 'Services Provided: Spain Study project';
     }
     if (s.includes('tourist') || s.includes('schengen') || s.includes('tourism')) {
-      return 'Services Provided: Spain Tourist Visa';
+      return 'Services Provided: Spain Tourist project';
     }
     if (s.includes('self_employed') || s.includes('business') || s.includes('self-employed')) {
-      return 'Services Provided: Spain Self-Employed / Business Visa';
+      return 'Services Provided: Spain Self-Employed / Business project';
     }
     if (s.includes('translation') || s.includes('sworn')) {
       return 'Services Provided: Spanish Sworn Translation';
@@ -670,7 +670,7 @@ export const ClientPortalDocs = () => {
       additionalApplicantPrice: 0,
       isRecommended: false,
       refundableText: 'Non-refundable (€250 fee deductible within 14 days if upgraded to Full or Premium Package)',
-      description: 'Dedicated One-to-One Case Review, Professional Case Evaluation, Comprehensive Eligibility Assessment, Most Suitable Visa & Residency Recommendation, Initial Document Review, Personalized Document Checklist, Missing & Required Documents Report, Application Readiness Assessment, Personalized Action Plan, Professional Package Recommendation, Assist with Appointments.',
+      description: 'Dedicated One-to-One Case Review, Professional Case Evaluation, Comprehensive Eligibility Assessment, Most Suitable project & Residency Recommendation, Initial Document Review, Personalized Document Checklist, Missing & Required Documents Report, Application Readiness Assessment, Personalized Action Plan, Professional Package Recommendation, Assist with Appointments.',
       includes: [
         'Dedicated One-to-One Case Review & Evaluation',
         'Comprehensive Eligibility Assessment & Action Plan',
@@ -686,7 +686,7 @@ export const ClientPortalDocs = () => {
       price: 3500,
       additionalApplicantPrice: 500,
       isRecommended: false,
-      refundableText: '100% refundable if visa is rejected (Subject to T&C)',
+      refundableText: '100% refundable if project is rejected (Subject to T&C)',
       description: 'Complete professional end-to-end support for Spain Residency applications from eligibility to submission.',
       includes: [
         'Complete End-to-End Application Processing & Strategy',
@@ -694,7 +694,7 @@ export const ClientPortalDocs = () => {
         'Official Sworn Translation Management',
         'Digital Nomad / NLV File Assembly',
         'Consulate Appointment Assistance & Status Tracking',
-        '100% Refundable if visa application is rejected (Subject to T&C)'
+        '100% Refundable if project application is rejected (Subject to T&C)'
       ]
     },
     {
@@ -705,7 +705,7 @@ export const ClientPortalDocs = () => {
       additionalApplicantPrice: 500,
       isRecommended: false,
       refundableText: 'Non-refundable',
-      description: 'Post-approval administrative relocation support for clients who already have their visa approved and need settlement help in Spain.',
+      description: 'Post-approval administrative relocation support for clients who already have their project approved and need settlement help in Spain.',
       includes: [
         'Post-Approval Residency Card (TIE) Fingerprint Processing',
         'Town Hall Registration (Empadronamiento)',
@@ -721,7 +721,7 @@ export const ClientPortalDocs = () => {
       price: 4750,
       additionalApplicantPrice: 750,
       isRecommended: true,
-      refundableText: '100% refundable if visa is rejected (Subject to T&C)',
+      refundableText: '100% refundable if project is rejected (Subject to T&C)',
       description: 'Everything in Full Process + complete relocation administrative assistance in Spain.',
       includes: [
         'Everything in Full Processing Package (End-to-End Service)',
@@ -730,7 +730,7 @@ export const ClientPortalDocs = () => {
         'NIE / TIE Fingerprint Appointment Booking',
         'Empadronamiento (Town Hall Registration)',
         'Spanish Social Security Registration',
-        '100% Refundable if visa application is rejected (Subject to T&C)'
+        '100% Refundable if project application is rejected (Subject to T&C)'
       ]
     }
   ];
@@ -970,13 +970,13 @@ export const ClientPortalDocs = () => {
   );
 
   const isStatusPaid = ['Payment Received', 'Paid', 'Partially Paid', 'Payment Completed', 'Under Process', 'Processing', 'Active'].includes(client?.status);
-  const isVisaStatusActive = ['Document Preparation', 'Document Review', 'Apostille & Translations', 'Submitted - Pending Decision', 'NIE / Local Registration', 'Visa Approved'].includes(client?.visaStatus);
+  const isprojectStatusActive = ['Document Preparation', 'Document Review', 'Apostille & Translations', 'Submitted - Pending Decision', 'NIE / Local Registration', 'Project Delivered'].includes(client?.projectStatus);
   const isMainPackageStatusActive = (
     client?.status === 'Payment Completed' ||
     client?.status === 'Paid' ||
-    ['Submitted - Pending Decision', 'NIE / Local Registration', 'Visa Approved'].includes(client?.visaStatus)
+    ['Submitted - Pending Decision', 'NIE / Local Registration', 'Project Delivered'].includes(client?.projectStatus)
   );
-  const isClientPaid = Boolean(client?.documentUploadAllowed || hasAnyPaidPayment || translationPaid || isStatusPaid || isVisaStatusActive);
+  const isClientPaid = Boolean(client?.documentUploadAllowed || hasAnyPaidPayment || translationPaid || isStatusPaid || isprojectStatusActive);
   const isMainPackagePaid = Boolean((hasMainPackagePaidPayment || isMainPackageStatusActive) && client?.status !== 'Partially Paid' && client?.status !== 'Payment Received');
 
   const totalApplicants = client ? getApplicantsCount(client.applicantsCount) : 1;
@@ -2055,7 +2055,7 @@ export const ClientPortalDocs = () => {
             Your Spain Immigration Journey
           </Typography>
           <Typography variant="body2" sx={{ opacity: 0.9, maxWidth: 500, fontWeight: 500, fontSize: { xs: '0.7rem', sm: '0.825rem' }, lineHeight: 1.35 }}>
-            Track your visa application, complete certified sworn translations, upload required compliance documents, and launch your new relocation lifestyle.
+            Track your project application, complete certified sworn translations, upload required compliance documents, and launch your new relocation lifestyle.
           </Typography>
         </Box>
       </Box>
@@ -2094,7 +2094,7 @@ export const ClientPortalDocs = () => {
               }}
             />
             <Tab
-              label="2. Visa Packages & Billing"
+              label="2. project Packages & Billing"
               sx={{
                 textTransform: 'none',
                 fontWeight: 800,
@@ -2149,7 +2149,7 @@ export const ClientPortalDocs = () => {
                   </Box>
                   <Typography variant="h5" sx={{ fontWeight: 900, color: '#051A3B', mb: 1.5, fontFamily: 'Outfit, sans-serif' }}>Document Center is Locked</Typography>
                   <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 500, mx: 'auto', mb: 4, lineHeight: 1.7, fontWeight: 500 }}>
-                    Please complete your visa package payment or wait for administrative approval to unlock your compliance document uploader panel.
+                    Please complete your project package payment or wait for administrative approval to unlock your compliance document uploader panel.
                   </Typography>
                   <Button
                     variant="contained"
@@ -2533,7 +2533,7 @@ export const ClientPortalDocs = () => {
                             📋 Resubmission Document Checklist
                           </Typography>
                           <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>
-                            Application Cycle #{activeResubmissionCycle.id.substring(0, 8)} | Original Refusal Ground: <strong>{activeResubmissionCycle.refusalReason || 'Visa Refused'}</strong>
+                            Application Cycle #{activeResubmissionCycle.id.substring(0, 8)} | Original Refusal Ground: <strong>{activeResubmissionCycle.refusalReason || 'project Refused'}</strong>
                           </Typography>
                         </Box>
                         <Chip
@@ -3697,9 +3697,9 @@ export const ClientPortalDocs = () => {
               {isMainPackagePaid && (
                 <Paper sx={{ p: 3, borderRadius: 3, border: '1px solid', borderColor: 'success.main', bgcolor: '#F0FDF4', boxShadow: 'none', textAlign: 'center' }}>
                   <CheckCircleIcon color="success" sx={{ fontSize: 44, mb: 1 }} />
-                  <Typography variant="h6" sx={{ fontWeight: 800, mb: 0.5, color: '#051A3B' }}>Visa Relocation Package Active & Paid</Typography>
+                  <Typography variant="h6" sx={{ fontWeight: 800, mb: 0.5, color: '#051A3B' }}>project Relocation Package Active & Paid</Typography>
                   <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 600, mx: 'auto', mb: 2 }}>
-                    Your active visa package payment has been verified. You can upload documents in the <strong>Document Center</strong> tab, or purchase additional packages/applicants below.
+                    Your active project package payment has been verified. You can upload documents in the <strong>Document Center</strong> tab, or purchase additional packages/applicants below.
                   </Typography>
                   <Button variant="contained" size="small" onClick={() => setTabValue(0)} sx={{ px: 3, py: 0.75, borderRadius: 2, fontWeight: 700, textTransform: 'none', bgcolor: '#051A3B', color: 'white', '&:hover': { bgcolor: '#C59B27' } }}>
                     Go to Document Center
@@ -3710,7 +3710,7 @@ export const ClientPortalDocs = () => {
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 2, mb: 3 }}>
                     <Box>
                       <Typography variant="h5" sx={{ fontWeight: 800, color: '#051A3B', fontFamily: 'Outfit, sans-serif' }}>
-                        Visa Packages & Billing Hub
+                        project Packages & Billing Hub
                       </Typography>
                       <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
                         Select your preferred package, add co-applicants, view itemized invoice with 5% VAT, and pay securely.
@@ -3774,7 +3774,7 @@ export const ClientPortalDocs = () => {
                                 isRecommended: !!pkg.isRecommended,
                                 isFixedPrice: !!pkg.isFixedPrice,
                                 isRefundable: isRefund,
-                                refundableText: pkg.refundableText || (isRefund ? '100% refundable if visa is rejected (Subject to T&C)' : 'Non-refundable'),
+                                refundableText: pkg.refundableText || (isRefund ? '100% refundable if project is rejected (Subject to T&C)' : 'Non-refundable'),
                                 description: pkg.description || '',
                                 includes: Array.isArray(pkg.includes) ? pkg.includes : []
                               };
@@ -3957,7 +3957,7 @@ export const ClientPortalDocs = () => {
                                   isRecommended: !!pkg.isRecommended,
                                   isFixedPrice: !!pkg.isFixedPrice,
                                   isRefundable: isRefund,
-                                  refundableText: pkg.refundableText || (isRefund ? '100% refundable if visa is rejected (Subject to T&C)' : 'Non-refundable'),
+                                  refundableText: pkg.refundableText || (isRefund ? '100% refundable if project is rejected (Subject to T&C)' : 'Non-refundable'),
                                   includes: Array.isArray(pkg.includes) ? pkg.includes : []
                                 };
                               })
@@ -4033,7 +4033,7 @@ export const ClientPortalDocs = () => {
                                 onChange={(e) => setBillingPaymentMethod(e.target.value)}
                                 sx={{ mb: 2 }}
                               >
-                                <MenuItem value="card">Credit / Debit Card (Visa/Mastercard) 💳</MenuItem>
+                                <MenuItem value="card">Credit / Debit Card (project/Mastercard) 💳</MenuItem>
                                 <MenuItem value="apple">Apple Pay / Google Pay 📱</MenuItem>
                                 <MenuItem value="wallet">Link Wallet 💼</MenuItem>
                                 <MenuItem value="bank">Emirates NBD Company Bank Transfer 🏦</MenuItem>
@@ -4136,7 +4136,7 @@ export const ClientPortalDocs = () => {
                                 <Typography variant="caption" sx={{ color: '#A37E1C', display: 'block', fontSize: '0.68rem', lineHeight: 1.3, fontWeight: 500 }}>
                                   {isRefundGuaranteePackage(activePkg || selectedPackage, client?.serviceType || client?.serviceId)
                                     ? 'Option B & D (Full Processing & Premium): 100% Refund Guarantee according to Company Terms & Conditions.'
-                                    : 'Case Assessment, Tourist Visa & Relocation Assistance are non-refundable according to Company Terms & Conditions.'}
+                                    : 'Case Assessment, Tourist project & Relocation Assistance are non-refundable according to Company Terms & Conditions.'}
                                 </Typography>
                               </Box>
                             </Box>
@@ -4163,11 +4163,11 @@ export const ClientPortalDocs = () => {
               <Box className="col-span-12">
                 <Paper sx={{ p: 3, borderRadius: 3, border: '1px solid rgba(197, 155, 39, 0.3)', bgcolor: '#FAF6ED' }}>
                   <Typography variant="h6" sx={{ fontWeight: 800, color: '#051A3B', fontFamily: 'Outfit, sans-serif', mb: 0.5 }}>
-                    🛡️ Spain Visa 100% Money-Back Guarantee & Refund Center
+                    🛡️ Spain project 100% Money-Back Guarantee & Refund Center
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
                     {isRefundEligible
-                      ? 'Your enrolled service plan includes our 100% Refund Guarantee under our terms & conditions. If your visa application is refused, submit your rejection letter below.'
+                      ? 'Your enrolled service plan includes our 100% Refund Guarantee under our terms & conditions. If your project application is refused, submit your rejection letter below.'
                       : 'Your currently enrolled package operates under standard non-refundable terms without a refund guarantee clause.'}
                   </Typography>
                 </Paper>
@@ -4244,7 +4244,7 @@ export const ClientPortalDocs = () => {
                               fontFamily: 'Outfit, sans-serif'
                             }}
                           >
-                            📌 <strong>Note:</strong> If the visa is rejected after the resubmission or appeal process, the client will receive a 100% refund, subject to the Company’s Terms and Conditions.
+                            📌 <strong>Note:</strong> If the project is rejected after the resubmission or appeal process, the client will receive a 100% refund, subject to the Company’s Terms and Conditions.
                           </Typography>
                         </Box>
                       </Box>
@@ -4392,7 +4392,7 @@ export const ClientPortalDocs = () => {
                                 createRefundMutation.mutate({
                                   clientId: client?.id || clientId,
                                   clientEmail: client?.email || '',
-                                  category: claimCategory || 'Visa Rejection (100% Guarantee)',
+                                  category: claimCategory || 'Scope Review / Cancellation (100% Guarantee)',
                                   reason: claimReason,
                                   proofUrl: claimProofUrl,
                                   bankAccountName: claimBankName.trim(),
@@ -4515,7 +4515,7 @@ export const ClientPortalDocs = () => {
 
           <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>Choose Payment Provider</Typography>
           <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-            <Button variant="outlined" sx={{ flexGrow: 1, py: 1 }}>Visa / Mastercard</Button>
+            <Button variant="outlined" sx={{ flexGrow: 1, py: 1 }}>project / Mastercard</Button>
             <Button variant="outlined" sx={{ flexGrow: 1, py: 1 }}>Apple Pay / Google Pay</Button>
             <Button variant="outlined" sx={{ flexGrow: 1, py: 1 }}>Emirates NBD Company Bank Transfer</Button>
           </Box>
@@ -4527,7 +4527,7 @@ export const ClientPortalDocs = () => {
               style={{ marginTop: 4, transform: 'scale(1.2)' }}
             />
             <label htmlFor="tc-checkbox" style={{ fontSize: '0.825rem', color: '#6B7280', cursor: 'pointer', lineHeight: 1.4 }}>
-              I agree to the Spain Visa Legal Relocation Terms of Service, sworn affidavit declaration policies, and 50% refund schedule conditions.
+              I agree to the Spain project Legal Relocation Terms of Service, sworn affidavit declaration policies, and 50% refund schedule conditions.
             </label>
           </Box>
 
@@ -4826,10 +4826,10 @@ export const ClientPortalDocs = () => {
                           <TableRow sx={{ '&:nth-of-type(even)': { bgcolor: '#F8FAFC' } }}>
                             <TableCell>
                               <Typography sx={{ fontWeight: 700, fontSize: '0.88rem', color: '#0C2340' }}>
-                                {currentPkg?.name || 'Spain Relocation Visa Package'}
+                                {currentPkg?.name || 'Spain Relocation project Package'}
                               </Typography>
                               <Typography sx={{ fontSize: '0.75rem', color: '#64748B', mt: 0.2 }}>
-                                {getServicesProvidedText(client?.serviceType || clientProfile?.serviceType || (isOptA ? 'Spain Visa Case Assessment' : ''))}
+                                {getServicesProvidedText(client?.serviceType || clientProfile?.serviceType || (isOptA ? 'Spain project Case Assessment' : ''))}
                               </Typography>
                             </TableCell>
                             <TableCell align="right" sx={{ fontWeight: 700 }}>€{basePrice.toFixed(2)}</TableCell>
@@ -5260,14 +5260,14 @@ export const ClientPortalDocs = () => {
                         <TableRow sx={{ bgcolor: '#F8FAFC' }}>
                           <TableCell>
                             <Typography sx={{ fontWeight: 700, fontSize: '0.9rem', color: '#0C2340' }}>
-                              Spain Visa Guarantee Refund Settlement
+                              Spain project Guarantee Refund Settlement
                             </Typography>
                             <Typography sx={{ fontSize: '0.78rem', color: '#64748B', mt: 0.2 }}>
                               Official refund settlement as per AAA 100% Money-Back Guarantee Terms & Conditions.
                             </Typography>
                           </TableCell>
                           <TableCell sx={{ fontWeight: 600, fontSize: '0.85rem' }}>
-                            {r.category || 'Visa Rejection'}
+                            {r.category || 'Scope Review / Cancellation'}
                           </TableCell>
                           <TableCell align="right" sx={{ fontWeight: 800, color: '#C59B27', fontSize: '1rem' }}>
                             {amountStr}
