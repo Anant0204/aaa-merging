@@ -89,6 +89,7 @@ import SuperAdminStorageBackup from '../pages/documents/SuperAdminStorageBackup'
 import SuperAdminCustomization from '../pages/settings/SuperAdminCustomization';
 import Integrations from '../pages/integrations/Integrations';
 import ReviewsDashboard from '../pages/reviews/ReviewsDashboard';
+import AiEmployeeControlCenter from '../pages/ai/AiEmployeeControlCenter';
 
 const getMenuLabelForPath = (path) => {
   const p = path.toLowerCase();
@@ -108,6 +109,7 @@ const getMenuLabelForPath = (path) => {
   if (p.includes('/consultations/calendar')) return 'Calendar';
   if (p.includes('/integrations')) return 'Integrations';
   if (p.includes('/reviews')) return 'Reviews';
+  if (p.includes('/ai-employees')) return 'AI Employees (24/7)';
 
   return null;
 };
@@ -136,6 +138,7 @@ const getDynamicRedirectPath = (label, role) => {
 
   if (label === 'Integrations') return '/integrations';
   if (label === 'Reviews') return '/reviews';
+  if (label === 'AI Employees (24/7)' || label === 'AI Employees') return '/ai-employees';
   if (!prefix) return path;
   return `/${prefix}${path}`;
 };
@@ -994,6 +997,49 @@ export const AppRoutes = () => {
         />
 
         {/* Reviews & Reputation (Super Admin, Admin, Operations, Marketing) */}
+        
+        {/* 7 Autonomous AI Employees Control Center */}
+        <Route
+          path="/ai-employees"
+          element={
+            <ProtectedRoute allowedRoles={['admin', 'super_admin', 'operations', 'marketing', 'consultant']}>
+              <AiEmployeeControlCenter />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/super_admin/ai-employees"
+          element={
+            <ProtectedRoute allowedRoles={['super_admin', 'admin']}>
+              <AiEmployeeControlCenter />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/ai-employees"
+          element={
+            <ProtectedRoute allowedRoles={['admin', 'super_admin']}>
+              <AiEmployeeControlCenter />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/operations/ai-employees"
+          element={
+            <ProtectedRoute allowedRoles={['operations', 'super_admin']}>
+              <AiEmployeeControlCenter />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/:rolePrefix/ai-employees"
+          element={
+            <ProtectedRoute allowedRoles={['admin', 'super_admin', 'operations', 'marketing', 'consultant']}>
+              <AiEmployeeControlCenter />
+            </ProtectedRoute>
+          }
+        />
+
         <Route
           path="/reviews"
           element={

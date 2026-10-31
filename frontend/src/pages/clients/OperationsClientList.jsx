@@ -361,7 +361,7 @@ export const OperationsClientList = () => {
       </Button>
       <PageHeader
         title="Operations Client Registry"
-        subtitle="Track onboarding contracts, payment schedules, and visa application submission lifecycles."
+        subtitle="Track client onboarding contracts, payment schedules, and software engineering delivery lifecycles."
         action={
           !isViewOnly && (
             <Button
@@ -621,7 +621,7 @@ export const OperationsClientList = () => {
                   labelId="service-id-label"
                   {...register('serviceId')}
                   value={watchServiceId || ''}
-                  label="Visa Service"
+                  label="IT Service"
                 >
                   {SERVICES.map((s) => (
                     <MenuItem key={s.id} value={s.id}>

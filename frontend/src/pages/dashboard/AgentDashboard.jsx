@@ -13,6 +13,7 @@ import ListItemText from '@mui/material/ListItemText';
 import Paper from '@mui/material/Paper';
 
 import { useAuth } from '../../hooks/useAuth';
+import { useCurrency } from '../../contexts/CurrencyContext';
 import PageHeader from '../../components/PageHeader';
 import StatCard from '../../components/StatCard';
 import AppCard from '../../components/AppCard';
@@ -32,6 +33,7 @@ import { SERVICES } from '../../constants/mockData';
 export const AgentDashboard = () => {
   const navigate = useNavigate();
   const { currentUser } = useAuth();
+  const { currency, currencySymbol, formatAmount, convertAmount } = useCurrency();
 
   const { data: allLeads = [] } = useQuery({ queryKey: ['leads'], queryFn: dbService.getLeads });
   const { data: allClients = [] } = useQuery({ queryKey: ['clients'], queryFn: dbService.getClients });
@@ -101,10 +103,10 @@ export const AgentDashboard = () => {
 
   // Render stats list
   const statsList = [
-    { title: 'My Total Consultations', value: totalConsultations, icon: <AssignmentIcon />, color: '#3F51B5', onClick: () => navigate('/agent/consultations', { state: { filterStatus: '', cardInfo: { title: 'My Total Consultations', value: totalConsultations, color: '#3F51B5', iconType: 'Assignment' } } }) },
+    { title: 'My Total Inquiries', value: totalConsultations, icon: <AssignmentIcon />, color: '#3F51B5', onClick: () => navigate('/agent/consultations', { state: { filterStatus: '', cardInfo: { title: 'My Total Inquiries', value: totalConsultations, color: '#3F51B5', iconType: 'Assignment' } } }) },
     { title: 'My Performance (%)', value: `${performancePercent}%`, icon: <TrendingUpIcon />, color: '#10B981' },
-    { title: 'Commission Earned', value: `€${commissionEarned.toLocaleString()}`, icon: <PaymentsIcon />, color: '#F59E0B' },
-    { title: 'My Active Cases', value: activeCases, icon: <AssignmentIcon />, color: '#3B82F6', onClick: () => navigate('/agent/leads', { state: { filterStatus: 'Active', cardInfo: { title: 'My Active Cases', value: activeCases, color: '#3B82F6', iconType: 'Assignment' } } }) },
+    { title: 'Commission Earned', value: formatAmount(currency === 'INR' ? convertAmount(commissionEarned, 'USD', 'INR') : commissionEarned), icon: <PaymentsIcon />, color: '#F59E0B' },
+    { title: 'My Active Projects', value: activeCases, icon: <AssignmentIcon />, color: '#3B82F6', onClick: () => navigate('/agent/leads', { state: { filterStatus: 'Active', cardInfo: { title: 'My Active Projects', value: activeCases, color: '#3B82F6', iconType: 'Assignment' } } }) },
     { title: 'Closed Cases', value: closedCases, icon: <CheckCircleOutlinedIcon />, color: '#22C55E', onClick: () => navigate('/agent/leads', { state: { filterStatus: 'Closed', cardInfo: { title: 'Closed Cases', value: closedCases, color: '#22C55E', iconType: 'CheckCircleOutlined' } } }) },
     { title: 'My Assigned Leads', value: myLeads.length, icon: <WarningAmberIcon />, color: '#EF4444', onClick: () => navigate('/agent/leads', { state: { filterStatus: '', filterToday: false, cardInfo: { title: 'My Assigned Leads', value: myLeads.length, color: '#EF4444', iconType: 'WarningAmber' } } }) }
   ];
@@ -124,7 +126,7 @@ export const AgentDashboard = () => {
       render: (row) => `${row.firstName} ${row.lastName}` },
     {
       id: 'service',
-      label: 'Visa Service',
+      label: 'IT Service',
       render: (row) => SERVICES.find((s) => s.id === row.serviceId)?.name || row.serviceId },
     { id: 'preferredLanguage', label: 'Language' },
     { id: 'status', label: 'Status' }
@@ -143,22 +145,22 @@ export const AgentDashboard = () => {
       >
         {statsList
           .filter(stat => {
-            const cardTitle = stat.title === 'My Total Consultations' ? 'Total Consultations' :
-              stat.title === 'My Active Cases' ? 'Active Cases' :
-                stat.title === 'Closed Cases' ? 'Completed Cases' :
+            const cardTitle = stat.title === 'My Total Inquiries' ? 'Total Inquiries' :
+              stat.title === 'My Active Projects' ? 'Active Projects' :
+                stat.title === 'Closed Cases' ? 'Completed Projects' :
                   stat.title;
 
             // If it's a personal/performance metric not present in the customizable cards catalog, always show it
             const customizableKeys = [
               'Total Clients',
               'Today\'s Clients',
-              'Total Consultations',
-              'Today\'s Consultations',
+              'Total Inquiries',
+              'Today\'s Inquiries',
               'Pending Payments',
               'Total Revenue',
-              'Active Cases',
-              'Completed Cases',
-              'Lost Consultations',
+              'Active Projects',
+              'Completed Projects',
+              'Lost Inquiries',
               'Revenue Today',
               'Outstanding Revenue',
               'Refunded (Guarantee Claims)'
@@ -221,7 +223,7 @@ export const AgentDashboard = () => {
           </Typography>
         </Box>
         <Typography variant="h3" color="amber.900" sx={{ fontWeight: 900 }}>
-          €{commissionEarned.toLocaleString()}
+          {formatAmount(currency === 'INR' ? convertAmount(commissionEarned, 'USD', 'INR') : commissionEarned)}
         </Typography>
       </Paper>
 

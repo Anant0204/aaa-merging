@@ -54,7 +54,8 @@ export const PageHeader = ({
           component="h1"
           sx={{
             fontWeight: 800,
-            fontSize: { xs: '1rem', sm: '1.2rem', md: '1.35rem' },
+            fontSize: { xs: '1.15rem', sm: '1.35rem', md: '1.5rem' },
+            letterSpacing: '-0.025em',
             lineHeight: 1.2,
           }}
         >

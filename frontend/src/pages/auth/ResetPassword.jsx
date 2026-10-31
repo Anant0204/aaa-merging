@@ -40,11 +40,32 @@ export const ResetPassword = () => {
 
   return (
     <Box>
-      <Box sx={{ mb: 3, textAlign: 'center' }}>
-        <Typography variant="h4" sx={{ fontWeight: 700, mb: 1 }}>
+      <Box sx={{ mb: 3, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <Box
+          sx={{
+            width: 54,
+            height: 54,
+            borderRadius: 3,
+            backgroundColor: '#FFFFFF',
+            boxShadow: '0 8px 24px rgba(37, 99, 235, 0.15)',
+            border: '1px solid rgba(226, 232, 240, 0.9)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            p: 1,
+            mb: 1.5,
+          }}
+        >
+          <img
+            src="/aaa-logo.png"
+            alt="AAA Technologies Logo"
+            style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+          />
+        </Box>
+        <Typography variant="h4" sx={{ fontWeight: 800, mb: 1, letterSpacing: '-0.02em' }}>
           Reset Password
         </Typography>
-        <Typography variant="body2" color="text.secondary">
+        <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center' }}>
           Enter your new password below.
         </Typography>
       </Box>

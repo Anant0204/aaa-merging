@@ -102,7 +102,7 @@ export const ConsultationList = () => {
       label: 'IT Service / Project Scope',
       render: (row) => (
         <Chip
-          label={row.visaType || row.serviceType || 'IT Discovery'}
+          label={row.serviceType || 'IT Technical Discovery'}
           size="small"
           color="primary"
           variant="outlined"

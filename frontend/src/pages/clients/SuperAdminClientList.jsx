@@ -454,7 +454,7 @@ export const SuperAdminClientList = () => {
       </Button>
       <PageHeader
         title="Admin Client Registry"
-        subtitle="Track onboarding contracts, payment schedules, and visa application submission lifecycles."
+        subtitle="Track client onboarding contracts, payment schedules, and software engineering delivery lifecycles."
         action={
           (!isViewOnly && (isSuperAdmin || clientsActions.canCreate !== false)) && (
             <Button
@@ -732,7 +732,7 @@ export const SuperAdminClientList = () => {
                   labelId="service-id-label"
                   {...register('serviceId')}
                   value={watchServiceId || ''}
-                  label="Visa Service"
+                  label="IT Service"
                 >
                   {SERVICES.map((s) => (
                     <MenuItem key={s.id} value={s.id}>

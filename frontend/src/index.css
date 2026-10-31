@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
 
 @import "tailwindcss";
 
@@ -15,13 +15,24 @@
   --font-size-body1: 0.825rem;
   --font-size-body2: 0.775rem;
 
-  /* Custom Brand Theme Colors */
-  --color-brand-navy: #051A3B;
-  --color-brand-navy-light: #0B2A59;
-  --color-brand-gold: #C59B27;
-  --color-brand-gold-light: #E5C058;
-  --color-brand-gold-dark: #A37E1C;
-  --color-brand-cream: #FAF6ED;
+  /* AI-Powered Fintech Design System Tokens */
+  --color-fintech-blue: #2563EB;
+  --color-fintech-blue-light: #3B82F6;
+  --color-fintech-indigo: #6366F1;
+  --color-fintech-violet: #8B5CF6;
+  --color-fintech-cyan: #06B6D4;
+  --color-fintech-emerald: #10B981;
+  --color-fintech-dark: #070A13;
+  --color-fintech-surface: #0F172A;
+  --color-fintech-surface-light: #1E293B;
+
+  /* Backward Compatibility Aliases mapped to Modern Fintech Palette */
+  --color-brand-navy: #0B0F19;
+  --color-brand-navy-light: #162036;
+  --color-brand-gold: #2563EB;
+  --color-brand-gold-light: #3B82F6;
+  --color-brand-gold-dark: #1D4ED8;
+  --color-brand-cream: #F8FAFC;
 }
 
 html,
@@ -33,13 +44,50 @@ body,
   height: 100%;
   font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
   background-color: transparent;
-  color: #283593;
+  color: #0F172A;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Modern Fintech Glassmorphism & Card Utilities */
+.fintech-glass {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+.dark-mode .fintech-glass {
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.fintech-gradient-border {
+  position: relative;
+  background-clip: padding-box;
+}
+
+.fintech-gradient-border::after {
+  content: '';
+  position: absolute;
+  top: 0; right: 0; bottom: 0; left: 0;
+  z-index: -1;
+  margin: -1px;
+  border-radius: inherit;
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.35), rgba(99, 102, 241, 0.15));
+}
+
+/* Modern AI Fintech Ambient Glow */
+.ai-glow {
+  box-shadow: 0 0 25px -5px rgba(37, 99, 235, 0.25);
 }
 
 /* Scrollbar Styles */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
@@ -48,15 +96,16 @@ body,
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(15, 23, 42, 0.3);
+  background: rgba(148, 163, 184, 0.4);
   border-radius: 4px;
+  transition: background 0.2s ease;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(197, 155, 39, 0.5);
+  background: rgba(37, 99, 235, 0.6);
 }
 
-/* Remove ugly white background spin buttons from number inputs on dark theme */
+/* Remove spin buttons from number inputs */
 input[type=number]::-webkit-inner-spin-button,
 input[type=number]::-webkit-outer-spin-button {
   -webkit-appearance: none;
@@ -66,12 +115,11 @@ input[type=number] {
   -moz-appearance: textfield;
 }
 
-
 /* Dark mode scrollbars */
 .dark-mode ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.2);
 }
 
 .dark-mode ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.5);
+  background: rgba(59, 130, 246, 0.6);
 }

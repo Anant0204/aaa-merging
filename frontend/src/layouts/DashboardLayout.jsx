@@ -59,12 +59,16 @@ import LinkedInIcon from '@mui/icons-material/LinkedIn';
 import TwitterIcon from '@mui/icons-material/Twitter';
 import PinterestIcon from '@mui/icons-material/Pinterest';
 import RateReviewIcon from '@mui/icons-material/RateReview';
+import SmartToyIcon from '@mui/icons-material/SmartToy';
+import LanguageIcon from '@mui/icons-material/Language';
+import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
 import ChatIcon from '@mui/icons-material/Chat';
 import { io } from 'socket.io-client';
 
 // Contexts & Hooks
 import { useThemeMode } from '../contexts/ThemeContext';
 import { useAlert } from '../contexts/AlertContext';
+import { useCurrency } from '../contexts/CurrencyContext';
 import { useAuth } from '../hooks/useAuth';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { dbService } from '../services/dbService';
@@ -439,6 +443,7 @@ export const DashboardLayout = () => {
     if (item.path === '/integrations') return '/integrations';
     if (item.path === '/settings') return '/settings';
     if (item.path === '/reviews') return '/reviews';
+    if (item.path === '/ai-employees') return '/ai-employees';
 
     if (item.path.startsWith(`/${prefix}`)) return item.path;
 
@@ -475,20 +480,26 @@ export const DashboardLayout = () => {
       roles: ['admin', 'consultant', 'operations', 'finance', 'super_admin', 'marketing'],
     },
     {
-      label: 'Agents',
+      label: 'AI Employees (24/7)',
+      icon: <SmartToyIcon sx={{ color: '#2563EB' }} />,
+      path: '/ai-employees',
+      roles: ['admin', 'consultant', 'operations', 'finance', 'super_admin', 'marketing'],
+    },
+    {
+      label: 'Team',
       icon: <GroupsIcon />,
       path: '/agents',
       roles: ['admin', 'operations', 'super_admin'],
     },
     {
-      label: 'Active Cases',
+      label: 'Projects',
       icon: <GroupsIcon />,
       path: '/active-cases',
       roles: ['admin', 'operations', 'super_admin'],
     },
 
     {
-      label: 'Closed Cases',
+      label: 'Archived Projects',
       icon: <AssignmentTurnedInIcon />,
       path: '/closed-cases',
       roles: ['admin', 'operations', 'super_admin'],
@@ -530,7 +541,7 @@ export const DashboardLayout = () => {
       roles: ['admin', 'consultant', 'operations', 'super_admin'],
     },
     {
-      label: 'All Agents Performance',
+      label: 'Team Performance',
       icon: <AssessmentIcon />,
       path: '/agents/performance',
       roles: ['admin', 'operations', 'super_admin'],
@@ -950,19 +961,24 @@ export const DashboardLayout = () => {
         <Box onClick={() => navigateTo('/dashboard')} sx={{ display: 'flex', alignItems: 'center', gap: 1, cursor: 'pointer' }}>
           <Box
             sx={{
-              width: 32,
-              height: 32,
-              borderRadius: 1,
-              background: 'linear-gradient(135deg, #2563EB 0%, #14B8A6 100%)',
+              width: 36,
+              height: 36,
+              borderRadius: 2,
+              backgroundColor: '#FFFFFF',
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
+              border: '1px solid #E2E8F0',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              color: 'white',
-              fontWeight: 800,
-              fontSize: '1.1rem',
+              p: 0.5,
+              flexShrink: 0,
             }}
           >
-            A³
+            <img
+              src="/aaa-logo.png"
+              alt="AAA Logo"
+              style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+            />
           </Box>
           {sidebarOpen && (
             <Box>
@@ -1148,18 +1164,25 @@ export const DashboardLayout = () => {
 
           {/* Right: Tools & Profile */}
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-            <FormControl size="small" sx={{ minWidth: 90 }}>
+            <FormControl size="small" sx={{ minWidth: 120 }}>
               <Select
                 value={adminLang}
                 onChange={(e) => changeAdminLanguage(e.target.value)}
+                displayEmpty
+                renderValue={(selected) => (
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8 }}>
+                    <LanguageIcon sx={{ fontSize: 16, color: 'primary.main' }} />
+                    <span>{selected}</span>
+                  </Box>
+                )}
                 sx={{ borderRadius: 2, height: 32, bgcolor: 'background.paper', fontSize: '0.8rem', fontWeight: 600 }}
               >
-                <MenuItem value="English">EN 🇺🇸</MenuItem>
-                <MenuItem value="Arabic">AR 🇦🇪</MenuItem>
-                <MenuItem value="Spanish">ES 🇪🇸</MenuItem>
-                <MenuItem value="French">FR 🇫🇷</MenuItem>
-                <MenuItem value="German">DE 🇩🇪</MenuItem>
-                <MenuItem value="Urdu">UR 🇵🇰</MenuItem>
+                <MenuItem value="English">English</MenuItem>
+                <MenuItem value="Arabic">العربية (Arabic)</MenuItem>
+                <MenuItem value="Spanish">Español (Spanish)</MenuItem>
+                <MenuItem value="French">Français (French)</MenuItem>
+                <MenuItem value="German">Deutsch (German)</MenuItem>
+                <MenuItem value="Urdu">اردو (Urdu)</MenuItem>
               </Select>
             </FormControl>
 
@@ -1199,7 +1222,7 @@ export const DashboardLayout = () => {
                   🔔 Notifications {unreadCount > 0 && `(${unreadCount})`}
                 </Typography>
                 {unreadCount > 0 && (
-                  <Button size="small" onClick={handleMarkAllRead} sx={{ fontSize: '0.7rem', color: '#C59B27', fontWeight: 700 }}>
+                  <Button size="small" onClick={handleMarkAllRead} sx={{ fontSize: '0.7rem', color: '#2563EB', fontWeight: 700 }}>
                     Mark all read
                   </Button>
                 )}
@@ -1240,7 +1263,7 @@ export const DashboardLayout = () => {
                           backgroundColor: notif.isRead ? 'transparent' : 'rgba(197, 155, 39, 0.06)',
                           borderBottom: '1px solid',
                           borderColor: 'divider',
-                          borderLeft: notif.isRead ? 'none' : '3px solid #C59B27',
+                          borderLeft: notif.isRead ? 'none' : '3px solid #2563EB',
                           '&:last-child': { border: 0 },
                           '&:hover': { bgcolor: 'rgba(197, 155, 39, 0.08)' }
                         }}
@@ -1251,7 +1274,7 @@ export const DashboardLayout = () => {
                               {notif.title}
                             </Typography>
                             {!notif.isRead && (
-                              <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: '#C59B27', flexShrink: 0, ml: 1 }} />
+                              <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: '#2563EB', flexShrink: 0, ml: 1 }} />
                             )}
                           </Box>
                           <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.75rem', lineHeight: 1.4 }}>

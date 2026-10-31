@@ -37,7 +37,7 @@ import { useAlert } from '../../contexts/AlertContext';
 import { useAuth } from '../../hooks/useAuth';
 import { SERVICES } from '../../constants/mockData';
 
-export const AdminActiveCases = () => {
+export const AdminActiveProjects = () => {
   const queryClient = useQueryClient();
   const { showAlert } = useAlert();
   const { currentUser, isAdmin, isOperations, isConsultant } = useAuth();
@@ -69,7 +69,7 @@ export const AdminActiveCases = () => {
     queryFn: dbService.getCustomizationSettings
   });
   const { isViewOnlyMenu } = useAuth();
-  const isViewOnly = isViewOnlyMenu(customizationSettings, 'Active Cases');
+  const isViewOnly = isViewOnlyMenu(customizationSettings, 'Active Projects');
 
   const updateClientMutation = useMutation({
     mutationFn: dbService.updateClient,
@@ -122,13 +122,13 @@ export const AdminActiveCases = () => {
 
   // Visa required checklists
   const REQUIRED_DOCUMENTS = {
-    dnv: ['Passport (Copy)', 'Employment Verification Letter', 'Remote Income Bank Statements', 'Social Security Certificate'],
-    nlv: ['Passport (Copy)', 'Spanish Health Insurance Policy', 'Clean Criminal Record Certificate', 'Savings Bank Statements'],
-    study: ['Passport (Copy)', 'University Acceptance Letter', 'Sufficient Funds Statements', 'Medical Certificate'],
-    family: ['Passport (Copy)', 'Marriage / Birth Certificates', 'Spanish Spouse ID', 'Financial Proof'],
-    sworn_translation: ['Original Document (Clear Copy)'],
-    property: ['Passport (Copy)', 'Spain Land Registry Certificate', 'Deed of Purchase', 'Bank Certificate'],
-    default: ['Passport (Copy)', 'Application Form EX-01', 'Proof of Sufficient Funds'] };
+    web_dev: ['Project SOW & Architecture', 'Figma Wireframes', 'API Documentation', 'Staging Deploy URL', 'Client UAT Sign-off'],
+    mobile_dev: ['UI/UX Design Prototypes', 'iOS & Android Source Code', 'Test Execution Report', 'App Store / Play Store Build'],
+    custom_software: ['Technical Architecture Document', 'Database Schema Specs', 'CI/CD Pipeline Setup', 'Production Deployment Sign-off'],
+    ai_ml: ['Dataset Specification', 'Model Pipeline Script', 'Inference API Endpoints', 'Integration Guide'],
+    cloud_devops: ['Infrastructure Architecture', 'Terraform/Docker Scripts', 'Security & IAM Audit', 'Monitoring Dashboard'],
+    default: ['Master Services Agreement (MSA)', 'Technical Requirements Document', 'Milestone Delivery Handover']
+  };
 
   const handleAssignHandler = (client, handlerId) => {
     const matchedHandler = agentsList.find((h) => h.id === handlerId);
@@ -210,7 +210,7 @@ export const AdminActiveCases = () => {
   return (
     <Box>
       <PageHeader
-        title="Active Cases Dashboard"
+        title="Active Projects Dashboard"
         subtitle="Operations directory to monitor paid customers, inspect client documentation completeness, and delegate case files."
       />
 
@@ -263,9 +263,9 @@ export const AdminActiveCases = () => {
                 />
 
                 <FormControl size="small" sx={{ minWidth: '160px', bgcolor: '#FFFFFF', '& .MuiOutlinedInput-root': { borderRadius: 2 } }}>
-                  <InputLabel>Visa Status</InputLabel>
-                  <Select value={visaFilter} label="Visa Status" onChange={(e) => setVisaFilter(e.target.value)}>
-                    <MenuItem value="all">All Visa Statuses</MenuItem>
+                  <InputLabel>Project Status</InputLabel>
+                  <Select value={visaFilter} label="Project Status" onChange={(e) => setVisaFilter(e.target.value)}>
+                    <MenuItem value="all">All Project Statuses</MenuItem>
                     <MenuItem value="Approved">Approved</MenuItem>
                     <MenuItem value="In Review">In Review</MenuItem>
                     <MenuItem value="Processing">Processing</MenuItem>
@@ -347,7 +347,7 @@ export const AdminActiveCases = () => {
                             )}
                             <Chip label={serviceName} size="small" color="secondary" sx={{ fontWeight: 700 }} />
                             <Chip
-                              label={client.visaStatus || 'Processing'}
+                              label={client.visaStatus || 'In Progress'}
                               size="small"
                               color={
                                 client.visaStatus === 'Approved'
@@ -625,4 +625,4 @@ export const AdminActiveCases = () => {
   );
 };
 
-export default AdminActiveCases;
+export default AdminActiveProjects;

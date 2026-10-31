@@ -56,10 +56,10 @@ export const Login = () => {
 
   const QUICK_ROLES = [
     { id: 'super_admin', label: 'CEO 👑', email: 'superadmin@aaaconsultancy.com' },
-    { id: 'admin', label: 'Manager 💼', email: 'admin@aaaconsultancy.com' },
-    { id: 'operations', label: 'Ops ⚙️', email: 'operations@aaaconsultancy.com' },
-    { id: 'marketing', label: 'Marketing 📣', email: 'marketing@aaaconsultancy.com' },
-    { id: 'consultant', label: 'Agent 🧑‍💼', email: 'agent@aaaconsultancy.com' }
+    { id: 'admin', label: 'Project Manager 💼', email: 'admin@aaaconsultancy.com' },
+    { id: 'operations', label: 'Tech Lead / DevOps ⚙️', email: 'operations@aaaconsultancy.com' },
+    { id: 'marketing', label: 'Growth / Marketing 📣', email: 'marketing@aaaconsultancy.com' },
+    { id: 'consultant', label: 'Solutions Consultant 🧑‍💼', email: 'agent@aaaconsultancy.com' }
   ];
 
   React.useEffect(() => {
@@ -195,8 +195,29 @@ export const Login = () => {
           Back to Homepage
         </Button>
       </Box>
-      <Box sx={{ mb: 2, textAlign: 'center' }}>
-        <Typography variant="h5" sx={{ fontWeight: 700, mb: 0.5 }}>
+      <Box sx={{ mb: 2, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <Box
+          sx={{
+            width: 58,
+            height: 58,
+            borderRadius: 3,
+            backgroundColor: '#FFFFFF',
+            boxShadow: '0 8px 24px rgba(37, 99, 235, 0.15)',
+            border: '1px solid rgba(226, 232, 240, 0.9)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            p: 1,
+            mb: 1.5,
+          }}
+        >
+          <img
+            src="/aaa-logo.png"
+            alt="AAA Technologies Logo"
+            style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+          />
+        </Box>
+        <Typography variant="h5" sx={{ fontWeight: 800, mb: 0.5, letterSpacing: '-0.02em' }}>
           Welcome back
         </Typography>
         <Typography variant="body2" color="text.secondary">

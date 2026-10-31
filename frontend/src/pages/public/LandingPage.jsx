@@ -124,44 +124,44 @@ export const LandingPage = () => {
     {
       title: 'Custom Software & SaaS Platforms',
       desc: 'Scalable multi-tenant cloud architectures, enterprise web portals, and microservice backends built for high concurrency and zero downtime.',
-      icon: <CodeIcon className="text-[#C59B27] text-3xl" />,
+      icon: <CodeIcon className="text-blue-600 text-3xl" />,
       tag: 'Core Specialization',
     },
     {
       title: 'Full-Stack Web & Mobile Apps',
       desc: 'Cross-platform native iOS & Android applications with Flutter & React Native alongside responsive ultra-fast web apps powered by React and Next.js.',
-      icon: <DevicesIcon className="text-[#3F51B5] text-3xl" />,
+      icon: <DevicesIcon className="text-indigo-600 text-3xl" />,
     },
     {
       title: 'AI & Intelligent Automation',
       desc: 'Custom LLM integrations, retrieval-augmented generation (RAG), computer vision, and workflow automation to unlock exponential efficiency.',
-      icon: <SmartToyIcon className="text-[#D2A33C] text-3xl" />,
+      icon: <SmartToyIcon className="text-cyan-600 text-3xl" />,
       tag: 'Trending',
     },
     {
       title: 'Cloud Infrastructure & DevOps (SRE)',
       desc: 'Automated CI/CD pipelines, Kubernetes container orchestration, Terraform infrastructure-as-code, and 24/7 site reliability engineering on AWS/GCP.',
-      icon: <CloudIcon className="text-emerald-400 text-3xl" />,
+      icon: <CloudIcon className="text-emerald-600 text-3xl" />,
     },
     {
       title: 'Enterprise CRM & ERP Systems',
       desc: 'Bespoke customer data platforms, sales pipeline automations, inventory management, and integration with legacy enterprise ERPs.',
-      icon: <LayersIcon className="text-[#E5C058] text-3xl" />,
+      icon: <LayersIcon className="text-blue-600 text-3xl" />,
     },
     {
       title: 'UI/UX Product Design & Prototyping',
       desc: 'Human-centered user experience design, interactive Figma design systems, usability research, and rapid clickable prototypes.',
-      icon: <AutoAwesomeIcon className="text-indigo-400 text-3xl" />,
+      icon: <AutoAwesomeIcon className="text-purple-600 text-3xl" />,
     },
     {
       title: 'E-Commerce & Omnichannel Platforms',
       desc: 'Headless e-commerce, high-volume checkout engines, payment gateway integrations, and real-time inventory synchronization.',
-      icon: <RocketLaunchIcon className="text-amber-400 text-3xl" />,
+      icon: <RocketLaunchIcon className="text-amber-600 text-3xl" />,
     },
     {
       title: '24/7 Managed IT Support & Security',
       desc: 'Proactive vulnerability assessments, SOC2 & ISO 27001 compliance hardening, automated database backups, and dedicated SLA support.',
-      icon: <SecurityIcon className="text-[#C59B27] text-3xl" />,
+      icon: <SecurityIcon className="text-blue-600 text-3xl" />,
     }
   ];
 
@@ -347,36 +347,36 @@ export const LandingPage = () => {
   ];
 
   return (
-    <div className="font-plus-jakarta bg-[#070D19] text-[#F9FAFB] min-h-screen selection:bg-[#C59B27] selection:text-[#051A3B]">
+    <div className="font-plus-jakarta bg-[#F8FAFC] text-slate-900 min-h-screen selection:bg-blue-600 selection:text-white">
       
       {/* 1. STICKY UNIFIED BRAND NAVIGATION BAR */}
-      <header className="sticky top-0 z-50 bg-[#070D19]/95 backdrop-blur-xl border-b border-[#1F2E4D] shadow-xl">
+      <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-xl border-b border-slate-200/80 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
           
-          {/* Logo & Brand Identity (flex-shrink-0 to guarantee no text collision) */}
+          {/* Logo & Brand Identity */}
           <Link to="/" className="flex items-center space-x-3 group flex-shrink-0">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#3F51B5] via-indigo-600 to-[#C59B27] flex items-center justify-center font-outfit font-black text-xl text-white shadow-lg shadow-[#3F51B5]/30 group-hover:scale-105 transition-transform flex-shrink-0">
-              K
+            <div className="w-11 h-11 rounded-xl bg-white border border-slate-200/80 p-1 flex items-center justify-center shadow-sm group-hover:scale-105 group-hover:border-blue-300 transition-all flex-shrink-0">
+              <img src="/aaa-logo.png" alt="AAA Technologies Logo" className="w-full h-full object-contain" />
             </div>
             <div className="flex flex-col flex-shrink-0">
-              <span className="font-outfit font-black text-lg text-white tracking-tight flex items-center space-x-1.5 leading-none">
-                <span>KIAAN</span>
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#C59B27] to-[#E5C058]">TECHNOLOGIES</span>
+              <span className="font-outfit font-black text-lg text-slate-900 tracking-tight flex items-center space-x-1.5 leading-none">
+                <span>AAA</span>
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-500">TECHNOLOGIES</span>
               </span>
-              <span className="text-[10px] text-slate-400 uppercase tracking-[0.2em] font-medium mt-1">
+              <span className="text-[10px] text-slate-500 uppercase tracking-[0.2em] font-semibold mt-1">
                 Cloud • Software • AI Systems
               </span>
             </div>
           </Link>
 
-          {/* Desktop Navigation Links with generous breathing room */}
-          <nav className="hidden lg:flex items-center space-x-5 xl:space-x-7">
+          {/* Desktop Navigation Links */}
+          <nav className="hidden lg:flex items-center space-x-6 xl:space-x-8">
             {navItems.map((item, idx) => (
               <a
                 key={idx}
                 href={item.href}
                 onClick={(e) => handleScroll(e, item.href.replace('#', ''))}
-                className="text-slate-300 hover:text-[#E5C058] text-xs uppercase tracking-wider font-semibold transition-colors whitespace-nowrap"
+                className="text-slate-600 hover:text-blue-600 text-xs uppercase tracking-wider font-bold transition-colors whitespace-nowrap"
               >
                 {item.label}
               </a>
@@ -387,14 +387,14 @@ export const LandingPage = () => {
           <div className="hidden sm:flex items-center space-x-3 flex-shrink-0">
             <Link
               to="/login"
-              className="text-xs font-semibold text-slate-300 hover:text-white px-4 py-2 rounded-lg border border-[#1F2E4D] bg-[#0B1426] hover:border-[#C59B27]/60 hover:bg-[#122038] transition-all whitespace-nowrap"
+              className="text-xs font-bold text-slate-700 hover:text-blue-600 px-4 py-2 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 shadow-sm transition-all whitespace-nowrap"
             >
               Client &amp; Staff Portal
             </Link>
             <a
               href="#contact"
               onClick={(e) => handleScroll(e, 'contact')}
-              className="text-xs font-extrabold text-[#051A3B] bg-gradient-to-r from-[#C59B27] via-amber-400 to-[#E5C058] hover:brightness-110 px-5 py-2.5 rounded-lg shadow-lg shadow-[#C59B27]/20 transition-all transform hover:-translate-y-0.5 flex items-center space-x-1.5 whitespace-nowrap"
+              className="text-xs font-bold text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 px-5 py-2.5 rounded-xl shadow-md shadow-blue-500/25 transition-all transform hover:-translate-y-0.5 flex items-center space-x-1.5 whitespace-nowrap"
             >
               <span>Start Project</span>
               <ArrowForwardIcon className="text-xs!" />
@@ -405,7 +405,7 @@ export const LandingPage = () => {
           <div className="lg:hidden flex items-center flex-shrink-0">
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="text-slate-300 hover:text-white p-2 rounded-lg bg-[#0B1426] border border-[#1F2E4D]"
+              className="text-slate-700 hover:text-blue-600 p-2 rounded-xl bg-slate-100 border border-slate-200"
               aria-label="Toggle navigation"
             >
               {mobileMenuOpen ? <CloseIcon /> : <MenuIcon />}
@@ -420,7 +420,7 @@ export const LandingPage = () => {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              className="lg:hidden bg-[#0B1426] border-t border-[#1F2E4D] px-6 py-6 space-y-3"
+              className="lg:hidden bg-white border-t border-slate-200 px-6 py-6 space-y-3 shadow-xl"
             >
               {navItems.map((item, idx) => (
                 <a
@@ -430,7 +430,7 @@ export const LandingPage = () => {
                     setMobileMenuOpen(false);
                     handleScroll(e, item.href.replace('#', ''));
                   }}
-                  className="block text-slate-300 hover:text-[#E5C058] py-2 text-sm font-medium border-b border-[#1F2E4D]/60"
+                  className="block text-slate-700 hover:text-blue-600 py-2 text-sm font-semibold border-b border-slate-100"
                 >
                   {item.label}
                 </a>
@@ -439,7 +439,7 @@ export const LandingPage = () => {
                 <Link
                   to="/login"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="text-center text-xs font-semibold text-slate-300 py-2.5 rounded-lg border border-[#1F2E4D] bg-[#070D19]"
+                  className="text-center text-xs font-bold text-slate-700 py-2.5 rounded-xl border border-slate-300 bg-white"
                 >
                   Client &amp; Staff Portal
                 </Link>
@@ -449,7 +449,7 @@ export const LandingPage = () => {
                     setMobileMenuOpen(false);
                     handleScroll(e, 'contact');
                   }}
-                  className="text-center text-xs font-bold text-[#051A3B] py-3 rounded-lg bg-gradient-to-r from-[#C59B27] to-[#E5C058] shadow-md"
+                  className="text-center text-xs font-bold text-white py-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 shadow-md shadow-blue-500/25"
                 >
                   Request Technical Consultation
                 </a>
@@ -460,10 +460,10 @@ export const LandingPage = () => {
       </header>
 
       {/* 2. HERO SECTION */}
-      <section className="relative overflow-hidden pt-12 pb-20 lg:pt-20 lg:pb-28">
-        {/* Unified Navy & Gold Ambient Glow Backgrounds */}
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[450px] bg-gradient-to-tr from-[#3F51B5]/20 via-[#0B2A59]/30 to-[#C59B27]/15 rounded-full blur-[140px] pointer-events-none" />
-        <div className="absolute top-0 right-0 w-96 h-96 bg-[#C59B27]/10 rounded-full blur-[120px] pointer-events-none" />
+      <section className="relative overflow-hidden pt-12 pb-20 lg:pt-20 lg:pb-28 bg-gradient-to-b from-white via-slate-50 to-[#F8FAFC]">
+        {/* Soft Ambient Radial Glow */}
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[450px] bg-gradient-to-tr from-blue-400/15 via-indigo-300/15 to-cyan-300/15 rounded-full blur-[140px] pointer-events-none" />
+        <div className="absolute top-0 right-0 w-96 h-96 bg-blue-400/10 rounded-full blur-[120px] pointer-events-none" />
         
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
@@ -471,21 +471,21 @@ export const LandingPage = () => {
             {/* Hero Left Content */}
             <div className="lg:col-span-7 flex flex-col space-y-6 text-center lg:text-left">
               
-              <div className="inline-flex self-center lg:self-start items-center space-x-2.5 bg-[#0B1426] border border-[#C59B27]/30 px-3.5 py-1.5 rounded-full shadow-inner">
-                <span className="w-2 h-2 bg-[#C59B27] rounded-full animate-ping" />
-                <span className="text-[11px] font-outfit text-[#E5C058] uppercase tracking-widest font-bold">
-                  Kiaan Technologies • Cloud-Native &amp; AI Systems
+              <div className="inline-flex self-center lg:self-start items-center space-x-2.5 bg-blue-50/80 border border-blue-200/80 px-4 py-1.5 rounded-full shadow-sm backdrop-blur-sm">
+                <span className="w-2 h-2 bg-blue-600 rounded-full animate-ping" />
+                <span className="text-[11px] font-outfit text-blue-700 uppercase tracking-widest font-bold">
+                  AAA Technologies • Cloud-Native &amp; AI Systems
                 </span>
               </div>
               
-              <h1 className="font-outfit font-black text-4xl sm:text-5xl lg:text-6xl text-white tracking-tight leading-[1.08]!">
+              <h1 className="font-outfit font-black text-4xl sm:text-5xl lg:text-6xl text-slate-900 tracking-tight leading-[1.08]!">
                 Engineering Scalable <br className="hidden sm:inline" />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-[#E5C058]">
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-600">
                   Digital Products &amp; Cloud Architectures
                 </span>
               </h1>
               
-              <p className="text-slate-300 text-base sm:text-lg max-w-2xl mx-auto lg:mx-0 leading-relaxed font-light">
+              <p className="text-slate-600 text-base sm:text-lg max-w-2xl mx-auto lg:mx-0 leading-relaxed font-normal">
                 We partner with ambitious startups and global enterprises to design, build, and deploy high-concurrency web applications, AI automations, and resilient cloud infrastructure with complete intellectual property ownership.
               </p>
 
@@ -494,7 +494,7 @@ export const LandingPage = () => {
                 <a
                   href="#contact"
                   onClick={(e) => handleScroll(e, 'contact')}
-                  className="bg-gradient-to-r from-[#C59B27] via-amber-400 to-[#E5C058] hover:brightness-110 text-[#051A3B] font-extrabold px-8 py-4 rounded-xl shadow-xl shadow-[#C59B27]/20 transition-all flex items-center justify-center space-x-2 text-sm transform hover:-translate-y-0.5"
+                  className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold px-8 py-4 rounded-xl shadow-lg shadow-blue-500/25 transition-all flex items-center justify-center space-x-2 text-sm transform hover:-translate-y-0.5"
                 >
                   <span>Schedule Technical Discovery</span>
                   <ArrowForwardIcon className="text-sm!" />
@@ -502,62 +502,62 @@ export const LandingPage = () => {
                 <a
                   href="#services"
                   onClick={(e) => handleScroll(e, 'services')}
-                  className="bg-[#0B1426] hover:bg-[#122038] border border-[#1F2E4D] hover:border-[#C59B27]/50 text-slate-200 font-semibold px-8 py-4 rounded-xl transition-all flex items-center justify-center space-x-2 text-sm backdrop-blur-md"
+                  className="bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 hover:text-blue-600 font-bold px-8 py-4 rounded-xl transition-all flex items-center justify-center space-x-2 text-sm shadow-sm"
                 >
                   <span>Explore Capabilities</span>
                 </a>
               </div>
 
               {/* Live Reliability Metrics */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-8 border-t border-[#1F2E4D]">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-8 border-t border-slate-200">
                 <div className="space-y-0.5">
-                  <div className="text-2xl font-black font-outfit text-[#E5C058]">99.99%</div>
-                  <div className="text-[11px] text-slate-400 font-light">Guaranteed Uptime SLA</div>
+                  <div className="text-2xl font-black font-outfit text-blue-600">99.99%</div>
+                  <div className="text-[11px] text-slate-500 font-medium">Guaranteed Uptime SLA</div>
                 </div>
                 <div className="space-y-0.5">
-                  <div className="text-2xl font-black font-outfit text-white">250+</div>
-                  <div className="text-[11px] text-slate-400 font-light">Deployed Systems</div>
+                  <div className="text-2xl font-black font-outfit text-slate-900">250+</div>
+                  <div className="text-[11px] text-slate-500 font-medium">Deployed Systems</div>
                 </div>
                 <div className="space-y-0.5">
-                  <div className="text-2xl font-black font-outfit text-white">&lt; 24hr</div>
-                  <div className="text-[11px] text-slate-400 font-light">Rapid Sprint Start</div>
+                  <div className="text-2xl font-black font-outfit text-slate-900">&lt; 24hr</div>
+                  <div className="text-[11px] text-slate-500 font-medium">Rapid Sprint Start</div>
                 </div>
                 <div className="space-y-0.5">
-                  <div className="text-2xl font-black font-outfit text-[#E5C058]">100%</div>
-                  <div className="text-[11px] text-slate-400 font-light">Client IP Ownership</div>
+                  <div className="text-2xl font-black font-outfit text-blue-600">100%</div>
+                  <div className="text-[11px] text-slate-500 font-medium">Client IP Ownership</div>
                 </div>
               </div>
             </div>
 
-            {/* Hero Right Visual (Modern 3D High-Tech Infrastructure Showcase) */}
+            {/* Hero Right Visual Showcase */}
             <div className="lg:col-span-5 relative">
-              <div className="relative rounded-2xl p-1 bg-gradient-to-tr from-[#3F51B5]/40 via-[#0B2A59]/40 to-[#C59B27]/40 shadow-2xl shadow-black/60">
-                <div className="relative rounded-[14px] overflow-hidden bg-[#050A14] aspect-[16/10] border border-[#1F2E4D]">
+              <div className="relative rounded-2xl p-1 bg-gradient-to-tr from-blue-200 via-indigo-100 to-slate-200 shadow-xl">
+                <div className="relative rounded-[14px] overflow-hidden bg-slate-900 aspect-[16/10] border border-slate-200">
                   <img
                     src={itHeroBanner}
                     alt="Cloud & AI IT Ecosystem"
                     className="w-full h-full object-cover filter brightness-95 hover:scale-102 transition-transform duration-700"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#070D19] via-transparent to-transparent opacity-80" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent opacity-80" />
                   
                   {/* Floating Live Telemetry Badge 1 */}
-                  <div className="absolute top-4 left-4 bg-[#0B1426]/90 backdrop-blur-md border border-[#C59B27]/30 px-3 py-1.5 rounded-lg flex items-center space-x-2">
-                    <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
-                    <span className="text-[10px] font-mono font-bold text-[#E5C058]">API Gateway: 18ms Latency</span>
+                  <div className="absolute top-4 left-4 bg-white/95 backdrop-blur-md border border-slate-200 px-3 py-1.5 rounded-xl flex items-center space-x-2 shadow-md">
+                    <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
+                    <span className="text-[10px] font-mono font-bold text-slate-800">API Gateway: <span className="text-blue-600">18ms Latency</span></span>
                   </div>
 
                   {/* Floating Live Telemetry Badge 2 */}
-                  <div className="absolute bottom-4 left-4 right-4 bg-[#0B1426]/95 backdrop-blur-md border border-[#1F2E4D] p-3 rounded-xl flex items-center justify-between">
+                  <div className="absolute bottom-4 left-4 right-4 bg-white/95 backdrop-blur-md border border-slate-200 p-3 rounded-xl flex items-center justify-between shadow-lg">
                     <div className="flex items-center space-x-2.5">
-                      <div className="w-8 h-8 rounded-lg bg-[#3F51B5]/20 text-[#3F51B5] flex items-center justify-center font-bold">
+                      <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center font-bold">
                         <CloudIcon className="text-base!" />
                       </div>
                       <div>
-                        <div className="text-xs font-bold text-white">Microservices Cluster</div>
-                        <div className="text-[10px] text-slate-400 font-mono">48/48 Pods Healthy (Kubernetes)</div>
+                        <div className="text-xs font-bold text-slate-900">Microservices Cluster</div>
+                        <div className="text-[10px] text-slate-500 font-mono">48/48 Pods Healthy (Kubernetes)</div>
                       </div>
                     </div>
-                    <span className="text-[10px] uppercase font-bold text-[#E5C058] bg-[#C59B27]/15 border border-[#C59B27]/30 px-2 py-0.5 rounded">
+                    <span className="text-[10px] uppercase font-bold text-blue-700 bg-blue-50 border border-blue-200 px-2.5 py-0.5 rounded-full">
                       SOC2 Ready
                     </span>
                   </div>
@@ -565,13 +565,13 @@ export const LandingPage = () => {
               </div>
 
               {/* Floating Tech Stat Mini-Card */}
-              <div className="hidden sm:flex absolute -bottom-6 -left-6 bg-[#0B1426]/95 border border-[#1F2E4D] p-3.5 rounded-xl shadow-2xl backdrop-blur-md items-center space-x-3 z-20">
-                <div className="p-2 bg-[#C59B27]/10 rounded-lg text-[#C59B27]">
+              <div className="hidden sm:flex absolute -bottom-6 -left-6 bg-white border border-slate-200/90 p-3.5 rounded-xl shadow-xl backdrop-blur-md items-center space-x-3 z-20">
+                <div className="p-2 bg-emerald-50 rounded-lg text-emerald-600">
                   <VerifiedIcon className="text-xl!" />
                 </div>
                 <div>
-                  <div className="text-xs font-bold text-white">CI/CD Production Rollout</div>
-                  <div className="text-[10px] text-slate-400 font-mono">Zero-Downtime Blue/Green Deploy</div>
+                  <div className="text-xs font-bold text-slate-900">CI/CD Production Rollout</div>
+                  <div className="text-[10px] text-slate-500 font-mono">Zero-Downtime Blue/Green Deploy</div>
                 </div>
               </div>
 
@@ -582,31 +582,31 @@ export const LandingPage = () => {
       </section>
 
       {/* 3. TECH LOGOS / ECOSYSTEM BANNER */}
-      <section className="bg-[#050A14] border-y border-[#1F2E4D] py-6">
+      <section className="bg-white border-y border-slate-200 py-6">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0 text-center md:text-left">
-            <span className="text-xs font-outfit uppercase tracking-widest text-[#C59B27] font-bold">
+            <span className="text-xs font-outfit uppercase tracking-widest text-blue-600 font-bold">
               Engineering Cloud Ecosystems With
             </span>
-            <div className="flex flex-wrap justify-center items-center gap-6 sm:gap-10 text-slate-300 font-mono text-xs sm:text-sm font-semibold">
-              <span className="hover:text-[#E5C058] transition-colors flex items-center space-x-1.5">
-                <CloudIcon className="text-base text-[#3F51B5]" />
+            <div className="flex flex-wrap justify-center items-center gap-6 sm:gap-10 text-slate-700 font-mono text-xs sm:text-sm font-semibold">
+              <span className="hover:text-blue-600 transition-colors flex items-center space-x-1.5">
+                <CloudIcon className="text-base text-blue-600" />
                 <span>AWS &amp; GCP</span>
               </span>
-              <span className="hover:text-[#E5C058] transition-colors flex items-center space-x-1.5">
-                <CodeIcon className="text-base text-[#C59B27]" />
+              <span className="hover:text-blue-600 transition-colors flex items-center space-x-1.5">
+                <CodeIcon className="text-base text-indigo-600" />
                 <span>React 19 &amp; Next.js</span>
               </span>
-              <span className="hover:text-[#E5C058] transition-colors flex items-center space-x-1.5">
-                <TerminalIcon className="text-base text-emerald-400" />
+              <span className="hover:text-blue-600 transition-colors flex items-center space-x-1.5">
+                <TerminalIcon className="text-base text-emerald-600" />
                 <span>Node &amp; Python</span>
               </span>
-              <span className="hover:text-[#E5C058] transition-colors flex items-center space-x-1.5">
-                <SmartToyIcon className="text-base text-purple-400" />
+              <span className="hover:text-blue-600 transition-colors flex items-center space-x-1.5">
+                <SmartToyIcon className="text-base text-purple-600" />
                 <span>OpenAI &amp; RAG AI</span>
               </span>
-              <span className="hover:text-[#E5C058] transition-colors flex items-center space-x-1.5">
-                <StorageIcon className="text-base text-amber-400" />
+              <span className="hover:text-blue-600 transition-colors flex items-center space-x-1.5">
+                <StorageIcon className="text-base text-amber-600" />
                 <span>PostgreSQL &amp; Redis</span>
               </span>
             </div>
@@ -615,17 +615,17 @@ export const LandingPage = () => {
       </section>
 
       {/* 4. CORE SERVICES SECTION */}
-      <section className="py-20 bg-[#070D19]" id="services">
+      <section className="py-20 bg-[#F8FAFC]" id="services">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
           <div className="text-center max-w-3xl mx-auto mb-14 space-y-3">
-            <span className="text-xs font-outfit uppercase tracking-widest text-[#C59B27] font-bold">
+            <span className="text-xs font-outfit uppercase tracking-widest text-blue-600 font-bold">
               Comprehensive Technology Capabilities
             </span>
-            <h2 className="font-outfit font-black text-3xl sm:text-4xl text-white">
+            <h2 className="font-outfit font-black text-3xl sm:text-4xl text-slate-900">
               End-to-End IT Services &amp; Digital Engineering
             </h2>
-            <p className="text-slate-400 text-sm sm:text-base font-light">
+            <p className="text-slate-600 text-sm sm:text-base font-normal">
               From initial product ideation and system architecture to high-velocity full-stack engineering and 24/7 site reliability.
             </p>
           </div>
@@ -635,29 +635,29 @@ export const LandingPage = () => {
               <motion.div
                 key={idx}
                 whileHover={{ y: -6 }}
-                className="bg-[#0B1426] border border-[#1F2E4D] hover:border-[#C59B27]/50 p-6 rounded-2xl shadow-xl transition-all relative flex flex-col justify-between group overflow-hidden"
+                className="bg-white border border-slate-200/90 hover:border-blue-400/80 p-6 rounded-2xl shadow-sm hover:shadow-xl hover:shadow-blue-500/10 transition-all relative flex flex-col justify-between group overflow-hidden"
               >
                 <div>
                   <div className="flex justify-between items-start mb-5">
-                    <div className="w-12 h-12 bg-[#070D19] border border-[#1F2E4D] rounded-xl flex items-center justify-center group-hover:scale-105 transition-transform">
+                    <div className="w-12 h-12 bg-blue-50/80 border border-blue-100 rounded-xl flex items-center justify-center group-hover:scale-105 group-hover:bg-blue-600 text-blue-600 group-hover:text-white transition-all">
                       {item.icon}
                     </div>
                     {item.tag && (
-                      <span className="text-[10px] font-bold bg-[#C59B27]/10 text-[#E5C058] border border-[#C59B27]/25 px-2.5 py-0.5 rounded-full">
+                      <span className="text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200 px-2.5 py-0.5 rounded-full">
                         {item.tag}
                       </span>
                     )}
                   </div>
                   
-                  <h3 className="font-outfit font-bold text-base text-white mb-2.5 group-hover:text-[#E5C058] transition-colors">
+                  <h3 className="font-outfit font-bold text-base text-slate-900 mb-2.5 group-hover:text-blue-600 transition-colors">
                     {item.title}
                   </h3>
-                  <p className="text-slate-400 text-xs leading-relaxed font-light">
+                  <p className="text-slate-600 text-xs leading-relaxed font-normal">
                     {item.desc}
                   </p>
                 </div>
 
-                <div className="mt-6 pt-4 border-t border-[#1F2E4D] flex items-center text-xs font-semibold text-[#C59B27] group-hover:text-[#E5C058]">
+                <div className="mt-6 pt-4 border-t border-slate-100 flex items-center text-xs font-bold text-blue-600 group-hover:text-blue-700">
                   <span>Explore Architecture</span>
                   <ArrowForwardIcon className="text-xs! ml-1 group-hover:translate-x-1 transition-transform" />
                 </div>
@@ -669,46 +669,46 @@ export const LandingPage = () => {
       </section>
 
       {/* 5. ENGINEERING SHOWCASE & DEVOPS SECTION */}
-      <section className="py-20 bg-[#050A14] border-t border-[#1F2E4D] relative overflow-hidden" id="showcase">
+      <section className="py-20 bg-white border-t border-slate-200 relative overflow-hidden" id="showcase">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
             
             {/* Left Content */}
             <div className="lg:col-span-6 space-y-6">
-              <span className="text-xs font-outfit uppercase tracking-widest text-[#C59B27] font-bold">
+              <span className="text-xs font-outfit uppercase tracking-widest text-blue-600 font-bold">
                 DevOps &amp; Continuous Delivery
               </span>
-              <h2 className="font-outfit font-black text-3xl sm:text-4xl text-white leading-tight">
+              <h2 className="font-outfit font-black text-3xl sm:text-4xl text-slate-900 leading-tight">
                 Built for High Concurrency, Microseconds Latency &amp; Zero Downtime
               </h2>
-              <div className="h-1 w-12 bg-[#C59B27] rounded" />
+              <div className="h-1 w-12 bg-blue-600 rounded" />
               
-              <p className="text-slate-300 text-sm font-light leading-relaxed">
+              <p className="text-slate-600 text-sm font-normal leading-relaxed">
                 Modern enterprise applications cannot afford infrastructure bottlenecks. Our engineering pods design resilient cloud environments with real-time observability, automated container failover, and strict regression test suites.
               </p>
 
               <div className="space-y-3.5">
-                <div className="flex items-start space-x-3 bg-[#0B1426] border border-[#1F2E4D] p-3.5 rounded-xl">
-                  <CheckCircleIcon className="text-[#C59B27] text-lg mt-0.5!" />
+                <div className="flex items-start space-x-3 bg-slate-50 border border-slate-200/90 p-4 rounded-xl hover:bg-blue-50/40 hover:border-blue-200 transition-all">
+                  <CheckCircleIcon className="text-blue-600 text-lg mt-0.5!" />
                   <div>
-                    <h4 className="text-xs font-bold text-white">Automated CI/CD Pipeline Automation</h4>
-                    <p className="text-[11px] text-slate-400 font-light mt-0.5">Every pull request is automatically built, linted, tested, and staged before human approval.</p>
+                    <h4 className="text-xs font-bold text-slate-900">Automated CI/CD Pipeline Automation</h4>
+                    <p className="text-[11px] text-slate-600 font-normal mt-0.5">Every pull request is automatically built, linted, tested, and staged before human approval.</p>
                   </div>
                 </div>
 
-                <div className="flex items-start space-x-3 bg-[#0B1426] border border-[#1F2E4D] p-3.5 rounded-xl">
-                  <CheckCircleIcon className="text-[#C59B27] text-lg mt-0.5!" />
+                <div className="flex items-start space-x-3 bg-slate-50 border border-slate-200/90 p-4 rounded-xl hover:bg-blue-50/40 hover:border-blue-200 transition-all">
+                  <CheckCircleIcon className="text-blue-600 text-lg mt-0.5!" />
                   <div>
-                    <h4 className="text-xs font-bold text-white">Security-First Architecture &amp; Data Encryption</h4>
-                    <p className="text-[11px] text-slate-400 font-light mt-0.5">AES-256-GCM encryption, TLS 1.3, least-privilege IAM, and automated secret rotations.</p>
+                    <h4 className="text-xs font-bold text-slate-900">Security-First Architecture &amp; Data Encryption</h4>
+                    <p className="text-[11px] text-slate-600 font-normal mt-0.5">AES-256-GCM encryption, TLS 1.3, least-privilege IAM, and automated secret rotations.</p>
                   </div>
                 </div>
 
-                <div className="flex items-start space-x-3 bg-[#0B1426] border border-[#1F2E4D] p-3.5 rounded-xl">
-                  <CheckCircleIcon className="text-[#C59B27] text-lg mt-0.5!" />
+                <div className="flex items-start space-x-3 bg-slate-50 border border-slate-200/90 p-4 rounded-xl hover:bg-blue-50/40 hover:border-blue-200 transition-all">
+                  <CheckCircleIcon className="text-blue-600 text-lg mt-0.5!" />
                   <div>
-                    <h4 className="text-xs font-bold text-white">24/7 Incident Observability &amp; Alerting</h4>
-                    <p className="text-[11px] text-slate-400 font-light mt-0.5">Prometheus, Grafana, and Datadog monitoring with automated PagerDuty escalation.</p>
+                    <h4 className="text-xs font-bold text-slate-900">24/7 Incident Observability &amp; Alerting</h4>
+                    <p className="text-[11px] text-slate-600 font-normal mt-0.5">Prometheus, Grafana, and Datadog monitoring with automated PagerDuty escalation.</p>
                   </div>
                 </div>
               </div>
@@ -716,15 +716,15 @@ export const LandingPage = () => {
 
             {/* Right Visual Image */}
             <div className="lg:col-span-6">
-              <div className="relative rounded-2xl p-1 bg-gradient-to-tr from-[#3F51B5]/30 via-[#0B2A59]/40 to-[#C59B27]/30 shadow-2xl">
-                <div className="relative rounded-[14px] overflow-hidden bg-[#070D19] aspect-[16/10] border border-[#1F2E4D]">
+              <div className="relative rounded-2xl p-1 bg-gradient-to-tr from-blue-200 via-indigo-100 to-slate-200 shadow-xl">
+                <div className="relative rounded-[14px] overflow-hidden bg-slate-900 aspect-[16/10] border border-slate-200">
                   <img
                     src={itDevOpsShowcase}
                     alt="DevOps & Agile Sprint Telemetry"
                     className="w-full h-full object-cover filter brightness-95 hover:scale-102 transition-transform duration-500"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#050A14]/80 via-transparent to-transparent" />
-                  <div className="absolute bottom-3 left-4 bg-[#0B1426]/90 border border-[#C59B27]/30 px-3 py-1 rounded text-[10px] font-mono text-[#E5C058]">
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent" />
+                  <div className="absolute bottom-3 left-4 bg-white/95 backdrop-blur-md border border-slate-200 px-3 py-1 rounded-lg text-[10px] font-mono text-slate-800 shadow-md">
                     Live Sprint Telemetry • Continuous QA &amp; SRE
                   </div>
                 </div>
@@ -736,17 +736,17 @@ export const LandingPage = () => {
       </section>
 
       {/* 6. ENGINEERING TECH STACK TABS */}
-      <section className="py-20 bg-[#070D19] border-t border-[#1F2E4D]" id="stack">
+      <section className="py-20 bg-[#F8FAFC] border-t border-slate-200" id="stack">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
           <div className="text-center max-w-3xl mx-auto mb-12 space-y-3">
-            <span className="text-xs font-outfit uppercase tracking-widest text-[#C59B27] font-bold">
+            <span className="text-xs font-outfit uppercase tracking-widest text-blue-600 font-bold">
               Modern Technology Ecosystem
             </span>
-            <h2 className="font-outfit font-black text-3xl sm:text-4xl text-white">
+            <h2 className="font-outfit font-black text-3xl sm:text-4xl text-slate-900">
               Proven Technologies for Scalable Platforms
             </h2>
-            <p className="text-slate-400 text-sm font-light">
+            <p className="text-slate-600 text-sm font-normal">
               We select battle-tested, high-performance frameworks and cloud platforms tailored to your business needs.
             </p>
 
@@ -763,8 +763,8 @@ export const LandingPage = () => {
                   onClick={() => setActiveTab(tab.id)}
                   className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
                     activeTab === tab.id
-                      ? 'bg-gradient-to-r from-[#C59B27] to-[#E5C058] text-[#051A3B] shadow-md shadow-[#C59B27]/20'
-                      : 'bg-[#0B1426] text-slate-400 hover:text-white border border-[#1F2E4D]'
+                      ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-500/25'
+                      : 'bg-white text-slate-700 hover:text-blue-600 border border-slate-200 shadow-sm'
                   }`}
                 >
                   {tab.label}
@@ -778,18 +778,18 @@ export const LandingPage = () => {
             {techCategories[activeTab].map((tech, idx) => (
               <div
                 key={idx}
-                className="bg-[#0B1426] border border-[#1F2E4D] p-5 rounded-xl hover:border-[#C59B27]/40 transition-all flex items-center justify-between"
+                className="bg-white border border-slate-200/90 hover:border-blue-400 p-5 rounded-xl shadow-sm hover:shadow-md transition-all flex items-center justify-between"
               >
                 <div className="flex items-center space-x-3.5">
-                  <div className="w-10 h-10 rounded-lg bg-[#C59B27]/10 text-[#E5C058] border border-[#C59B27]/20 flex items-center justify-center font-mono font-bold text-xs">
+                  <div className="w-10 h-10 rounded-lg bg-blue-50 text-blue-600 border border-blue-100 flex items-center justify-center font-mono font-bold text-xs">
                     {tech.icon}
                   </div>
                   <div>
-                    <h4 className="text-sm font-bold text-white">{tech.name}</h4>
-                    <p className="text-[11px] text-slate-400 font-light">{tech.tag}</p>
+                    <h4 className="text-sm font-bold text-slate-900">{tech.name}</h4>
+                    <p className="text-[11px] text-slate-500 font-medium">{tech.tag}</p>
                   </div>
                 </div>
-                <span className="text-[10px] uppercase font-mono text-[#E5C058] bg-[#070D19] px-2 py-0.5 rounded border border-[#C59B27]/30">
+                <span className="text-[10px] uppercase font-mono text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-200 font-semibold">
                   Verified
                 </span>
               </div>
@@ -800,17 +800,17 @@ export const LandingPage = () => {
       </section>
 
       {/* 7. DELIVERY LIFECYCLE (WORKFLOW) */}
-      <section className="py-20 bg-[#050A14] border-t border-[#1F2E4D]" id="process">
+      <section className="py-20 bg-white border-t border-slate-200" id="process">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
           <div className="text-center max-w-3xl mx-auto mb-14 space-y-3">
-            <span className="text-xs font-outfit uppercase tracking-widest text-[#C59B27] font-bold">
+            <span className="text-xs font-outfit uppercase tracking-widest text-blue-600 font-bold">
               Structured Engineering Process
             </span>
-            <h2 className="font-outfit font-black text-3xl sm:text-4xl text-white">
+            <h2 className="font-outfit font-black text-3xl sm:text-4xl text-slate-900">
               Agile Product Delivery Lifecycle
             </h2>
-            <p className="text-slate-400 text-sm font-light">
+            <p className="text-slate-600 text-sm font-normal">
               Predictable, transparent sprints delivering continuous code commits, automated QA, and seamless deployments.
             </p>
           </div>
@@ -819,16 +819,16 @@ export const LandingPage = () => {
             {deliveryStages.map((step, idx) => (
               <div
                 key={idx}
-                className="bg-[#0B1426] border border-[#1F2E4D] p-6 rounded-2xl relative flex flex-col justify-between group hover:border-[#C59B27]/40 transition-all"
+                className="bg-slate-50/70 border border-slate-200 hover:border-blue-400 hover:bg-white p-6 rounded-2xl shadow-sm hover:shadow-lg transition-all relative flex flex-col justify-between group"
               >
                 <div>
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#3F51B5] via-indigo-600 to-[#C59B27] text-white font-black flex items-center justify-center font-mono text-sm mb-5 shadow-md shadow-[#3F51B5]/25">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white font-black flex items-center justify-center font-mono text-sm mb-5 shadow-md shadow-blue-500/20">
                     {step.num}
                   </div>
-                  <h3 className="font-outfit font-bold text-base text-white mb-2.5 group-hover:text-[#E5C058] transition-colors">
+                  <h3 className="font-outfit font-bold text-base text-slate-900 mb-2.5 group-hover:text-blue-600 transition-colors">
                     {step.title}
                   </h3>
-                  <p className="text-slate-400 text-xs leading-relaxed font-light">
+                  <p className="text-slate-600 text-xs leading-relaxed font-normal">
                     {step.desc}
                   </p>
                 </div>
@@ -840,17 +840,17 @@ export const LandingPage = () => {
       </section>
 
       {/* 8. ENGAGEMENT PLANS & PRICING */}
-      <section className="py-20 bg-[#070D19] border-t border-[#1F2E4D]" id="plans">
+      <section className="py-20 bg-[#F8FAFC] border-t border-slate-200" id="plans">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
           <div className="text-center max-w-3xl mx-auto mb-14 space-y-3">
-            <span className="text-xs font-outfit uppercase tracking-widest text-[#C59B27] font-bold">
+            <span className="text-xs font-outfit uppercase tracking-widest text-blue-600 font-bold">
               Flexible Partnership Models
             </span>
-            <h2 className="font-outfit font-black text-3xl sm:text-4xl text-white">
+            <h2 className="font-outfit font-black text-3xl sm:text-4xl text-slate-900">
               IT Engagement &amp; Delivery Plans
             </h2>
-            <p className="text-slate-400 text-sm font-light">
+            <p className="text-slate-600 text-sm font-normal">
               Choose from fixed-scope product builds, dedicated monthly engineering pods, or ongoing 24/7 maintenance retainers.
             </p>
           </div>
@@ -861,54 +861,54 @@ export const LandingPage = () => {
                 key={idx}
                 className={`rounded-2xl p-6 flex flex-col justify-between transition-all ${
                   plan.highlight
-                    ? 'bg-gradient-to-b from-[#0B1426] via-[#0B1426] to-[#122038] border-2 border-[#C59B27] shadow-2xl shadow-[#C59B27]/10 lg:-translate-y-2'
-                    : 'bg-[#0B1426] border border-[#1F2E4D] hover:border-slate-700'
+                    ? 'bg-white border-2 border-blue-600 shadow-2xl shadow-blue-600/15 lg:-translate-y-2'
+                    : 'bg-white border border-slate-200 hover:border-slate-300 shadow-sm'
                 }`}
               >
                 <div className="space-y-6">
                   <div>
-                    <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded inline-block mb-3 ${
+                    <span className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full inline-block mb-3 ${
                       plan.highlight
-                        ? 'bg-[#C59B27] text-[#051A3B]'
-                        : 'bg-[#070D19] text-slate-300 border border-[#1F2E4D]'
+                        ? 'bg-blue-600 text-white font-bold'
+                        : 'bg-slate-100 text-slate-700 border border-slate-200'
                     }`}>
                       {plan.badge}
                     </span>
-                    <h3 className="font-outfit font-black text-lg text-white leading-tight">
+                    <h3 className="font-outfit font-black text-lg text-slate-900 leading-tight">
                       {plan.name}
                     </h3>
-                    <p className="text-xs text-slate-400 mt-2 font-light leading-relaxed">
+                    <p className="text-xs text-slate-600 mt-2 font-normal leading-relaxed">
                       {plan.desc}
                     </p>
                   </div>
 
-                  <div className="py-2 border-y border-[#1F2E4D]">
-                    <div className="text-2xl font-black font-outfit text-white">
+                  <div className="py-2 border-y border-slate-100">
+                    <div className="text-2xl font-black font-outfit text-slate-900">
                       {plan.price}
                     </div>
-                    <div className="text-[11px] text-[#C59B27] font-light">
+                    <div className="text-[11px] text-blue-600 font-semibold">
                       {plan.period}
                     </div>
                   </div>
 
                   <ul className="space-y-2.5">
                     {plan.features.map((feat, fIdx) => (
-                      <li key={fIdx} className="flex items-start space-x-2 text-xs text-slate-300">
-                        <CheckIcon className="text-xs text-[#C59B27] mt-0.5 flex-shrink-0" />
-                        <span className="font-light">{feat}</span>
+                      <li key={fIdx} className="flex items-start space-x-2 text-xs text-slate-700">
+                        <CheckIcon className="text-xs text-blue-600 mt-0.5 flex-shrink-0" />
+                        <span className="font-normal">{feat}</span>
                       </li>
                     ))}
                   </ul>
                 </div>
 
-                <div className="mt-8 pt-4 border-t border-[#1F2E4D]">
+                <div className="mt-8 pt-4 border-t border-slate-100">
                   <a
                     href="#contact"
                     onClick={(e) => handleScroll(e, 'contact')}
                     className={`block w-full py-2.5 text-center text-xs font-bold rounded-xl transition-all ${
                       plan.highlight
-                        ? 'bg-gradient-to-r from-[#C59B27] via-amber-400 to-[#E5C058] text-[#051A3B] hover:brightness-110 shadow-lg'
-                        : 'bg-[#122038] hover:bg-[#1A2E50] text-white border border-[#1F2E4D]'
+                        ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:brightness-110 shadow-md shadow-blue-500/20'
+                        : 'bg-slate-100 hover:bg-slate-200 text-slate-800'
                     }`}
                   >
                     Select Partnership
@@ -922,17 +922,17 @@ export const LandingPage = () => {
       </section>
 
       {/* 9. CASE STUDIES / TESTIMONIALS */}
-      <section className="py-20 bg-[#050A14] border-t border-[#1F2E4D]" id="case-studies">
+      <section className="py-20 bg-white border-t border-slate-200" id="case-studies">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
           <div className="text-center max-w-3xl mx-auto mb-14 space-y-3">
-            <span className="text-xs font-outfit uppercase tracking-widest text-[#C59B27] font-bold">
+            <span className="text-xs font-outfit uppercase tracking-widest text-blue-600 font-bold">
               Engineering Impact
             </span>
-            <h2 className="font-outfit font-black text-3xl sm:text-4xl text-white">
+            <h2 className="font-outfit font-black text-3xl sm:text-4xl text-slate-900">
               Proven Results Across Global Industries
             </h2>
-            <p className="text-slate-400 text-sm font-light">
+            <p className="text-slate-600 text-sm font-normal">
               See how our digital solutions have unlocked measurable business scaling for our clients.
             </p>
           </div>
@@ -941,34 +941,34 @@ export const LandingPage = () => {
             {caseStudies.map((study, idx) => (
               <div
                 key={idx}
-                className="bg-[#0B1426] border border-[#1F2E4D] p-6 rounded-2xl flex flex-col justify-between hover:border-[#C59B27]/40 transition-all"
+                className="bg-slate-50 border border-slate-200/90 hover:border-blue-400 hover:bg-white p-6 rounded-2xl flex flex-col justify-between shadow-sm hover:shadow-lg transition-all"
               >
                 <div className="space-y-4">
-                  <div className="flex items-center space-x-1 text-[#C59B27]">
+                  <div className="flex items-center space-x-1 text-amber-500">
                     {[...Array(5)].map((_, i) => (
                       <StarIcon key={i} className="text-sm!" />
                     ))}
                   </div>
 
                   <div>
-                    <div className="text-xs uppercase tracking-wider font-mono text-[#E5C058] font-bold">
+                    <div className="text-xs uppercase tracking-wider font-mono text-blue-600 font-bold">
                       {study.service}
                     </div>
-                    <div className="text-2xl font-black font-outfit text-white mt-1">
+                    <div className="text-2xl font-black font-outfit text-slate-900 mt-1">
                       {study.metric}
                     </div>
                   </div>
 
-                  <p className="text-xs text-slate-300 font-light leading-relaxed">
+                  <p className="text-xs text-slate-600 font-normal leading-relaxed italic">
                     "{study.desc}"
                   </p>
                 </div>
 
-                <div className="mt-6 pt-4 border-t border-[#1F2E4D] flex items-center justify-between">
-                  <span className="text-xs font-bold text-white">{study.client}</span>
+                <div className="mt-6 pt-4 border-t border-slate-200/80 flex items-center justify-between">
+                  <span className="text-xs font-bold text-slate-900">{study.client}</span>
                   <div className="flex space-x-1">
                     {study.tags.map((tag, tIdx) => (
-                      <span key={tIdx} className="text-[9px] font-mono bg-[#070D19] border border-[#1F2E4D] px-1.5 py-0.5 rounded text-slate-300">
+                      <span key={tIdx} className="text-[9px] font-mono bg-white border border-slate-200 px-1.5 py-0.5 rounded text-slate-600">
                         {tag}
                       </span>
                     ))}
@@ -982,17 +982,17 @@ export const LandingPage = () => {
       </section>
 
       {/* 10. FAQ SECTION */}
-      <section className="py-20 bg-[#070D19] border-t border-[#1F2E4D]" id="faqs">
+      <section className="py-20 bg-[#F8FAFC] border-t border-slate-200" id="faqs">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           
           <div className="text-center mb-12 space-y-3">
-            <span className="text-xs font-outfit uppercase tracking-widest text-[#C59B27] font-bold">
+            <span className="text-xs font-outfit uppercase tracking-widest text-blue-600 font-bold">
               Got Questions?
             </span>
-            <h2 className="font-outfit font-black text-3xl sm:text-4xl text-white">
+            <h2 className="font-outfit font-black text-3xl sm:text-4xl text-slate-900">
               Frequently Asked Technical Questions
             </h2>
-            <p className="text-slate-400 text-sm font-light">
+            <p className="text-slate-600 text-sm font-normal">
               Clear answers regarding intellectual property, sprint cadence, pricing models, and security.
             </p>
           </div>
@@ -1003,16 +1003,16 @@ export const LandingPage = () => {
               return (
                 <div
                   key={idx}
-                  className="bg-[#0B1426] border border-[#1F2E4D] rounded-xl overflow-hidden transition-all"
+                  className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm hover:border-blue-300 transition-all"
                 >
                   <button
                     onClick={() => setActiveFaq(isOpen ? null : idx)}
                     className="w-full px-6 py-4 flex justify-between items-center text-left focus:outline-none"
                   >
-                    <span className="font-outfit font-bold text-sm text-white">
+                    <span className="font-outfit font-bold text-sm text-slate-900">
                       {faq.q}
                     </span>
-                    <span className="text-[#C59B27]">
+                    <span className="text-blue-600">
                       {isOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
                     </span>
                   </button>
@@ -1025,7 +1025,7 @@ export const LandingPage = () => {
                         exit={{ height: 0, opacity: 0 }}
                         transition={{ duration: 0.2 }}
                       >
-                        <div className="px-6 pb-5 text-xs text-slate-300 leading-relaxed font-light border-t border-[#1F2E4D] pt-3">
+                        <div className="px-6 pb-5 text-xs text-slate-600 leading-relaxed font-normal border-t border-slate-100 bg-slate-50/50 pt-3">
                           {faq.a}
                         </div>
                       </motion.div>
@@ -1040,72 +1040,72 @@ export const LandingPage = () => {
       </section>
 
       {/* 11. TECHNICAL CONSULTATION & DISCOVERY FORM */}
-      <section className="py-20 bg-[#050A14] border-t border-[#1F2E4D] relative overflow-hidden" id="contact">
-        <div className="absolute top-1/2 right-1/4 w-[500px] h-[300px] bg-[#C59B27]/10 rounded-full blur-[140px] pointer-events-none" />
+      <section className="py-20 bg-white border-t border-slate-200 relative overflow-hidden" id="contact">
+        <div className="absolute top-1/2 right-1/4 w-[500px] h-[300px] bg-blue-400/10 rounded-full blur-[140px] pointer-events-none" />
         
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
             
             {/* Left Contact Info */}
             <div className="lg:col-span-5 space-y-6">
-              <span className="text-xs font-outfit uppercase tracking-widest text-[#C59B27] font-bold">
+              <span className="text-xs font-outfit uppercase tracking-widest text-blue-600 font-bold">
                 Direct Engineering Collaboration
               </span>
-              <h2 className="font-outfit font-black text-3xl sm:text-4xl text-white">
+              <h2 className="font-outfit font-black text-3xl sm:text-4xl text-slate-900">
                 Let's Build Your Next Digital Product
               </h2>
-              <div className="h-1 w-12 bg-[#C59B27] rounded" />
+              <div className="h-1 w-12 bg-blue-600 rounded" />
               
-              <p className="text-slate-300 text-sm font-light leading-relaxed">
+              <p className="text-slate-600 text-sm font-normal leading-relaxed">
                 Connect with our senior engineering architects. We evaluate your requirements, suggest optimal tech stacks, and provide a detailed architectural roadmap within 24 business hours.
               </p>
 
               <div className="space-y-4 pt-2">
-                <div className="flex items-center space-x-3.5 bg-[#0B1426] border border-[#1F2E4D] p-4 rounded-xl">
-                  <div className="w-10 h-10 rounded-lg bg-[#C59B27]/10 text-[#C59B27] flex items-center justify-center">
+                <div className="flex items-center space-x-3.5 bg-slate-50 border border-slate-200/90 p-4 rounded-xl">
+                  <div className="w-10 h-10 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
                     <EmailIcon className="text-lg!" />
                   </div>
                   <div>
-                    <div className="text-[10px] text-slate-400 uppercase tracking-wider font-mono">Technical Inquiries</div>
-                    <div className="text-sm font-bold text-white">contact@kiaantech.com</div>
+                    <div className="text-[10px] text-slate-500 uppercase tracking-wider font-mono font-semibold">Technical Inquiries</div>
+                    <div className="text-sm font-bold text-slate-900">contact@aaatechnologies.ae</div>
                   </div>
                 </div>
 
-                <div className="flex items-center space-x-3.5 bg-[#0B1426] border border-[#1F2E4D] p-4 rounded-xl">
-                  <div className="w-10 h-10 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center">
+                <div className="flex items-center space-x-3.5 bg-slate-50 border border-slate-200/90 p-4 rounded-xl">
+                  <div className="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
                     <PhoneIcon className="text-lg!" />
                   </div>
                   <div>
-                    <div className="text-[10px] text-slate-400 uppercase tracking-wider font-mono">Direct Support &amp; WhatsApp</div>
-                    <div className="text-sm font-bold text-white">+1 (800) 550-9842</div>
+                    <div className="text-[10px] text-slate-500 uppercase tracking-wider font-mono font-semibold">Direct Support &amp; WhatsApp</div>
+                    <div className="text-sm font-bold text-slate-900">+971 4 000 0000</div>
                   </div>
                 </div>
 
-                <div className="flex items-center space-x-3.5 bg-[#0B1426] border border-[#1F2E4D] p-4 rounded-xl">
-                  <div className="w-10 h-10 rounded-lg bg-[#3F51B5]/20 text-[#3F51B5] flex items-center justify-center">
+                <div className="flex items-center space-x-3.5 bg-slate-50 border border-slate-200/90 p-4 rounded-xl">
+                  <div className="w-10 h-10 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center">
                     <LocationOnIcon className="text-lg!" />
                   </div>
                   <div>
-                    <div className="text-[10px] text-slate-400 uppercase tracking-wider font-mono">Global Technology Hubs</div>
-                    <div className="text-sm font-bold text-white">San Francisco • London • Dubai Silicon Oasis</div>
+                    <div className="text-[10px] text-slate-500 uppercase tracking-wider font-mono font-semibold">Global Technology Hubs</div>
+                    <div className="text-sm font-bold text-slate-900">San Francisco • London • Dubai Silicon Oasis</div>
                   </div>
                 </div>
               </div>
             </div>
 
             {/* Right Project Inquiry Form */}
-            <div className="lg:col-span-7 bg-[#0B1426] border border-[#1F2E4D] p-8 rounded-2xl shadow-2xl backdrop-blur-md">
-              <h3 className="font-outfit font-black text-xl text-white mb-1">
+            <div className="lg:col-span-7 bg-white border border-slate-200 p-8 rounded-2xl shadow-xl">
+              <h3 className="font-outfit font-black text-xl text-slate-900 mb-1">
                 Request a Technical Discovery Call
               </h3>
-              <p className="text-xs text-slate-400 mb-6 font-light">
+              <p className="text-xs text-slate-500 mb-6 font-normal">
                 Fill out your project details. Strict NDA guaranteed for all submitted materials.
               </p>
 
               <form onSubmit={handleFormSubmit} className="space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-semibold text-slate-300 mb-1">First Name *</label>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">First Name *</label>
                     <input
                       type="text"
                       name="firstName"
@@ -1113,11 +1113,11 @@ export const LandingPage = () => {
                       onChange={handleFormChange}
                       required
                       placeholder="Jane"
-                      className="w-full bg-[#070D19] border border-[#1F2E4D] rounded-lg px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-[#C59B27]"
+                      className="w-full bg-slate-50 border border-slate-300 rounded-lg px-3.5 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:bg-white focus:ring-2 focus:ring-blue-100 transition-all"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-slate-300 mb-1">Last Name *</label>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">Last Name *</label>
                     <input
                       type="text"
                       name="lastName"
@@ -1125,14 +1125,14 @@ export const LandingPage = () => {
                       onChange={handleFormChange}
                       required
                       placeholder="Doe"
-                      className="w-full bg-[#070D19] border border-[#1F2E4D] rounded-lg px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-[#C59B27]"
+                      className="w-full bg-slate-50 border border-slate-300 rounded-lg px-3.5 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:bg-white focus:ring-2 focus:ring-blue-100 transition-all"
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-semibold text-slate-300 mb-1">Work Email *</label>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">Work Email *</label>
                     <input
                       type="email"
                       name="email"
@@ -1140,42 +1140,42 @@ export const LandingPage = () => {
                       onChange={handleFormChange}
                       required
                       placeholder="jane@company.com"
-                      className="w-full bg-[#070D19] border border-[#1F2E4D] rounded-lg px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-[#C59B27]"
+                      className="w-full bg-slate-50 border border-slate-300 rounded-lg px-3.5 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:bg-white focus:ring-2 focus:ring-blue-100 transition-all"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-slate-300 mb-1">Phone / WhatsApp *</label>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">Phone / WhatsApp *</label>
                     <input
                       type="tel"
                       name="phone"
                       value={formData.phone}
                       onChange={handleFormChange}
                       required
-                      placeholder="+1 (555) 000-0000"
-                      className="w-full bg-[#070D19] border border-[#1F2E4D] rounded-lg px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-[#C59B27]"
+                      placeholder="+971 50 000 0000"
+                      className="w-full bg-slate-50 border border-slate-300 rounded-lg px-3.5 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:bg-white focus:ring-2 focus:ring-blue-100 transition-all"
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-semibold text-slate-300 mb-1">Company / Organization</label>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">Company / Organization</label>
                     <input
                       type="text"
                       name="companyName"
                       value={formData.companyName}
                       onChange={handleFormChange}
                       placeholder="Acme Corp"
-                      className="w-full bg-[#070D19] border border-[#1F2E4D] rounded-lg px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-[#C59B27]"
+                      className="w-full bg-slate-50 border border-slate-300 rounded-lg px-3.5 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:bg-white focus:ring-2 focus:ring-blue-100 transition-all"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-slate-300 mb-1">Primary Capability Needed</label>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">Primary Capability Needed</label>
                     <select
                       name="serviceType"
                       value={formData.serviceType}
                       onChange={handleFormChange}
-                      className="w-full bg-[#070D19] border border-[#1F2E4D] rounded-lg px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-[#C59B27]"
+                      className="w-full bg-slate-50 border border-slate-300 rounded-lg px-3.5 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-blue-600 focus:bg-white focus:ring-2 focus:ring-blue-100 transition-all"
                     >
                       <option value="Custom Software & SaaS Development">Custom Software &amp; SaaS Development</option>
                       <option value="Web & Mobile App Development">Web &amp; Mobile App Development</option>
@@ -1190,12 +1190,12 @@ export const LandingPage = () => {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-semibold text-slate-300 mb-1">Estimated Budget Range</label>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">Estimated Budget Range</label>
                     <select
                       name="budget"
                       value={formData.budget}
                       onChange={handleFormChange}
-                      className="w-full bg-[#070D19] border border-[#1F2E4D] rounded-lg px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-[#C59B27]"
+                      className="w-full bg-slate-50 border border-slate-300 rounded-lg px-3.5 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-blue-600 focus:bg-white focus:ring-2 focus:ring-blue-100 transition-all"
                     >
                       <option value="$5,000 - $15,000">$5,000 - $15,000 (MVP Prototype)</option>
                       <option value="$15,000 - $50,000">$15,000 - $50,000 (Production Launch)</option>
@@ -1204,12 +1204,12 @@ export const LandingPage = () => {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-slate-300 mb-1">Target Launch Timeline</label>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">Target Launch Timeline</label>
                     <select
                       name="timeline"
                       value={formData.timeline}
                       onChange={handleFormChange}
-                      className="w-full bg-[#070D19] border border-[#1F2E4D] rounded-lg px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-[#C59B27]"
+                      className="w-full bg-slate-50 border border-slate-300 rounded-lg px-3.5 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-blue-600 focus:bg-white focus:ring-2 focus:ring-blue-100 transition-all"
                     >
                       <option value="Immediate (< 1 Month)">Immediate (&lt; 1 Month)</option>
                       <option value="1 - 3 Months">1 - 3 Months</option>
@@ -1220,21 +1220,21 @@ export const LandingPage = () => {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Project Brief &amp; Architecture Notes</label>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1">Project Brief &amp; Architecture Notes</label>
                   <textarea
                     name="notes"
                     value={formData.notes}
                     onChange={handleFormChange}
                     rows="3"
                     placeholder="Briefly describe your product goals, tech preferences, or current challenges..."
-                    className="w-full bg-[#070D19] border border-[#1F2E4D] rounded-lg p-3 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-[#C59B27] resize-none"
+                    className="w-full bg-slate-50 border border-slate-300 rounded-lg p-3 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:bg-white focus:ring-2 focus:ring-blue-100 transition-all resize-none"
                   />
                 </div>
 
                 <button
                   type="submit"
                   disabled={leadMutation.isPending}
-                  className="w-full bg-gradient-to-r from-[#C59B27] via-amber-400 to-[#E5C058] hover:brightness-110 text-[#051A3B] font-extrabold py-3.5 rounded-xl shadow-lg shadow-[#C59B27]/25 transition-all text-xs uppercase tracking-wider flex items-center justify-center space-x-2 cursor-pointer disabled:opacity-50"
+                  className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-blue-500/25 transition-all text-xs uppercase tracking-wider flex items-center justify-center space-x-2 cursor-pointer disabled:opacity-50"
                 >
                   {leadMutation.isPending ? (
                     <span>Submitting Discovery Request...</span>
@@ -1253,25 +1253,25 @@ export const LandingPage = () => {
       </section>
 
       {/* 12. FOOTER */}
-      <footer className="bg-[#050A14] text-slate-400 border-t border-[#1F2E4D] pt-14 pb-8">
+      <footer className="bg-slate-900 text-slate-400 border-t border-slate-800 pt-14 pb-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 pb-12 border-b border-[#1F2E4D]">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 pb-12 border-b border-slate-800">
             
             {/* Column 1: Brand Info */}
             <div className="space-y-4">
               <div className="flex items-center space-x-2.5">
-                <div className="w-9 h-9 bg-gradient-to-tr from-[#3F51B5] to-[#C59B27] rounded-lg flex items-center justify-center text-white font-black font-outfit text-lg">
-                  K
+                <div className="w-9 h-9 bg-white rounded-lg p-1 flex items-center justify-center shadow-sm">
+                  <img src="/aaa-logo.png" alt="AAA Technologies Logo" className="w-full h-full object-contain" />
                 </div>
                 <span className="font-outfit font-black text-base text-white tracking-tight">
-                  KIAAN TECHNOLOGIES
+                  AAA TECHNOLOGIES
                 </span>
               </div>
-              <p className="text-xs font-light leading-relaxed text-slate-400">
+              <p className="text-xs font-normal leading-relaxed text-slate-400">
                 Full-stack digital engineering, cloud infrastructure modernization, and AI systems architecture for high-growth enterprises worldwide.
               </p>
-              <div className="text-[11px] font-mono text-[#C59B27]">
+              <div className="text-[11px] font-mono text-blue-400">
                 SOC2 Type II • ISO 27001 Ready • AWS Advanced Partner
               </div>
             </div>
@@ -1280,11 +1280,11 @@ export const LandingPage = () => {
             <div className="space-y-3">
               <h4 className="font-outfit font-bold text-xs text-white uppercase tracking-wider">Capabilities</h4>
               <ul className="space-y-2 text-xs">
-                <li><a href="#services" onClick={(e) => handleScroll(e, 'services')} className="hover:text-[#E5C058] transition-colors">Custom Software &amp; SaaS</a></li>
-                <li><a href="#services" onClick={(e) => handleScroll(e, 'services')} className="hover:text-[#E5C058] transition-colors">Web &amp; Mobile Applications</a></li>
-                <li><a href="#services" onClick={(e) => handleScroll(e, 'services')} className="hover:text-[#E5C058] transition-colors">AI &amp; Intelligent Automation</a></li>
-                <li><a href="#services" onClick={(e) => handleScroll(e, 'services')} className="hover:text-[#E5C058] transition-colors">Cloud &amp; DevOps Engineering</a></li>
-                <li><a href="#services" onClick={(e) => handleScroll(e, 'services')} className="hover:text-[#E5C058] transition-colors">Enterprise CRM &amp; ERP</a></li>
+                <li><a href="#services" onClick={(e) => handleScroll(e, 'services')} className="hover:text-blue-400 transition-colors">Custom Software &amp; SaaS</a></li>
+                <li><a href="#services" onClick={(e) => handleScroll(e, 'services')} className="hover:text-blue-400 transition-colors">Web &amp; Mobile Applications</a></li>
+                <li><a href="#services" onClick={(e) => handleScroll(e, 'services')} className="hover:text-blue-400 transition-colors">AI &amp; Intelligent Automation</a></li>
+                <li><a href="#services" onClick={(e) => handleScroll(e, 'services')} className="hover:text-blue-400 transition-colors">Cloud &amp; DevOps Engineering</a></li>
+                <li><a href="#services" onClick={(e) => handleScroll(e, 'services')} className="hover:text-blue-400 transition-colors">Enterprise CRM &amp; ERP</a></li>
               </ul>
             </div>
 
@@ -1292,17 +1292,17 @@ export const LandingPage = () => {
             <div className="space-y-3">
               <h4 className="font-outfit font-bold text-xs text-white uppercase tracking-wider">Access &amp; Legal</h4>
               <ul className="space-y-2 text-xs">
-                <li><Link to="/login" className="hover:text-[#E5C058] transition-colors">Client &amp; Staff CRM Portal</Link></li>
-                <li><a href="#plans" onClick={(e) => handleScroll(e, 'plans')} className="hover:text-[#E5C058] transition-colors">Engagement Plans</a></li>
-                <li><a href="#case-studies" onClick={(e) => handleScroll(e, 'case-studies')} className="hover:text-[#E5C058] transition-colors">Engineering Case Studies</a></li>
-                <li><a href="#faqs" onClick={(e) => handleScroll(e, 'faqs')} className="hover:text-[#E5C058] transition-colors">Technical FAQs</a></li>
+                <li><Link to="/login" className="hover:text-blue-400 transition-colors">Client &amp; Staff CRM Portal</Link></li>
+                <li><a href="#plans" onClick={(e) => handleScroll(e, 'plans')} className="hover:text-blue-400 transition-colors">Engagement Plans</a></li>
+                <li><a href="#case-studies" onClick={(e) => handleScroll(e, 'case-studies')} className="hover:text-blue-400 transition-colors">Engineering Case Studies</a></li>
+                <li><a href="#faqs" onClick={(e) => handleScroll(e, 'faqs')} className="hover:text-blue-400 transition-colors">Technical FAQs</a></li>
               </ul>
             </div>
 
             {/* Column 4: Global Hubs */}
             <div className="space-y-3">
               <h4 className="font-outfit font-bold text-xs text-white uppercase tracking-wider">Global Locations</h4>
-              <div className="space-y-1.5 text-xs text-slate-400 font-light">
+              <div className="space-y-1.5 text-xs text-slate-400 font-normal">
                 <div>• San Francisco, CA (HQ R&amp;D)</div>
                 <div>• London, UK (European Hub)</div>
                 <div>• Dubai Silicon Oasis, UAE (MENA)</div>
@@ -1314,7 +1314,7 @@ export const LandingPage = () => {
 
           <div className="pt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 space-y-4 sm:space-y-0">
             <div>
-              &copy; {new Date().getFullYear()} Kiaan Technologies Global Inc. All Rights Reserved.
+              &copy; {new Date().getFullYear()} AAA Technologies Global Inc. All Rights Reserved.
             </div>
             <div className="space-x-4">
               <span>Privacy Policy</span>

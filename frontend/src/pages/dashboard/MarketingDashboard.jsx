@@ -138,21 +138,21 @@ export const MarketingDashboard = () => {
 <Box className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2 mb-4">
         {marketingStats
           .filter(stat => {
-            const cardTitle = stat.title === 'Total Leads Generated' ? 'Total Consultations' :
-              stat.title === 'Total Consultations Booked' ? "Today's Consultations" :
+            const cardTitle = stat.title === 'Total Leads Generated' ? 'Total Inquiries' :
+              stat.title === 'Total Consultations Booked' ? "Today's Inquiries" :
                 stat.title;
 
             // If it's a campaign metric not present in the customizable cards catalog, always show it
             const customizableKeys = [
               'Total Clients',
               'Today\'s Clients',
-              'Total Consultations',
-              'Today\'s Consultations',
+              'Total Inquiries',
+              'Today\'s Inquiries',
               'Pending Payments',
               'Total Revenue',
-              'Active Cases',
-              'Completed Cases',
-              'Lost Consultations',
+              'Active Projects',
+              'Completed Projects',
+              'Lost Inquiries',
               'Revenue Today',
               'Outstanding Revenue',
               'Refunded (Guarantee Claims)'

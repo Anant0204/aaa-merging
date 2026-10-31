@@ -25,6 +25,7 @@ import Chip from '@mui/material/Chip';
 import Switch from '@mui/material/Switch';
 import InputAdornment from '@mui/material/InputAdornment';
 import IconButton from '@mui/material/IconButton';
+import Tooltip from '@mui/material/Tooltip';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
@@ -48,6 +49,8 @@ import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
 import PhoneIcon from '@mui/icons-material/Phone';
 import EmailIcon from '@mui/icons-material/Email';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
+import SyncIcon from '@mui/icons-material/Sync';
+import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
 import WebIcon from '@mui/icons-material/Web';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import VpnKeyIcon from '@mui/icons-material/VpnKey';
@@ -68,6 +71,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import PageHeader from '../../components/PageHeader';
 import AppCard from '../../components/AppCard';
 import { useAlert } from '../../contexts/AlertContext';
+import { useCurrency } from '../../contexts/CurrencyContext';
 import useAuth from '../../hooks/useAuth';
 
 // General Form Schema
@@ -123,6 +127,7 @@ const fieldStyle = {
 export const Settings = () => {
   const queryClient = useQueryClient();
   const { showAlert } = useAlert();
+  const { currency: activeCurrency, currencySymbol: activeSymbol, setCurrency: setActiveCurrency, exchangeRate, refetchRates, isFetchingRates } = useCurrency();
   const { currentUser } = useAuth();
   const [activeTab, setActiveTab] = useState(0);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -212,6 +217,62 @@ export const Settings = () => {
       showAlert('Sworn translation languages & per-word rates saved successfully! These are now live on the client quote form.', 'success');
     } catch (err) {
       showAlert(err.response?.data?.message || 'Failed to save translation rates.', 'error');
+    }
+  };
+
+  const currentCurrency = generalSettings?.customizationSettings?.currency || activeCurrency || 'USD';
+  const currentCurrencySymbol = generalSettings?.customizationSettings?.currencySymbol || activeSymbol || '$';
+
+  const [converterUsd, setConverterUsd] = useState('1000');
+  const [converterInr, setConverterInr] = useState((1000 * (exchangeRate || 95.07)).toFixed(2));
+
+  useEffect(() => {
+    if (exchangeRate) {
+      const usdNum = parseFloat(converterUsd);
+      if (!isNaN(usdNum)) {
+        setConverterInr((usdNum * exchangeRate).toFixed(2));
+      }
+    }
+  }, [exchangeRate]);
+
+  const handleConverterUsdChange = (val) => {
+    setConverterUsd(val);
+    const num = parseFloat(val);
+    if (!isNaN(num) && exchangeRate > 0) {
+      setConverterInr((num * exchangeRate).toFixed(2));
+    } else {
+      setConverterInr('');
+    }
+  };
+
+  const handleConverterInrChange = (val) => {
+    setConverterInr(val);
+    const num = parseFloat(val);
+    if (!isNaN(num) && exchangeRate > 0) {
+      setConverterUsd((num / exchangeRate).toFixed(2));
+    } else {
+      setConverterUsd('');
+    }
+  };
+
+  const handleSaveCurrency = async (newCode) => {
+    const symbol = newCode === 'INR' ? '₹' : '$';
+    try {
+      const updatedCustomization = {
+        ...(generalSettings.customizationSettings || {}),
+        currency: newCode,
+        currencySymbol: symbol
+      };
+      await dbService.updateSettings({
+        ...generalSettings,
+        customizationSettings: updatedCustomization
+      });
+      setActiveCurrency(newCode);
+      queryClient.invalidateQueries({ queryKey: ['settings-general'] });
+      queryClient.invalidateQueries({ queryKey: ['companySettings'] });
+      showAlert('Portal currency set to ' + (newCode === 'INR' ? 'Indian Rupee (INR ₹)' : 'US Dollar (USD $)') + '!', 'success');
+    } catch (err) {
+      showAlert(err.message || 'Failed to update currency', 'error');
     }
   };
 
@@ -712,7 +773,7 @@ export const Settings = () => {
         sx={{ borderBottom: '1px solid', borderColor: 'divider', mb: 4, width: '100%' }}
       >
         <Tab icon={<BusinessIcon />} iconPosition="start" label="General Info" sx={{ fontWeight: 700, minHeight: 48 }} />
-        <Tab icon={<MonetizationOnIcon />} iconPosition="start" label="Visa Settings" sx={{ fontWeight: 700, minHeight: 48 }} />
+        <Tab icon={<MonetizationOnIcon />} iconPosition="start" label="IT Service Settings" sx={{ fontWeight: 700, minHeight: 48 }} />
         <Tab icon={<CardMembershipIcon />} iconPosition="start" label="Relocation Packages" sx={{ fontWeight: 700, minHeight: 48 }} />
         <Tab icon={<PaymentIcon />} iconPosition="start" label="Stripe Config" sx={{ fontWeight: 700, minHeight: 48 }} />
         <Tab icon={<GTranslateIcon />} iconPosition="start" label="Sworn Translation" sx={{ fontWeight: 700, minHeight: 48 }} />
@@ -749,7 +810,7 @@ export const Settings = () => {
                       width: 76,
                       height: 76,
                       borderRadius: 2,
-                      background: 'linear-gradient(135deg, #0A2540 0%, #C59B27 100%)',
+                      background: 'linear-gradient(135deg, #2563EB 0%, #6366F1 100%)',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
@@ -767,7 +828,7 @@ export const Settings = () => {
                       {generalSettings.companyName || 'AAA Business Consultancy LLC'}
                     </Typography>
                     <Typography variant="caption" color="text.secondary" display="block" sx={{ fontWeight: 500 }}>
-                      Primary Brand: Dark Navy (#0A2540) | Accent Color: Rich Gold (#C59B27)
+                      Primary Brand: Electric Blue (#2563EB) | Accent Color: AI Indigo (#6366F1)
                     </Typography>
                     <Typography variant="caption" color="secondary.main" display="block" sx={{ fontWeight: 700, mt: 0.5, textTransform: 'uppercase' }}>
                       Spain Visa, Residency & Relocation Services Portal
@@ -911,13 +972,192 @@ export const Settings = () => {
                     </Paper>
                   </Box>
                   <Box className="col-span-12 sm:col-span-6">
-                    <Paper sx={{ p: 2, border: '1px solid', borderColor: 'divider', borderRadius: 2, bgcolor: 'background.neutral', display: 'flex', alignItems: 'center', gap: 2 }}>
-                      <Box sx={{ fontWeight: 800, color: 'secondary.main', fontSize: '1.2rem', width: 24, textAlign: 'center' }}>€</Box>
-                      <Box>
-                        <Typography variant="caption" color="text.secondary" display="block">Default Portal Currency</Typography>
-                        <Typography variant="body2" sx={{ fontWeight: 700, color: 'primary.main' }}>
-                          Euro (EUR)
+                    <Paper sx={{ p: 2, border: '1px solid', borderColor: 'divider', borderRadius: 2, bgcolor: 'background.neutral', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 2 }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                        <Box sx={{ fontWeight: 800, color: 'primary.main', fontSize: '1.25rem', width: 28, textAlign: 'center' }}>
+                          {currentCurrencySymbol}
+                        </Box>
+                        <Box>
+                          <Typography variant="caption" color="text.secondary" display="block">Default Portal Currency</Typography>
+                          <Typography variant="body2" sx={{ fontWeight: 700, color: 'primary.main' }}>
+                            {currentCurrency === 'INR' ? 'Indian Rupee (INR ₹)' : 'US Dollar (USD $)'}
+                          </Typography>
+                        </Box>
+                      </Box>
+
+                      {/* Quick Currency Switch Pills */}
+                      <Box sx={{ display: 'flex', gap: 0.5, bgcolor: '#F1F5F9', p: 0.5, borderRadius: 2 }}>
+                        <Button
+                          size="small"
+                          variant={currentCurrency === 'USD' ? 'contained' : 'text'}
+                          onClick={() => handleSaveCurrency('USD')}
+                          sx={{
+                            fontWeight: 700,
+                            fontSize: '0.72rem',
+                            py: 0.2,
+                            px: 1.2,
+                            minWidth: 50,
+                            textTransform: 'none',
+                            borderRadius: 1.5,
+                            bgcolor: currentCurrency === 'USD' ? '#2563EB' : 'transparent',
+                            color: currentCurrency === 'USD' ? '#FFFFFF' : '#475569'
+                          }}
+                        >
+                          USD ($)
+                        </Button>
+                        <Button
+                          size="small"
+                          variant={currentCurrency === 'INR' ? 'contained' : 'text'}
+                          onClick={() => handleSaveCurrency('INR')}
+                          sx={{
+                            fontWeight: 700,
+                            fontSize: '0.72rem',
+                            py: 0.2,
+                            px: 1.2,
+                            minWidth: 50,
+                            textTransform: 'none',
+                            borderRadius: 1.5,
+                            bgcolor: currentCurrency === 'INR' ? '#16A34A' : 'transparent',
+                            color: currentCurrency === 'INR' ? '#FFFFFF' : '#475569'
+                          }}
+                        >
+                          INR (₹)
+                        </Button>
+                      </Box>
+                    </Paper>
+                  </Box>
+
+                  {/* LIVE CURRENCY CONVERTER WIDGET (POWERED BY open.er-api.com) */}
+                  <Box className="col-span-12">
+                    <Paper sx={{ p: 2.5, border: '1px solid #E2E8F0', borderRadius: 2.5, bgcolor: '#FFFFFF', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
+                      <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, justifyContent: 'space-between', alignItems: { xs: 'flex-start', sm: 'center' }, gap: 2, mb: 2, pb: 1.5, borderBottom: '1px solid #F1F5F9' }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                          <Box sx={{ p: 1, borderRadius: 2, bgcolor: '#EFF6FF', color: '#2563EB', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <SwapHorizIcon />
+                          </Box>
+                          <Box>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                              <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#0F172A' }}>
+                                Live Currency & Instant Converter (USD ⇄ INR)
+                              </Typography>
+                              <Chip
+                                label="LIVE RATE"
+                                size="small"
+                                sx={{ bgcolor: '#DCFCE7', color: '#166534', fontWeight: 800, fontSize: '0.65rem', height: 20 }}
+                              />
+                            </Box>
+                            <Typography variant="caption" sx={{ color: '#64748B' }}>
+                              Powered by ExchangeRate API (open.er-api.com) • 1 USD = <strong>₹{Number(exchangeRate || 95.07).toFixed(2)} INR</strong>
+                            </Typography>
+                          </Box>
+                        </Box>
+
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          <Tooltip title="Refresh live rate from open.er-api.com">
+                            <IconButton size="small" onClick={() => refetchRates()} disabled={isFetchingRates}>
+                              <SyncIcon sx={{ fontSize: 18, animation: isFetchingRates ? 'spin 1s linear infinite' : 'none' }} />
+                            </IconButton>
+                          </Tooltip>
+
+                          <Box sx={{ display: 'flex', gap: 0.5, bgcolor: '#F1F5F9', p: 0.5, borderRadius: 2 }}>
+                            <Button
+                              size="small"
+                              variant={currentCurrency === 'USD' ? 'contained' : 'text'}
+                              onClick={() => handleSaveCurrency('USD')}
+                              sx={{
+                                fontWeight: 700,
+                                fontSize: '0.75rem',
+                                py: 0.3,
+                                px: 1.5,
+                                textTransform: 'none',
+                                borderRadius: 1.5,
+                                bgcolor: currentCurrency === 'USD' ? '#2563EB' : 'transparent',
+                                color: currentCurrency === 'USD' ? '#FFFFFF' : '#475569'
+                              }}
+                            >
+                              💵 USD ($)
+                            </Button>
+                            <Button
+                              size="small"
+                              variant={currentCurrency === 'INR' ? 'contained' : 'text'}
+                              onClick={() => handleSaveCurrency('INR')}
+                              sx={{
+                                fontWeight: 700,
+                                fontSize: '0.75rem',
+                                py: 0.3,
+                                px: 1.5,
+                                textTransform: 'none',
+                                borderRadius: 1.5,
+                                bgcolor: currentCurrency === 'INR' ? '#16A34A' : 'transparent',
+                                color: currentCurrency === 'INR' ? '#FFFFFF' : '#475569'
+                              }}
+                            >
+                              🇮🇳 INR (₹)
+                            </Button>
+                          </Box>
+                        </Box>
+                      </Box>
+
+                      {/* Interactive Converter Calculator */}
+                      <Box sx={{ bgcolor: '#F8FAFC', p: 2, borderRadius: 2, border: '1px solid #E2E8F0' }}>
+                        <Typography variant="caption" sx={{ fontWeight: 700, color: '#475569', display: 'block', mb: 1.5 }}>
+                          INSTANT DUAL-WAY CALCULATOR
                         </Typography>
+
+                        <Box className="grid grid-cols-12 gap-3" sx={{ alignItems: 'center' }}>
+                          <Box className="col-span-12 sm:col-span-5">
+                            <TextField
+                              fullWidth
+                              size="small"
+                              label="Amount in USD ($)"
+                              type="number"
+                              value={converterUsd}
+                              onChange={(e) => handleConverterUsdChange(e.target.value)}
+                              InputProps={{
+                                startAdornment: <InputAdornment position="start">$</InputAdornment>
+                              }}
+                              sx={{ bgcolor: '#FFFFFF' }}
+                            />
+                          </Box>
+
+                          <Box className="col-span-12 sm:col-span-2" sx={{ textAlign: 'center', display: 'flex', justifyContent: 'center' }}>
+                            <Box sx={{ p: 0.8, borderRadius: '50%', bgcolor: '#E2E8F0', color: '#475569', display: 'inline-flex' }}>
+                              <SwapHorizIcon fontSize="small" />
+                            </Box>
+                          </Box>
+
+                          <Box className="col-span-12 sm:col-span-5">
+                            <TextField
+                              fullWidth
+                              size="small"
+                              label="Equivalent in INR (₹)"
+                              type="number"
+                              value={converterInr}
+                              onChange={(e) => handleConverterInrChange(e.target.value)}
+                              InputProps={{
+                                startAdornment: <InputAdornment position="start">₹</InputAdornment>
+                              }}
+                              sx={{ bgcolor: '#FFFFFF' }}
+                            />
+                          </Box>
+                        </Box>
+
+                        {/* Quick Presets */}
+                        <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', mt: 1.5, flexWrap: 'wrap' }}>
+                          <Typography variant="caption" sx={{ color: '#64748B', fontSize: '0.72rem' }}>
+                            Quick Presets:
+                          </Typography>
+                          {['100', '500', '1000', '2500', '5000', '10000'].map((preset) => (
+                            <Chip
+                              key={preset}
+                              label={'$' + Number(preset).toLocaleString()}
+                              size="small"
+                              clickable
+                              onClick={() => handleConverterUsdChange(preset)}
+                              sx={{ fontSize: '0.7rem', height: 22, bgcolor: '#FFFFFF', border: '1px solid #CBD5E1', cursor: 'pointer' }}
+                            />
+                          ))}
+                        </Box>
                       </Box>
                     </Paper>
                   </Box>
@@ -1001,8 +1241,8 @@ export const Settings = () => {
       {/* TAB 1: VISA SETTINGS */}
       {activeTab === 1 && (
         <AppCard
-          title="Visa Services & Pathway Pricing"
-          subheader="Configure base processing and application fees for Spain residency and study visa streams."
+          title="IT Services & Package Pricing"
+          subheader="Configure base engineering and service fees for custom software, web/mobile, and cloud solutions."
           action={
             <Button
               variant="contained"
@@ -1024,7 +1264,7 @@ export const Settings = () => {
               <Box className="grid grid-cols-12 gap-5" alignItems="center">
                 <Box className="col-span-12 sm:col-span-4">
                   <TextField
-                    label="Visa Pathway Name"
+                    label="IT Service Name"
                     value={newServiceName}
                     onChange={(e) => setNewServiceName(e.target.value)}
                     placeholder="e.g. Golden Visa Investment"
@@ -1242,8 +1482,8 @@ export const Settings = () => {
                 <Paper sx={{
                   p: 4,
                   borderRadius: 4,
-                  border: pkg.isRecommended ? '2px solid #C59B27' : '1px solid',
-                  borderColor: pkg.isRecommended ? '#C59B27' : 'divider',
+                  border: pkg.isRecommended ? '2px solid #2563EB' : '1px solid',
+                  borderColor: pkg.isRecommended ? '#2563EB' : 'divider',
                   background: pkg.isRecommended ? 'linear-gradient(180deg, #FAF6ED 0%, #ffffff 100%)' : 'linear-gradient(180deg, #ffffff 0%, rgba(244, 246, 249, 0.4) 100%)',
                   display: 'flex',
                   flexDirection: 'column',
@@ -1902,7 +2142,7 @@ export const Settings = () => {
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end" sx={{ pr: 1 }}>
-                      <span style={{ fontWeight: 700, color: '#C59B27', fontSize: '0.95rem', fontFamily: "'Outfit', sans-serif" }}>%</span>
+                      <span style={{ fontWeight: 700, color: '#2563EB', fontSize: '0.95rem', fontFamily: "'Outfit', sans-serif" }}>%</span>
                     </InputAdornment>
                   )
                 }}
@@ -1982,7 +2222,7 @@ export const Settings = () => {
                 fontFamily: "'Outfit', sans-serif",
                 textTransform: 'none',
                 fontWeight: 700,
-                background: 'linear-gradient(135deg, #C59B27 0%, #A57F1E 100%)',
+                background: 'linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%)',
                 boxShadow: '0 4px 14px 0 rgba(197, 155, 39, 0.3)',
                 transition: 'all 0.2s',
                 '&:hover': {
@@ -2053,7 +2293,7 @@ export const Settings = () => {
                     InputProps={{
                       startAdornment: (
                         <InputAdornment position="start" sx={{ mr: 0.5 }}>
-                          <span style={{ fontWeight: 700, color: '#C59B27', fontSize: '0.95rem' }}>€</span>
+                          <span style={{ fontWeight: 700, color: '#2563EB', fontSize: '0.95rem' }}>€</span>
                         </InputAdornment>
                       )
                     }}
@@ -2182,7 +2422,7 @@ export const Settings = () => {
                   fontFamily: "'Outfit', sans-serif",
                   textTransform: 'none',
                   fontWeight: 700,
-                  background: 'linear-gradient(135deg, #C59B27 0%, #A57F1E 100%)',
+                  background: 'linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%)',
                   boxShadow: '0 4px 14px 0 rgba(197, 155, 39, 0.3)',
                   transition: 'all 0.2s',
                   '&:hover': {
@@ -2392,7 +2632,7 @@ export const Settings = () => {
                 fontFamily: "'Outfit', sans-serif",
                 textTransform: 'none',
                 fontWeight: 700,
-                background: 'linear-gradient(135deg, #C59B27 0%, #A57F1E 100%)',
+                background: 'linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%)',
                 boxShadow: '0 4px 14px 0 rgba(197, 155, 39, 0.3)',
                 transition: 'all 0.2s',
                 '&:hover': {

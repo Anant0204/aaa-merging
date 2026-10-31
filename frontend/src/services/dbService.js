@@ -603,6 +603,10 @@ export const dbService = {
     });
     return res.data;
   },
+  getExchangeRates: async () => {
+    const res = await apiClient.get('/settings/exchange-rates');
+    return res.data;
+  },
   getSettings: async () => {
     const res = await apiClient.get('/settings/company');
     return res.data;
@@ -955,3 +959,5 @@ export const dbService = {
     return res.data;
   },
 };
+
+export default dbService;

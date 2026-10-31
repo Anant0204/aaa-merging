@@ -13,6 +13,7 @@ import ListItemText from '@mui/material/ListItemText';
 import Card from '@mui/material/Card';
 
 import { useAuth } from '../../hooks/useAuth';
+import { useCurrency } from '../../contexts/CurrencyContext';
 import PageHeader from '../../components/PageHeader';
 import StatCard from '../../components/StatCard';
 import ChartCard from '../../components/ChartCard';
@@ -40,6 +41,7 @@ import SettingsIcon from '@mui/icons-material/Settings';
 
 export const FinanceDashboard = () => {
   const navigate = useNavigate();
+  const { currency, currencySymbol, formatAmount, convertAmount } = useCurrency();
 
   const { data: allPayments = [] } = useQuery({ queryKey: ['payments'], queryFn: dbService.getPayments });
   const { data: refundClaims = [] } = useQuery({ queryKey: ['refundClaims'], queryFn: dbService.getRefundRequests });
@@ -77,10 +79,10 @@ export const FinanceDashboard = () => {
         id: agent.id,
         fullName: agent.fullName,
         rate: `${rate}%`,
-        totalRevenue: `€${totalClosedRevenue.toLocaleString()}`,
-        earned: `€${calculatedCommission.toLocaleString()}`,
-        paid: `€${commissionPaid.toLocaleString()}`,
-        balance: `€${balance.toLocaleString()}`
+        totalRevenue: formatAmount(currency === 'INR' ? convertAmount(totalClosedRevenue, 'USD', 'INR') : totalClosedRevenue),
+        earned: formatAmount(currency === 'INR' ? convertAmount(calculatedCommission, 'USD', 'INR') : calculatedCommission),
+        paid: formatAmount(currency === 'INR' ? convertAmount(commissionPaid, 'USD', 'INR') : commissionPaid),
+        balance: formatAmount(currency === 'INR' ? convertAmount(balance, 'USD', 'INR') : balance)
       };
     });
 
@@ -95,9 +97,9 @@ export const FinanceDashboard = () => {
 
   // Render stats list
   const statsList = [
-    { title: 'Total Revenue (Paid)', value: `€${totalRevenue.toLocaleString()}`, icon: <PaymentsIcon />, color: '#22C55E', onClick: () => navigate('/payments/invoices', { state: { filterStatus: 'Paid', cardInfo: { title: 'Total Revenue (Paid)', value: `€${totalRevenue.toLocaleString()}`, color: '#22C55E', iconType: 'Payments' } } }) },
-    { title: 'Total Invoiced Value', value: `€${totalInvoiced.toLocaleString()}`, icon: <ReceiptIcon />, color: '#3F51B5', onClick: () => navigate('/payments/invoices', { state: { filterStatus: '', cardInfo: { title: 'Total Invoiced Value', value: `€${totalInvoiced.toLocaleString()}`, color: '#3F51B5', iconType: 'Receipt' } } }) },
-    { title: 'Pending Receivables', value: `€${totalPendingVal.toLocaleString()}`, icon: <CreditCardIcon />, color: '#F59E0B', onClick: () => navigate('/payments/invoices', { state: { filterStatus: 'Pending', cardInfo: { title: 'Pending Receivables', value: `€${totalPendingVal.toLocaleString()}`, color: '#F59E0B', iconType: 'CreditCard' } } }) },
+    { title: 'Total Revenue (Paid)', value: formatAmount(currency === 'INR' ? convertAmount(totalRevenue, 'USD', 'INR') : totalRevenue), icon: <PaymentsIcon />, color: '#22C55E', onClick: () => navigate('/payments/invoices', { state: { filterStatus: 'Paid', cardInfo: { title: 'Total Revenue (Paid)', value: formatAmount(currency === 'INR' ? convertAmount(totalRevenue, 'USD', 'INR') : totalRevenue), color: '#22C55E', iconType: 'Payments' } } }) },
+    { title: 'Total Invoiced Value', value: formatAmount(currency === 'INR' ? convertAmount(totalInvoiced, 'USD', 'INR') : totalInvoiced), icon: <ReceiptIcon />, color: '#3F51B5', onClick: () => navigate('/payments/invoices', { state: { filterStatus: '', cardInfo: { title: 'Total Invoiced Value', value: formatAmount(currency === 'INR' ? convertAmount(totalInvoiced, 'USD', 'INR') : totalInvoiced), color: '#3F51B5', iconType: 'Receipt' } } }) },
+    { title: 'Pending Receivables', value: formatAmount(currency === 'INR' ? convertAmount(totalPendingVal, 'USD', 'INR') : totalPendingVal), icon: <CreditCardIcon />, color: '#F59E0B', onClick: () => navigate('/payments/invoices', { state: { filterStatus: 'Pending', cardInfo: { title: 'Pending Receivables', value: formatAmount(currency === 'INR' ? convertAmount(totalPendingVal, 'USD', 'INR') : totalPendingVal), color: '#F59E0B', iconType: 'CreditCard' } } }) },
     { title: 'Completed Invoices', value: completedPayments.length, icon: <ReceiptIcon />, color: '#10B981', onClick: () => navigate('/payments/invoices', { state: { filterStatus: 'Paid', cardInfo: { title: 'Completed Invoices', value: completedPayments.length, color: '#10B981', iconType: 'Receipt' } } }) }
   ];
 
@@ -134,7 +136,7 @@ export const FinanceDashboard = () => {
     {
       id: 'amount',
       label: 'Net Amount',
-      render: (row) => `€${((row.amount || 0) - (row.discount || 0)).toLocaleString()}` },
+      render: (row) => formatAmount(currency === 'INR' ? convertAmount((row.amount || 0) - (row.discount || 0), 'USD', 'INR') : ((row.amount || 0) - (row.discount || 0))) },
     { id: 'dueDate', label: 'Due Date' },
     { id: 'status', label: 'Status' }
   ];
@@ -192,9 +194,9 @@ export const FinanceDashboard = () => {
                 <CartesianGrid strokeDasharray="3 3" vertical={false} />
                 <XAxis dataKey="name" stroke="#94A3B8" fontSize={11} />
                 <YAxis stroke="#94A3B8" fontSize={11} />
-                <ChartTooltip formatter={(value) => [`€${value}`]} />
-                <Area type="monotone" dataKey="revenue" name="Payments Collected (€)" stroke="#22C55E" strokeWidth={2.5} fillOpacity={1} fill="url(#colorRevenueFin)" />
-                <Area type="monotone" dataKey="invoiced" name="Invoiced Amount (€)" stroke="#94A3B8" strokeWidth={1.5} strokeDasharray="5 5" fill="none" />
+                <ChartTooltip formatter={(value) => [`${currencySymbol}${Number(value).toLocaleString()}`]} />
+                <Area type="monotone" dataKey="revenue" name={`Payments Collected (${currencySymbol})`} stroke="#22C55E" strokeWidth={2.5} fillOpacity={1} fill="url(#colorRevenueFin)" />
+                <Area type="monotone" dataKey="invoiced" name={`Invoiced Amount (${currencySymbol})`} stroke="#94A3B8" strokeWidth={1.5} strokeDasharray="5 5" fill="none" />
               </AreaChart>
             </ResponsiveContainer>
           </ChartCard>
@@ -347,11 +349,11 @@ const RefundClaimsTable = () => {
 
   const refundColumns = [
     { header: 'Client Name', accessor: 'clientName', cell: (row) => <strong>{row.clientName}</strong> },
-    { header: 'Total Paid (€)', accessor: 'totalPaid', cell: (row) => `€${(row.totalPaid || row.amount || 0).toLocaleString()}` },
+    { header: `Total Paid (${currencySymbol})`, accessor: 'totalPaid', cell: (row) => formatAmount(currency === 'INR' ? convertAmount(row.totalPaid || row.amount || 0, 'USD', 'INR') : (row.totalPaid || row.amount || 0)) },
     { 
-      header: 'Refund Amount (€)', 
+      header: `Refund Amount (${currencySymbol})`, 
       accessor: 'calculatedRefundAmount', 
-      cell: (row) => <strong style={{ color: '#DC2626' }}>€{(row.calculatedRefundAmount || 0).toLocaleString()}</strong> 
+      cell: (row) => <strong style={{ color: '#DC2626' }}>{formatAmount(currency === 'INR' ? convertAmount(row.calculatedRefundAmount || 0, 'USD', 'INR') : (row.calculatedRefundAmount || 0))}</strong> 
     },
     { 
       header: 'Refund Status', 

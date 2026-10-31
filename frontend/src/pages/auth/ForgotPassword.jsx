@@ -24,17 +24,38 @@ export const ForgotPassword = () => {
     // Simulate API request
     await new Promise((resolve) => setTimeout(resolve, 800));
     setLoading(false);
-    showAlert('Password reset request has been sent to info@aaabusinessconsultancy.com. Management will review your request and send your new credentials shortly.', 'success');
+    showAlert('Password reset request has been sent to support@aaatechnologies.ae. Management will review your request and send your new credentials shortly.', 'success');
     navigate('/login');
   };
 
   return (
     <Box>
-      <Box sx={{ mb: 3, textAlign: 'center' }}>
-        <Typography variant="h4" sx={{ fontWeight: 700, mb: 1 }}>
+      <Box sx={{ mb: 3, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <Box
+          sx={{
+            width: 54,
+            height: 54,
+            borderRadius: 3,
+            backgroundColor: '#FFFFFF',
+            boxShadow: '0 8px 24px rgba(37, 99, 235, 0.15)',
+            border: '1px solid rgba(226, 232, 240, 0.9)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            p: 1,
+            mb: 1.5,
+          }}
+        >
+          <img
+            src="/aaa-logo.png"
+            alt="AAA Technologies Logo"
+            style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+          />
+        </Box>
+        <Typography variant="h4" sx={{ fontWeight: 800, mb: 1, letterSpacing: '-0.02em' }}>
           Forgot Password
         </Typography>
-        <Typography variant="body2" color="text.secondary">
+        <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center' }}>
           Enter your corporate email address to request management to reset your password.
         </Typography>
       </Box>
