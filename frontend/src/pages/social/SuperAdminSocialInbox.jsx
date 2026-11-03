@@ -64,6 +64,8 @@ import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import QuickreplyIcon from '@mui/icons-material/Quickreply';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
+import YouTubeIcon from '@mui/icons-material/YouTube';
+import EmailIcon from '@mui/icons-material/Email';
 import TwitterIcon from '@mui/icons-material/Twitter';
 import PinterestIcon from '@mui/icons-material/Pinterest';
 import CommentIcon from '@mui/icons-material/Comment';
@@ -85,24 +87,18 @@ const SOCIAL_PLATFORMS = [
   'whatsapp',
   'facebook',
   'instagram',
-  'telegram',
+  'linkedin',
+  'youtube',
+  'brevo',
   'comments',
   'unassigned',
-  'unread',
-  'linkedin',
-  'twitter',
-  'pinterest',
-  'wechat',
-  'line',
-  'viber',
-  'discord',
-  'snapchat'
+  'unread'
 ];
 import { SERVICES } from '../../constants/mockData';
 
 const QUICK_TEMPLATES = [
-  { id: 'aaa_greeting', label: 'Greet', text: 'Hello👋 \n\nWelcome to AAA Business Consultancy Services! \n\nWe’re here to help you with your Spain Visa, Residency & Relocation requirements. \n\nReply Hi to get started.' },
-  { id: 'booking_form', label: '⚡ Booking & Assessment Form', text: 'Hello! 🇪🇸✈️ Thank you for connecting with Kiaan Technology.\n\nTo schedule your Free 20-Minute Technical Discovery & Project Scoping Session with a Solutions Consultant, please complete our quick assessment form here:\n👉 https://aaa-crm-service.netlify.app/#/public/lead-form?source=Social_Comment\n\nOur team looks forward to assisting you!' }
+  { id: 'kt_greeting', label: 'Greet', text: 'Hello 👋\n\nWelcome to Kiaan Technology! 💻🚀\n\nWe provide modern IT Services, Custom Software Development, Web/Mobile Apps, and Cloud Solutions.\n\nHow can we help you today?' },
+  { id: 'discovery_meeting', label: '⚡ Technical Discovery', text: 'Hello! 👋 Thank you for connecting with Kiaan Technology.\n\nOur engineering team would love to learn more about your project. Please share your requirements, target timeline, and budget, and we will get back to you shortly!' }
 ];
 
 const displayName = (name, phone) => {
@@ -634,18 +630,12 @@ export const SuperAdminSocialInbox = () => {
                     <Tab label="WhatsApp" icon={<WhatsAppIcon fontSize="small" sx={{ color: isWhatsAppConnected ? '#25D366' : '#9ca3af' }} />} iconPosition="start" />
                     <Tab label="Facebook" icon={<FacebookIcon fontSize="small" sx={{ color: '#1877F2' }} />} iconPosition="start" />
                     <Tab label="Instagram" icon={<InstagramIcon fontSize="small" sx={{ color: '#E4405F' }} />} iconPosition="start" />
-                    <Tab label="Telegram" icon={<TelegramIcon fontSize="small" sx={{ color: '#0088cc' }} />} iconPosition="start" />
+                    <Tab label="LinkedIn" icon={<LinkedInIcon fontSize="small" sx={{ color: '#0A66C2' }} />} iconPosition="start" />
+                    <Tab label="YouTube" icon={<YouTubeIcon fontSize="small" sx={{ color: '#FF0000' }} />} iconPosition="start" />
+                    <Tab label="Email" icon={<EmailIcon fontSize="small" sx={{ color: '#0B996F' }} />} iconPosition="start" />
                     <Tab label="Comments" icon={<CommentIcon fontSize="small" sx={{ color: '#4B5563' }} />} iconPosition="start" />
                     <Tab label="Unassigned" icon={<PersonOffIcon fontSize="small" sx={{ color: '#F59E0B' }} />} iconPosition="start" />
                     <Tab label="Unread" icon={<MarkChatUnreadIcon fontSize="small" sx={{ color: '#EF4444' }} />} iconPosition="start" />
-                    <Tab label="LinkedIn" icon={<LinkedInIcon fontSize="small" sx={{ color: '#0A66C2' }} />} iconPosition="start" />
-                    <Tab label="Twitter" icon={<TwitterIcon fontSize="small" sx={{ color: '#1DA1F2' }} />} iconPosition="start" />
-                    <Tab label="Pinterest" icon={<PinterestIcon fontSize="small" sx={{ color: '#BD081C' }} />} iconPosition="start" />
-                    <Tab label="WeChat" icon={<ChatIcon fontSize="small" sx={{ color: '#07C160' }} />} iconPosition="start" />
-                    <Tab label="LINE" icon={<ChatIcon fontSize="small" sx={{ color: '#06C755' }} />} iconPosition="start" />
-                    <Tab label="Viber" icon={<ChatIcon fontSize="small" sx={{ color: '#7360F2' }} />} iconPosition="start" />
-                    <Tab label="Discord" icon={<ChatIcon fontSize="small" sx={{ color: '#5865F2' }} />} iconPosition="start" />
-                    <Tab label="Snapchat" icon={<ChatIcon fontSize="small" sx={{ color: '#FFFC00' }} />} iconPosition="start" />
                   </Tabs>
                 )}
 

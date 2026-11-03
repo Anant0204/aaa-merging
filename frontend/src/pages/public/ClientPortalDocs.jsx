@@ -4,7 +4,7 @@ import dayjs from 'dayjs';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { jsPDF } from 'jspdf';
-import aaaLogo from '../../assets/aaa-logo.png';
+import aaaLogo from '../../assets/kiaan-logo.svg';
 import { CaseActivityTimeline } from '../../components/CaseActivityTimeline';
 import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
@@ -378,7 +378,7 @@ export const ClientPortalDocs = () => {
       doc.setFont("helvetica", "bold");
       doc.setFontSize(18);
       doc.setTextColor(12, 35, 64);
-      doc.text("AAA BUSINESS CONSULTANCY L.L.C", 14, 20);
+      doc.text("KIAAN TECHNOLOGIES LLC", 14, 20);
 
       doc.setFontSize(8);
       doc.setFont("helvetica", "bold");
@@ -388,7 +388,7 @@ export const ClientPortalDocs = () => {
       doc.setFontSize(8);
       doc.setFont("helvetica", "normal");
       doc.setTextColor(100, 116, 139);
-      doc.text("Email: client@aaabusinessconsultancy.com | Tel: +971509554142", 14, 31);
+      doc.text("Email: client@kiaantechnology.com | Tel: +919876543210", 14, 31);
       doc.text("Business Village B, Office F-09, Port Saeed, Deira, Dubai, UAE", 14, 36);
 
       // Gold line
@@ -457,7 +457,7 @@ export const ClientPortalDocs = () => {
       doc.setFont("helvetica", "normal");
       doc.setFontSize(8);
       doc.setTextColor(100, 116, 139);
-      doc.text("Official refund processed under AAA Business Consultancy Terms & Conditions.", 18, 127);
+      doc.text("Official refund processed under KIAAN TECHNOLOGIES Terms & Conditions.", 18, 127);
 
       doc.setFont("helvetica", "normal");
       doc.setFontSize(9);
@@ -489,7 +489,7 @@ export const ClientPortalDocs = () => {
       doc.setFontSize(8.5);
       doc.setFont("helvetica", "normal");
       doc.setTextColor(148, 163, 184);
-      doc.text("Thank you for choosing AAA Business Consultancy for your Spain Relocation journey.", 14, 175);
+      doc.text("Thank you for choosing KIAAN TECHNOLOGIES for your Spain Relocation journey.", 14, 175);
 
       doc.save(`Refund_Receipt_${receiptNo}.pdf`);
     } catch (err) {
@@ -1229,7 +1229,7 @@ export const ClientPortalDocs = () => {
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(11);
       doc.setTextColor(12, 35, 64); // #0C2340
-      doc.text('AAA BUSINESS CONSULTANCY L.L.C', 34, 15.5);
+      doc.text('KIAAN TECHNOLOGIES LLC', 34, 15.5);
 
       // Tagline container with gold border lines
       doc.setDrawColor(197, 155, 39);
@@ -1247,9 +1247,9 @@ export const ClientPortalDocs = () => {
       doc.line(126, 10, 126, 26);
 
       const contactItems = [
-        'client@aaabusinessconsultancy.com',
-        '+971509554142',
-        'www.aaabusinessconsultancy.com',
+        'client@kiaantechnology.com',
+        '+919876543210',
+        'www.kiaantechnology.com',
         'Business Village B , office number F-09 Port Saeed Deira Dubai, UAE'
       ];
 
@@ -1449,7 +1449,7 @@ export const ClientPortalDocs = () => {
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(8);
       doc.setTextColor(148, 163, 184);
-      doc.text('Thank you for choosing AAA Business Consultancy for your Spain Relocation journey.', 105, currentY, { align: 'center' });
+      doc.text('Thank you for choosing KIAAN TECHNOLOGIES for your Spain Relocation journey.', 105, currentY, { align: 'center' });
 
       // Save PDF
       doc.save(`Receipt_Sworn_Translation_${client.firstName}_${client.lastName}.pdf`);
@@ -4052,7 +4052,7 @@ export const ClientPortalDocs = () => {
 
                                     <Box sx={{ display: 'flex', flexDirection: 'column', bgcolor: '#FFFFFF', p: 1.2, borderRadius: 2, border: '1px solid rgba(0,0,0,0.06)' }}>
                                       <Typography variant="caption" sx={{ color: '#6B7280', fontWeight: 700, fontSize: '0.68rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Account Name</Typography>
-                                      <Typography variant="body2" sx={{ fontWeight: 800, color: '#051A3B', fontSize: '0.85rem' }}>AAA Business Consultancy FZC LLC</Typography>
+                                      <Typography variant="body2" sx={{ fontWeight: 800, color: '#051A3B', fontSize: '0.85rem' }}>KIAAN TECHNOLOGIES FZC LLC</Typography>
                                     </Box>
 
                                     <Box sx={{ display: 'flex', flexDirection: 'column', bgcolor: '#FFFFFF', p: 1.2, borderRadius: 2, border: '1px solid rgba(0,0,0,0.06)' }}>
@@ -4096,11 +4096,11 @@ export const ClientPortalDocs = () => {
                                 <label htmlFor="billing-tc-checkbox" style={{ fontSize: '0.75rem', color: '#4B5563', cursor: 'pointer', lineHeight: 1.35, fontWeight: 500 }}>
                                   {isRefundGuaranteePackage(activePkg || selectedPackage, client?.serviceType || client?.serviceId) ? (
                                     <>
-                                      I agree to the <span style={{ color: '#E11D48', fontWeight: 800 }}>100%</span> Refund Guarantee according to the <a href="https://aaabusinessconsultancy.com/terms-conditions/" target="_blank" rel="noopener noreferrer" style={{ color: '#051A3B', textDecoration: 'underline', fontWeight: 700 }}>Company Terms &amp; Conditions</a>.
+                                      I agree to the <span style={{ color: '#E11D48', fontWeight: 800 }}>100%</span> Refund Guarantee according to the <a href="https://kiaantechnology.com/terms-conditions/" target="_blank" rel="noopener noreferrer" style={{ color: '#051A3B', textDecoration: 'underline', fontWeight: 700 }}>Company Terms &amp; Conditions</a>.
                                     </>
                                   ) : (
                                     <>
-                                      I agree to the <a href="https://aaabusinessconsultancy.com/terms-conditions/" target="_blank" rel="noopener noreferrer" style={{ color: '#051A3B', textDecoration: 'underline', fontWeight: 700 }}>Company Terms &amp; Conditions</a>.
+                                      I agree to the <a href="https://kiaantechnology.com/terms-conditions/" target="_blank" rel="noopener noreferrer" style={{ color: '#051A3B', textDecoration: 'underline', fontWeight: 700 }}>Company Terms &amp; Conditions</a>.
                                     </>
                                   )}
                                 </label>
@@ -4573,7 +4573,7 @@ export const ClientPortalDocs = () => {
             <ReceiptLongIcon sx={{ color: '#C59B27', fontSize: 32 }} />
             <Box>
               <Typography variant="h6" sx={{ fontWeight: 900, color: '#051A3B', fontFamily: 'Outfit, sans-serif' }}>
-                AAA BUSINESS CONSULTANCY LLC
+                KIAAN TECHNOLOGIES LLC
               </Typography>
               <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 700, letterSpacing: '0.05em' }}>
                 Receipt
@@ -4656,7 +4656,7 @@ export const ClientPortalDocs = () => {
                   }
                 `}</style>
 
-                {/* OFFICIAL AAA BUSINESS CONSULTANCY FZC LLC LETTERHEAD CONTAINER */}
+                {/* OFFICIAL KIAAN TECHNOLOGIES FZC LLC LETTERHEAD CONTAINER */}
                 <Paper
                   className="printable-client-receipt-letterhead"
                   sx={{
@@ -4698,7 +4698,7 @@ export const ClientPortalDocs = () => {
                         <img src={aaaLogo} alt="AAA Logo" style={{ width: 64, height: 68, objectFit: 'contain' }} />
                         <Box sx={{ borderLeft: '1.5px solid #C59B27', pl: 1.2, py: 0.2 }}>
                           <Typography sx={{ fontWeight: 900, fontSize: '1.05rem', color: '#0C2340', lineHeight: 1.1, letterSpacing: '0.3px', whiteSpace: 'nowrap' }}>
-                            AAA BUSINESS CONSULTANCY L.L.C
+                            KIAAN TECHNOLOGIES LLC
                           </Typography>
 
                           <Box sx={{ borderTop: '1.5px solid #C59B27', borderBottom: '1.5px solid #C59B27', py: 0.2, px: 0.4, textAlign: 'center', mt: 0.5, display: 'inline-block', width: '100%' }}>
@@ -4717,7 +4717,7 @@ export const ClientPortalDocs = () => {
                               ✉️
                             </Box>
                             <Typography sx={{ fontSize: '0.68rem', color: '#0C2340', fontWeight: 700, whiteSpace: 'nowrap' }}>
-                              client@aaabusinessconsultancy.com
+                              client@kiaantechnology.com
                             </Typography>
                           </Box>
 
@@ -4726,7 +4726,7 @@ export const ClientPortalDocs = () => {
                               📞
                             </Box>
                             <Typography sx={{ fontSize: '0.68rem', color: '#0C2340', fontWeight: 700, whiteSpace: 'nowrap' }}>
-                              +971509554142
+                              +919876543210
                             </Typography>
                           </Box>
 
@@ -4735,7 +4735,7 @@ export const ClientPortalDocs = () => {
                               🌐
                             </Box>
                             <Typography sx={{ fontSize: '0.68rem', color: '#0C2340', fontWeight: 700, whiteSpace: 'nowrap' }}>
-                              www.aaabusinessconsultancy.com
+                              www.kiaantechnology.com
                             </Typography>
                           </Box>
 
@@ -4899,7 +4899,7 @@ export const ClientPortalDocs = () => {
                     </Box>
 
                     <Typography sx={{ fontSize: '0.75rem', color: '#94A3B8', textAlign: 'center' }}>
-                      Thank you for choosing AAA Business Consultancy for your Spain Relocation journey.
+                      Thank you for choosing KIAAN TECHNOLOGIES for your Spain Relocation journey.
                     </Typography>
                   </Box>
 
@@ -4993,11 +4993,11 @@ export const ClientPortalDocs = () => {
                       <label htmlFor="modal-billing-tc" style={{ fontSize: '0.8rem', color: '#374151', cursor: 'pointer', fontWeight: 500, lineHeight: 1.4 }}>
                         {isRefundGuaranteePackage(currentPkg || selectedPackage, client?.serviceType || client?.serviceId) ? (
                           <>
-                            I agree to the <span style={{ color: '#E11D48', fontWeight: 800 }}>100%</span> Refund Guarantee according to the <a href="https://aaabusinessconsultancy.com/terms-conditions/" target="_blank" rel="noopener noreferrer" style={{ color: '#051A3B', textDecoration: 'underline', fontWeight: 700 }}>Company Terms &amp; Conditions</a>.
+                            I agree to the <span style={{ color: '#E11D48', fontWeight: 800 }}>100%</span> Refund Guarantee according to the <a href="https://kiaantechnology.com/terms-conditions/" target="_blank" rel="noopener noreferrer" style={{ color: '#051A3B', textDecoration: 'underline', fontWeight: 700 }}>Company Terms &amp; Conditions</a>.
                           </>
                         ) : (
                           <>
-                            I agree to the <a href="https://aaabusinessconsultancy.com/terms-conditions/" target="_blank" rel="noopener noreferrer" style={{ color: '#051A3B', textDecoration: 'underline', fontWeight: 700 }}>Company Terms &amp; Conditions</a>.
+                            I agree to the <a href="https://kiaantechnology.com/terms-conditions/" target="_blank" rel="noopener noreferrer" style={{ color: '#051A3B', textDecoration: 'underline', fontWeight: 700 }}>Company Terms &amp; Conditions</a>.
                           </>
                         )}
                       </label>
@@ -5062,7 +5062,7 @@ export const ClientPortalDocs = () => {
         </DialogActions>
       </Dialog>
 
-      {/* ── OFFICIAL AAA BUSINESS CONSULTANCY LETTERHEAD REFUND STATEMENT MODAL ── */}
+      {/* ── OFFICIAL KIAAN TECHNOLOGIES LETTERHEAD REFUND STATEMENT MODAL ── */}
       <Dialog
         open={Boolean(selectedRefundForReceipt)}
         onClose={() => setSelectedRefundForReceipt(null)}
@@ -5155,7 +5155,7 @@ export const ClientPortalDocs = () => {
                       <img src={aaaLogo} alt="AAA Logo" style={{ width: 60, height: 60, objectFit: 'contain' }} />
                       <Box sx={{ borderLeft: '1.5px solid #C59B27', pl: 1.2, py: 0.2 }}>
                         <Typography sx={{ fontWeight: 900, fontSize: '1.05rem', color: '#0C2340', lineHeight: 1.1, letterSpacing: '0.3px', whiteSpace: 'nowrap' }}>
-                          AAA BUSINESS CONSULTANCY L.L.C
+                          KIAAN TECHNOLOGIES LLC
                         </Typography>
                         <Box sx={{ borderTop: '1.5px solid #C59B27', borderBottom: '1.5px solid #C59B27', py: 0.2, px: 0.4, textAlign: 'center', mt: 0.5, display: 'inline-block', width: '100%' }}>
                           <Typography sx={{ fontWeight: 800, fontSize: '0.55rem', color: '#C59B27', letterSpacing: '2px', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>
@@ -5170,13 +5170,13 @@ export const ClientPortalDocs = () => {
                       <Box sx={{ width: '1.5px', height: '58px', bgcolor: '#C59B27', flexShrink: 0 }} />
                       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.3 }}>
                         <Typography sx={{ fontSize: '0.68rem', color: '#0C2340', fontWeight: 700 }}>
-                          ✉️ client@aaabusinessconsultancy.com
+                          ✉️ client@kiaantechnology.com
                         </Typography>
                         <Typography sx={{ fontSize: '0.68rem', color: '#0C2340', fontWeight: 700 }}>
-                          📞 +971509554142
+                          📞 +919876543210
                         </Typography>
                         <Typography sx={{ fontSize: '0.68rem', color: '#0C2340', fontWeight: 700 }}>
-                          🌐 www.aaabusinessconsultancy.com
+                          🌐 www.kiaantechnology.com
                         </Typography>
                         <Typography sx={{ fontSize: '0.63rem', color: '#0C2340', fontWeight: 700, maxWidth: '210px', lineHeight: 1.2 }}>
                           📍 Business Village B, office number F-09 Port Saeed Deira Dubai, UAE
@@ -5288,7 +5288,7 @@ export const ClientPortalDocs = () => {
                   </Box>
 
                   <Typography sx={{ fontSize: '0.78rem', color: '#94A3B8', textAlign: 'center', mb: 1 }}>
-                    Thank you for choosing AAA Business Consultancy for your Spain Relocation journey.
+                    Thank you for choosing KIAAN TECHNOLOGIES for your Spain Relocation journey.
                   </Typography>
                 </Box>
 

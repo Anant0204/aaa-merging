@@ -1118,7 +1118,7 @@ export const LeadSelfFillForm = () => {
                 letterSpacing: "-0.5px",
               }}
             >
-              AAA Technologies LLC
+              Kiaan Technologies LLC
             </span>
           </div>
           <p
@@ -1595,7 +1595,7 @@ export const LeadSelfFillForm = () => {
             marginTop: "20px",
           }}
         >
-          © 2026 AAA Technologies LLC · All rights reserved
+          © 2026 Kiaan Technologies LLC · All rights reserved
         </p>
       </div>
 

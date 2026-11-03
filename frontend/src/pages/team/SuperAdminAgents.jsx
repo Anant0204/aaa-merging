@@ -756,8 +756,8 @@ export const SuperAdminAgents = () => {
   return (
     <Box sx={{ height: 'calc(100vh - 120px)', display: 'flex', flexDirection: 'column' }}>
       <PageHeader
-        title="Agents Management"
-        subtitle="Manage agent accounts, review key performance metrics, commissions, and access privileges."
+        title="User & Staff Management"
+        subtitle="Manage user accounts, system roles, permissions, security credentials, and performance."
         action={
           !isViewOnly && (isAdmin || isSuperAdmin) && (
             <Button
@@ -767,7 +767,7 @@ export const SuperAdminAgents = () => {
               onClick={handleOpenAddModal}
               sx={{ borderRadius: 2.5, fontWeight: 700 }}
             >
-              Add New Team/Agent
+              Add New User
             </Button>
           )
         }
@@ -792,7 +792,7 @@ export const SuperAdminAgents = () => {
               <Box sx={{ p: 2, borderBottom: '1px solid', borderColor: 'divider', bgcolor: 'background.neutral' }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 1 }}>
                   <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'text.secondary', textTransform: 'uppercase' }}>
-                    Agents Directory
+                    User & Staff Directory
                   </Typography>
                   {/* Custom Override Summary Badge */}
                   {(() => {
@@ -1453,7 +1453,7 @@ export const SuperAdminAgents = () => {
 
       {/* MODAL: Add New Agent */}
       <Dialog open={openAddModal} onClose={() => setOpenAddModal(false)} maxWidth="sm" fullWidth PaperProps={{ sx: { borderRadius: 4, p: 1 } }}>
-        <DialogTitle sx={{ fontWeight: 800 }}>Register Team / Agent Account</DialogTitle>
+        <DialogTitle sx={{ fontWeight: 800 }}>Register New User Account</DialogTitle>
         <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 2.5, pt: 1.5 }}>
           <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <Avatar src={avatarBase64} sx={{ width: 90, height: 90, mb: 1, border: '1px dashed', borderColor: 'divider' }} />
@@ -1541,7 +1541,7 @@ export const SuperAdminAgents = () => {
 
       {/* MODAL: Edit Agent */}
       <Dialog open={openEditModal} onClose={() => setOpenEditModal(false)} maxWidth="sm" fullWidth PaperProps={{ sx: { borderRadius: 4, p: 1 } }}>
-        <DialogTitle sx={{ fontWeight: 800 }}>Edit Agent Profile</DialogTitle>
+        <DialogTitle sx={{ fontWeight: 800 }}>Edit User Profile</DialogTitle>
         <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 2.5, pt: 1.5 }}>
           <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <Avatar src={avatarBase64} sx={{ width: 90, height: 90, mb: 1, border: '1px dashed', borderColor: 'divider' }} />

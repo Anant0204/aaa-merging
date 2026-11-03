@@ -64,7 +64,7 @@ export const LeadIntakeForm = () => {
           <CheckCircleIcon color="success" sx={{ fontSize: 60, mb: 2 }} />
           <Typography variant="h5" sx={{ fontWeight: 800, mb: 1 }}>Registration Completed!</Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mb: 4 }}>
-            Thank you for registering with AAA Business Consultancy. Your client portal credentials have been generated.
+            Thank you for registering with KIAAN TECHNOLOGIES. Your client portal credentials have been generated.
           </Typography>
 
           <Paper variant="outlined" sx={{ p: 3, mb: 4, bgcolor: 'background.neutral', borderRadius: 2, borderStyle: 'dashed' }}>

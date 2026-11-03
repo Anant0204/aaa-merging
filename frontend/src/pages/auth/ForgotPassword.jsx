@@ -7,10 +7,12 @@ import Button from '@mui/material/Button';
 import Link from '@mui/material/Link';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useAlert } from '../../contexts/AlertContext';
+import { useCompanySettings } from '../../hooks/useCompanySettings';
 
 export const ForgotPassword = () => {
   const navigate = useNavigate();
   const { showAlert } = useAlert();
+  const { logoUrl, companyName } = useCompanySettings();
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -24,7 +26,7 @@ export const ForgotPassword = () => {
     // Simulate API request
     await new Promise((resolve) => setTimeout(resolve, 800));
     setLoading(false);
-    showAlert('Password reset request has been sent to support@aaatechnologies.ae. Management will review your request and send your new credentials shortly.', 'success');
+    showAlert('Password reset request has been sent to support@kiaantechnology.com. Management will review your request and send your new credentials shortly.', 'success');
     navigate('/login');
   };
 
@@ -47,9 +49,10 @@ export const ForgotPassword = () => {
           }}
         >
           <img
-            src="/aaa-logo.png"
-            alt="AAA Technologies Logo"
+            src={logoUrl}
+            alt={`${companyName} Logo`}
             style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+            onError={(e) => { e.currentTarget.src = '/kiaan-logo.svg'; }}
           />
         </Box>
         <Typography variant="h4" sx={{ fontWeight: 800, mb: 1, letterSpacing: '-0.02em' }}>

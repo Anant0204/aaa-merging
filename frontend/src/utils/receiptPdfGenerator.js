@@ -2,7 +2,7 @@ import { jsPDF } from 'jspdf';
 import dayjs from 'dayjs';
 
 /**
- * Generates and downloads an official AAA Business Consultancy Letterhead Payment Receipt PDF
+ * Generates and downloads an official KIAAN TECHNOLOGIES Letterhead Payment Receipt PDF
  */
 export const downloadLetterheadReceiptPDF = (inv, showAlert) => {
   try {
@@ -27,7 +27,7 @@ export const downloadLetterheadReceiptPDF = (inv, showAlert) => {
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(20);
     doc.setTextColor(12, 35, 64); // Deep Navy (#0C2340)
-    doc.text('AAA BUSINESS CONSULTANCY L.L.C', 14, 20);
+    doc.text('KIAAN TECHNOLOGIES LLC', 14, 20);
 
     // Tagline
     doc.setFontSize(9);
@@ -40,7 +40,7 @@ export const downloadLetterheadReceiptPDF = (inv, showAlert) => {
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(100, 116, 139); // Slate Gray (#64748B)
     doc.text('Business Village B, Office F-09, Port Saeed, Deira, Dubai, UAE', 14, 32);
-    doc.text('Email: info@aaabusinessconsultancy.com | Tel: +971 50 955 4142', 14, 37);
+    doc.text('Email: info@kiaantechnology.com | Tel: +91 98765 43210', 14, 37);
 
     // Top Gold Accent Line
     doc.setDrawColor(197, 155, 39); // Gold (#C59B27)
@@ -163,7 +163,7 @@ export const downloadLetterheadReceiptPDF = (inv, showAlert) => {
     doc.setFont('helvetica', 'italic');
     doc.setFontSize(8);
     doc.setTextColor(148, 163, 184);
-    doc.text('Thank you for choosing AAA Business Consultancy for your Spain Relocation journey.', 14, footerY + 9);
+    doc.text('Thank you for choosing KIAAN TECHNOLOGIES for your Spain Relocation journey.', 14, footerY + 9);
     doc.text('This is an official computer-generated receipt. No physical signature is required.', 14, footerY + 14);
 
     doc.save(`Official-Receipt-${invoiceId}.pdf`);

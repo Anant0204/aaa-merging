@@ -98,15 +98,15 @@ const PORT = Number(process.env.PORT) || 5000;
 
 server.on('error', (err) => {
   if (err.code === 'EADDRINUSE') {
-    console.error(`[Server Error] Port ${PORT} is already in use.`);
+    console.error('[Server Error Detail]', err.code, err.message, err.address, err.port);
     process.exit(1);
   } else {
     console.error('[Server Error]', err);
   }
 });
 
-server.listen(PORT, '0.0.0.0', () => {
-  console.log(`Server running on port ${PORT} (bound to 0.0.0.0)`);
+server.listen(PORT, '127.0.0.1', () => {
+  console.log(`Server running on port ${PORT}`);
 });
 
 // Initialize BullMQ Workers safely

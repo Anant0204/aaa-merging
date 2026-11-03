@@ -44,6 +44,7 @@ import AdminClientDetails from '../pages/clients/AdminClientDetails';
 import OperationsClientDetails from '../pages/clients/OperationsClientDetails';
 import AgentClientDetails from '../pages/clients/AgentClientDetails';
 import AdminAgents from '../pages/team/AdminAgents';
+import TeamList from '../pages/team/TeamList';
 import OperationsAgents from '../pages/team/OperationsAgents';
 import AdminActiveCases from '../pages/team/AdminActiveCases';
 import OperationsActiveCases from '../pages/team/OperationsActiveCases';
@@ -51,25 +52,20 @@ import AdminClosedCases from '../pages/clients/AdminClosedCases';
 import OperationsClosedCases from '../pages/clients/OperationsClosedCases';
 import AdminMarketing from '../pages/marketing/AdminMarketing';
 import OperationsMarketing from '../pages/marketing/OperationsMarketing';
-import AdminAgentsPerformance from '../pages/team/AdminAgentsPerformance';
-import OperationsAgentsPerformance from '../pages/team/OperationsAgentsPerformance';
 import StaffProfile from '../pages/team/StaffProfile';
 import Settings from '../pages/settings/Settings';
 import AdminSocialInbox from '../pages/social/AdminSocialInbox';
 import OperationsSocialInbox from '../pages/social/OperationsSocialInbox';
 import AgentSocialInbox from '../pages/social/AgentSocialInbox';
 import ClientIntakeForm from '../pages/public/ClientIntakeForm';
-import SwornTranslationForm from '../pages/public/SwornTranslationForm';
 import LandingPage from '../pages/public/LandingPage';
 import LeadSelfFillForm from '../pages/public/LeadSelfFillForm';
 import PaymentSuccess from '../pages/public/PaymentSuccess';
-import NoShowPayment from '../pages/public/NoShowPayment';
 import PublicReviewLanding from '../pages/public/PublicReviewLanding';
 
 import Agents from '../pages/team/Agents';
 import ActiveCases from '../pages/team/ActiveCases';
 import ClosedCases from '../pages/clients/ClosedCases';
-import AllAgentsPerformance from '../pages/team/AllAgentsPerformance';
 
 // Super Admin Dedicated Pages
 import SuperAdminLeadList from '../pages/leads/SuperAdminLeadList';
@@ -82,34 +78,59 @@ import SuperAdminClientDetails from '../pages/clients/SuperAdminClientDetails';
 import SuperAdminClosedCases from '../pages/clients/SuperAdminClosedCases';
 import SuperAdminAgents from '../pages/team/SuperAdminAgents';
 import SuperAdminActiveCases from '../pages/team/SuperAdminActiveCases';
-import SuperAdminAgentsPerformance from '../pages/team/SuperAdminAgentsPerformance';
 import SuperAdminMarketing from '../pages/marketing/SuperAdminMarketing';
 import SuperAdminSocialInbox from '../pages/social/SuperAdminSocialInbox';
-import SuperAdminStorageBackup from '../pages/documents/SuperAdminStorageBackup';
-import SuperAdminCustomization from '../pages/settings/SuperAdminCustomization';
 import Integrations from '../pages/integrations/Integrations';
 import ReviewsDashboard from '../pages/reviews/ReviewsDashboard';
 import AiEmployeeControlCenter from '../pages/ai/AiEmployeeControlCenter';
+import Projects from '../pages/projects/Projects';
+import ProjectDetails from '../pages/projects/ProjectDetails';
+
+const isMenuAllowed = (allowedMenus, currentMenuLabel) => {
+  if (!allowedMenus || !Array.isArray(allowedMenus)) return true;
+  if (!currentMenuLabel) return true;
+
+  if (allowedMenus.includes(currentMenuLabel)) return true;
+
+  const synonyms = {
+    'Projects': ['Active Projects', 'Active Cases', 'Projects'],
+    'Active Projects': ['Active Projects', 'Active Cases', 'Projects'],
+    'Active Cases': ['Active Projects', 'Active Cases', 'Projects'],
+    'Archived Projects': ['Archived Projects', 'Closed Cases'],
+    'Closed Cases': ['Archived Projects', 'Closed Cases'],
+    'User Management': ['User Management'],
+    'Team': ['Team', 'Agents'],
+    'Agents': ['Team', 'Agents'],
+    'General Settings': ['General Settings', 'Settings'],
+    'Settings': ['General Settings', 'Settings'],
+    'Calendar': ['Calendar', 'Consultations'],
+    'AI Employees (24/7)': ['AI Employees (24/7)', 'AI Employees'],
+    'AI Employees': ['AI Employees (24/7)', 'AI Employees'],
+  };
+
+  const equivalents = synonyms[currentMenuLabel] || [currentMenuLabel];
+  return equivalents.some(item => allowedMenus.includes(item));
+};
 
 const getMenuLabelForPath = (path) => {
   const p = path.toLowerCase();
 
   if (p.includes('/dashboard')) return 'Dashboard';
-  if (p.includes('/agents/performance')) return 'All Agents Performance';
-  if (p.includes('/agents') || p.includes('/team/agents')) return 'Agents';
-  if (p.includes('/active-cases')) return 'Active Cases';
-// if (p.includes('/documents/storage')) return 'AWS Cloud Backups';
-  if (p.includes('/closed-cases')) return 'Closed Cases';
-  if (p.includes('/marketing-manager/leads')) return 'Leads';
+  if (p.includes('/ai-employees')) return 'AI Employees (24/7)';
+  if (p.includes('/super_admin/users') || p.includes('/users')) return 'User Management';
+  if (p.includes('/agents') || p.includes('/team/agents')) return 'Team';
+  if (p.includes('/projects')) return 'Projects';
+  if (p.includes('/active-cases')) return 'Projects';
+  if (p.includes('/closed-cases')) return 'Archived Projects';
+  if (p.includes('/marketing-manager/leads') || p.includes('/leads')) return 'Leads';
   if (p.includes('/marketing-manager/dashboard')) return 'Dashboard';
   if (p.includes('/clients')) return 'Clients';
-  if (p.includes('/leads')) return 'Leads';
   if (p.includes('/social-inbox')) return 'Social Inbox';
   if (p.includes('/marketing')) return 'Marketing';
-  if (p.includes('/consultations/calendar')) return 'Calendar';
+  if (p.includes('/consultations/calendar') || p.includes('/calendar')) return 'Calendar';
   if (p.includes('/integrations')) return 'Integrations';
   if (p.includes('/reviews')) return 'Reviews';
-  if (p.includes('/ai-employees')) return 'AI Employees (24/7)';
+  if (p.includes('/settings')) return 'General Settings';
 
   return null;
 };
@@ -125,20 +146,21 @@ const getDynamicRedirectPath = (label, role) => {
 
   let path = '/dashboard';
   if (label === 'Dashboard') path = '/dashboard';
-  else if (label === 'Agents') path = '/agents';
+  else if (label === 'User Management') return '/users';
+  else if (label === 'Team' || label === 'Agents') path = '/agents';
+  else if (label === 'Projects' || label === 'Active Projects') return '/projects';
   else if (label === 'Active Cases') path = '/active-cases';
-  else if (label === 'Closed Cases') path = '/closed-cases';
+  else if (label === 'Archived Projects' || label === 'Closed Cases') path = '/closed-cases';
   else if (label === 'Clients') path = '/clients';
   else if (label === 'Leads') path = '/leads';
   else if (label === 'Social Inbox') path = '/social-inbox';
   else if (label === 'Marketing') path = '/marketing';
   else if (label === 'Calendar') path = '/consultations/calendar';
-  else if (label === 'Integrations') path = '/integrations';
-  else if (label === 'Reviews') path = '/reviews';
+  else if (label === 'Integrations') return '/integrations';
+  else if (label === 'Reviews') return '/reviews';
+  else if (label === 'AI Employees (24/7)' || label === 'AI Employees') return '/ai-employees';
+  else if (label === 'General Settings' || label === 'Settings') return '/settings';
 
-  if (label === 'Integrations') return '/integrations';
-  if (label === 'Reviews') return '/reviews';
-  if (label === 'AI Employees (24/7)' || label === 'AI Employees') return '/ai-employees';
   if (!prefix) return path;
   return `/${prefix}${path}`;
 };
@@ -176,7 +198,7 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
       // 1. Check individual custom permissions first (highest priority)
       if (currentUser.customPermissions?.enabled) {
         const allowedMenus = currentUser.customPermissions.menus || [];
-        if (currentMenuLabel && !allowedMenus.includes(currentMenuLabel)) {
+        if (currentMenuLabel && !isMenuAllowed(allowedMenus, currentMenuLabel)) {
           if (allowedMenus.length > 0) {
             const firstAllowedLabel = allowedMenus[0];
             const redirectPath = getDynamicRedirectPath(firstAllowedLabel, currentUser.role);
@@ -191,7 +213,7 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
         const userOverrides = customizationSettings[currentUser.id] || {};
         const allowedMenus = userOverrides.menus || roleDefaults.menus || [];
         
-        if (currentMenuLabel && !allowedMenus.includes(currentMenuLabel)) {
+        if (currentMenuLabel && !isMenuAllowed(allowedMenus, currentMenuLabel)) {
           if (allowedMenus.length > 0) {
             const firstAllowedLabel = allowedMenus[0];
             const redirectPath = getDynamicRedirectPath(firstAllowedLabel, currentUser.role);
@@ -253,6 +275,29 @@ const PaymentsRedirect = () => {
   return <Navigate to="/dashboard" replace />;
 };
 
+const AgentsRedirect = () => {
+  const { currentUser } = useAuth();
+  return <Navigate to={`/${getPrefixForRole(currentUser?.role)}/agents`} replace />;
+};
+
+const UsersRoute = () => {
+  const { currentUser } = useAuth();
+  if (currentUser?.role === 'super_admin') {
+    return <SuperAdminAgents />;
+  }
+  return <AdminAgents />;
+};
+
+const ActiveCasesRedirect = () => {
+  const { currentUser } = useAuth();
+  return <Navigate to={`/${getPrefixForRole(currentUser?.role)}/active-cases`} replace />;
+};
+
+const ClosedCasesRedirect = () => {
+  const { currentUser } = useAuth();
+  return <Navigate to={`/${getPrefixForRole(currentUser?.role)}/closed-cases`} replace />;
+};
+
 // ClientPortalGuard removed
 
 export const AppRoutes = () => {
@@ -273,7 +318,7 @@ export const AppRoutes = () => {
       <Route path="/reschedule-meeting/:token" element={<LeadSelfFillForm />} />
       <Route path="/cancel-meeting/:token" element={<LeadSelfFillForm />} />
       <Route path="/public/intake/client/:clientId" element={<ClientIntakeForm />} />
-      <Route path="/public/translation" element={<SwornTranslationForm />} />
+      <Route path="/public/translation" element={<Navigate to="/" replace />} />
       <Route path="/public/payment-success" element={<PaymentSuccess />} />
 
 
@@ -283,7 +328,7 @@ export const AppRoutes = () => {
 
       {/* Client Portal Removed: Redirect any portal access to Landing Page */}
       <Route path="/portal/*" element={<Navigate to="/" replace />} />
-      <Route path="/public/no-show-payment" element={<NoShowPayment />} />
+      <Route path="/public/no-show-payment" element={<Navigate to="/" replace />} />
 
       {/* Main CRM Dashboard Shell Layout (Protected) */}
       <Route
@@ -297,6 +342,10 @@ export const AppRoutes = () => {
         <Route path="/dashboard" element={<Dashboard />} />
         
         {/* Un-prefixed fallback redirects for details / lists */}
+        <Route path="/agents" element={<ProtectedRoute><TeamList /></ProtectedRoute>} />
+        <Route path="/team" element={<ProtectedRoute><TeamList /></ProtectedRoute>} />
+        <Route path="/active-cases" element={<ProtectedRoute><ActiveCasesRedirect /></ProtectedRoute>} />
+        <Route path="/closed-cases" element={<ProtectedRoute><ClosedCasesRedirect /></ProtectedRoute>} />
         <Route path="/leads/details/:id" element={<ProtectedRoute><LeadDetailsRedirect /></ProtectedRoute>} />
         <Route path="/clients/details/:id" element={<ProtectedRoute><ClientDetailsRedirect /></ProtectedRoute>} />
         <Route path="/consultations" element={<ProtectedRoute><ConsultationsRedirect /></ProtectedRoute>} />
@@ -402,7 +451,15 @@ export const AppRoutes = () => {
           }
         />
         <Route
-          path="/super_admin/agents"
+          path="/users"
+          element={
+            <ProtectedRoute allowedRoles={['admin', 'super_admin']}>
+              <UsersRoute />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/super_admin/users"
           element={
             <ProtectedRoute allowedRoles={['super_admin']}>
               <SuperAdminAgents />
@@ -410,13 +467,22 @@ export const AppRoutes = () => {
           }
         />
         <Route
-          path="/super_admin/agents/performance"
+          path="/super_admin/team"
           element={
             <ProtectedRoute allowedRoles={['super_admin']}>
-              <SuperAdminAgentsPerformance />
+              <TeamList />
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/super_admin/agents"
+          element={
+            <ProtectedRoute allowedRoles={['super_admin']}>
+              <TeamList />
+            </ProtectedRoute>
+          }
+        />
+        <Route path="/super_admin/agents/performance" element={<Navigate to="/dashboard" replace />} />
         <Route
           path="/super_admin/active-cases"
           element={
@@ -444,22 +510,7 @@ export const AppRoutes = () => {
         />
         <Route path="/super_admin/payments" element={<Navigate to="/dashboard" replace />} />
         <Route path="/:role/payments/refund-commission" element={<Navigate to="/dashboard" replace />} />
-        {/* <Route
-          path="/super_admin/documents/storage"
-          element={
-            <ProtectedRoute allowedRoles={['super_admin']}>
-              <SuperAdminStorageBackup />
-            </ProtectedRoute>
-          }
-        /> */}
-        <Route
-          path="/super_admin/customization"
-          element={
-            <ProtectedRoute allowedRoles={['super_admin']}>
-              <SuperAdminCustomization />
-            </ProtectedRoute>
-          }
-        />
+        <Route path="/super_admin/customization" element={<Navigate to="/dashboard" replace />} />
         <Route
           path="/super_admin/social-inbox"
           element={
@@ -700,9 +751,25 @@ export const AppRoutes = () => {
         <Route path="/finance/clients/details/:id" element={<Navigate to="/finance/dashboard" replace />} />
         <Route path="/marketing-manager/clients/details/:id" element={<Navigate to="/marketing-manager/leads" replace />} />
 
-        {/* Agents Module (Admins, Operations) */}
+        {/* Team & User Management Modules */}
+        <Route
+          path="/admin/team"
+          element={
+            <ProtectedRoute allowedRoles={['admin', 'super_admin']}>
+              <TeamList />
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="/admin/agents"
+          element={
+            <ProtectedRoute allowedRoles={['admin', 'super_admin']}>
+              <TeamList />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/users"
           element={
             <ProtectedRoute allowedRoles={['admin', 'super_admin']}>
               <AdminAgents />
@@ -717,22 +784,8 @@ export const AppRoutes = () => {
             </ProtectedRoute>
           }
         />
-        <Route
-          path="/admin/agents/performance"
-          element={
-            <ProtectedRoute allowedRoles={['admin', 'super_admin']}>
-              <AdminAgentsPerformance />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/operations/agents/performance"
-          element={
-            <ProtectedRoute allowedRoles={['operations', 'super_admin']}>
-              <OperationsAgentsPerformance />
-            </ProtectedRoute>
-          }
-        />
+        <Route path="/admin/agents/performance" element={<Navigate to="/dashboard" replace />} />
+        <Route path="/operations/agents/performance" element={<Navigate to="/dashboard" replace />} />
         <Route
           path="/agent/agents"
           element={
@@ -757,30 +810,9 @@ export const AppRoutes = () => {
             </ProtectedRoute>
           }
         />
-        <Route
-          path="/agent/agents/performance"
-          element={
-            <ProtectedRoute allowedRoles={['consultant', 'super_admin']}>
-              <AllAgentsPerformance />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/finance/agents/performance"
-          element={
-            <ProtectedRoute allowedRoles={['finance', 'super_admin']}>
-              <AllAgentsPerformance />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/marketing-manager/agents/performance"
-          element={
-            <ProtectedRoute allowedRoles={['marketing', 'super_admin']}>
-              <AllAgentsPerformance />
-            </ProtectedRoute>
-          }
-        />
+        <Route path="/agent/agents/performance" element={<Navigate to="/dashboard" replace />} />
+        <Route path="/finance/agents/performance" element={<Navigate to="/dashboard" replace />} />
+        <Route path="/marketing-manager/agents/performance" element={<Navigate to="/dashboard" replace />} />
         <Route
           path="/team/profile/:id"
           element={
@@ -1081,6 +1113,40 @@ export const AppRoutes = () => {
           }
         />
 
+        {/* IT Projects Module */}
+        <Route
+          path="/projects"
+          element={
+            <ProtectedRoute allowedRoles={['admin', 'finance', 'operations', 'super_admin', 'consultant']}>
+              <Projects />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/projects/:id"
+          element={
+            <ProtectedRoute allowedRoles={['admin', 'finance', 'operations', 'super_admin', 'consultant', 'client']}>
+              <ProjectDetails />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/:rolePrefix/projects"
+          element={
+            <ProtectedRoute allowedRoles={['admin', 'finance', 'operations', 'super_admin', 'consultant']}>
+              <Projects />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/:rolePrefix/projects/:id"
+          element={
+            <ProtectedRoute allowedRoles={['admin', 'finance', 'operations', 'super_admin', 'consultant', 'client']}>
+              <ProjectDetails />
+            </ProtectedRoute>
+          }
+        />
+
         {/* Settings (Admins, Finance, Operations) */}
         <Route
           path="/settings"
@@ -1094,7 +1160,8 @@ export const AppRoutes = () => {
         {/* Dynamic / Custom Role Fallback Routes */}
         <Route path="/:rolePrefix/dashboard" element={<ProtectedRoute><OperationsDashboard /></ProtectedRoute>} />
         <Route path="/:rolePrefix/agents" element={<ProtectedRoute><OperationsAgents /></ProtectedRoute>} />
-        <Route path="/:rolePrefix/agents/performance" element={<ProtectedRoute><OperationsAgentsPerformance /></ProtectedRoute>} />
+        <Route path="/:rolePrefix/users" element={<ProtectedRoute allowedRoles={['admin', 'super_admin']}><UsersRoute /></ProtectedRoute>} />
+        <Route path="/:rolePrefix/agents/performance" element={<Navigate to="/dashboard" replace />} />
         <Route path="/:rolePrefix/active-cases" element={<ProtectedRoute><OperationsActiveCases /></ProtectedRoute>} />
         <Route path="/:rolePrefix/documents/verify" element={<Navigate to="/dashboard" replace />} />
         <Route path="/:rolePrefix/clients" element={<ProtectedRoute><OperationsClientList /></ProtectedRoute>} />

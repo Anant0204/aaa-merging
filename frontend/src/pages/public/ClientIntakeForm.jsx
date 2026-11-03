@@ -228,7 +228,7 @@ export const ClientIntakeForm = () => {
           <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 1.5, mb: 1.5 }}>
             <BusinessIcon sx={{ fontSize: 40, color: '#D97706' }} />
             <Typography variant="h4" sx={{ fontWeight: 800, background: 'linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', letterSpacing: 0.5 }}>
-              AAA Business Consultancy
+              KIAAN TECHNOLOGIES
             </Typography>
           </Box>
           <Typography variant="subtitle1" color="text.secondary" sx={{ fontWeight: 500 }}>

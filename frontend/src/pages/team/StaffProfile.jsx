@@ -70,7 +70,7 @@ export const StaffProfile = () => {
 
   const clientColumns = [
     { id: 'clientCode', label: 'Client ID', minWidth: 100, render: (row) => row.clientCode || row.id },
-    { id: 'name', label: 'Client Name', render: (row) => `${row.firstName} ${row.lastName}` },
+    { id: 'name', label: 'Client Name', render: (row) => `${row.firstName || ''} ${row.lastName || ''}`.trim() || row.fullName || 'Client' },
     { id: 'nationality', label: 'Nationality' },
     {
       id: 'service',
@@ -83,14 +83,14 @@ export const StaffProfile = () => {
     <Box>
       <Button
         startIcon={<KeyboardArrowLeftIcon />}
-        onClick={() => navigate('/consultants')}
+        onClick={() => navigate('/team')}
         sx={{ mb: 2, color: 'text.secondary' }}
       >
-        Back to Consultants
+        Back to Team Directory
       </Button>
 
       <PageHeader
-        title={`${c.name}`}
+        title={`${c.name || 'Team Member'}`}
         subtitle="Review staff performance metrics, cases load, and linguistic capabilities."
       />
 
@@ -123,8 +123,8 @@ export const StaffProfile = () => {
               {c.email}
             </Typography>
             
-            <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1, mb: 3 }}>
-              {c.languages.map((l) => (
+            <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1, mb: 3, flexWrap: 'wrap' }}>
+              {(Array.isArray(c.languages) ? c.languages : (typeof c.languages === 'string' ? c.languages.split(',').filter(Boolean) : [])).map((l) => (
                 <Chip key={l} label={l} size="small" variant="outlined" sx={{ fontWeight: 600 }} />
               ))}
             </Box>
@@ -132,7 +132,7 @@ export const StaffProfile = () => {
             <Divider sx={{ my: 2 }} />
 
             <Typography variant="body2" align="left" sx={{ fontStyle: 'italic', color: 'text.secondary', p: 1 }}>
-              "{c.bio}"
+              "{c.bio || 'No bio provided.'}"
             </Typography>
           </Paper>
         </Box>
@@ -150,7 +150,7 @@ export const StaffProfile = () => {
                 </Box>
                 <Box>
                   <Typography variant="caption" color="text.secondary" display="block">Cases Handled</Typography>
-                  <Typography variant="h5" sx={{ fontWeight: 700 }}>{c.casesCount} Active</Typography>
+                  <Typography variant="h5" sx={{ fontWeight: 700 }}>{c.casesCount || 0} Active</Typography>
                 </Box>
               </Paper>
             </Box>
@@ -165,7 +165,7 @@ export const StaffProfile = () => {
                 </Box>
                 <Box>
                   <Typography variant="caption" color="text.secondary" display="block">Conversion Rate</Typography>
-                  <Typography variant="h5" sx={{ fontWeight: 700 }}>{c.conversionRate}% Success</Typography>
+                  <Typography variant="h5" sx={{ fontWeight: 700 }}>{c.conversionRate || 0}% Success</Typography>
                 </Box>
               </Paper>
             </Box>
@@ -173,14 +173,14 @@ export const StaffProfile = () => {
             <Box className="col-span-12 sm:col-span-6">
               <Paper 
                 sx={{ p: 2.5, borderRadius: 3, border: '1px solid', borderColor: 'divider', boxShadow: 'none', display: 'flex', alignItems: 'center', gap: 2, cursor: 'pointer', '&:hover': { bgcolor: 'action.hover' } }}
-                onClick={() => navigate('/payments')}
+                onClick={() => navigate('/dashboard')}
               >
                 <Box sx={{ p: 1.5, borderRadius: 2, bgcolor: 'primary.neutral', color: 'success.main' }}>
                   <PaymentsIcon />
                 </Box>
                 <Box>
                   <Typography variant="caption" color="text.secondary" display="block">Monthly Agent Commission Earned</Typography>
-                  <Typography variant="h5" sx={{ fontWeight: 700 }}>€{Math.round(c.revenueGenerated * 0.1 * 0.25).toLocaleString()}</Typography>
+                  <Typography variant="h5" sx={{ fontWeight: 700 }}>₹{Math.round((c.revenueGenerated || 0) * 0.1 * 0.25).toLocaleString()}</Typography>
                 </Box>
               </Paper>
             </Box>
@@ -188,14 +188,14 @@ export const StaffProfile = () => {
             <Box className="col-span-12 sm:col-span-6">
               <Paper 
                 sx={{ p: 2.5, borderRadius: 3, border: '1px solid', borderColor: 'divider', boxShadow: 'none', display: 'flex', alignItems: 'center', gap: 2, cursor: 'pointer', '&:hover': { bgcolor: 'action.hover' } }}
-                onClick={() => navigate('/payments')}
+                onClick={() => navigate('/dashboard')}
               >
                 <Box sx={{ p: 1.5, borderRadius: 2, bgcolor: 'primary.neutral', color: 'warning.main' }}>
                   <PaymentsIcon />
                 </Box>
                 <Box>
                   <Typography variant="caption" color="text.secondary" display="block">Total Commission Since Joining</Typography>
-                  <Typography variant="h5" sx={{ fontWeight: 700 }}>€{Math.round(c.revenueGenerated * 0.1).toLocaleString()}</Typography>
+                  <Typography variant="h5" sx={{ fontWeight: 700 }}>₹{Math.round((c.revenueGenerated || 0) * 0.1).toLocaleString()}</Typography>
                 </Box>
               </Paper>
             </Box>

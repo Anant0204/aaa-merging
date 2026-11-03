@@ -19,6 +19,7 @@ import VisibilityOff from '@mui/icons-material/VisibilityOff';
 
 import { useAuth } from '../../hooks/useAuth';
 import { useAlert } from '../../contexts/AlertContext';
+import { useCompanySettings } from '../../hooks/useCompanySettings';
 
 // Icons
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
@@ -51,6 +52,7 @@ export const Login = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
   const { showAlert } = useAlert();
+  const { logoUrl, companyName } = useCompanySettings();
   const [showPassword, setShowPassword] = React.useState(false);
   const [loadingRole, setLoadingRole] = React.useState(null);
 
@@ -59,7 +61,8 @@ export const Login = () => {
     { id: 'admin', label: 'Project Manager 💼', email: 'admin@aaaconsultancy.com' },
     { id: 'operations', label: 'Tech Lead / DevOps ⚙️', email: 'operations@aaaconsultancy.com' },
     { id: 'marketing', label: 'Growth / Marketing 📣', email: 'marketing@aaaconsultancy.com' },
-    { id: 'consultant', label: 'Solutions Consultant 🧑‍💼', email: 'agent@aaaconsultancy.com' }
+    { id: 'consultant', label: 'Solutions Consultant 🧑‍💼', email: 'agent@aaaconsultancy.com' },
+    { id: 'finance', label: 'Finance 💰', email: 'finance@aaaconsultancy.com' }
   ];
 
   React.useEffect(() => {
@@ -212,16 +215,17 @@ export const Login = () => {
           }}
         >
           <img
-            src="/aaa-logo.png"
-            alt="AAA Technologies Logo"
+            src={logoUrl}
+            alt={`${companyName} Logo`}
             style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+            onError={(e) => { e.currentTarget.src = '/kiaan-logo.svg'; }}
           />
         </Box>
         <Typography variant="h5" sx={{ fontWeight: 800, mb: 0.5, letterSpacing: '-0.02em' }}>
           Welcome back
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          Enter your credentials to access the IT Services CRM portal.
+          Enter your credentials to access the {companyName || 'Kiaan Technology CRM'} portal.
         </Typography>
       </Box>
 

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { useMutation } from '@tanstack/react-query';
+import { useCompanySettings } from '../../hooks/useCompanySettings';
 
 // IT Enterprise Visual Assets
 import itHeroBanner from '../../assets/it_hero_banner.jpg';
@@ -39,6 +40,7 @@ import { useAlert } from '../../contexts/AlertContext';
 export const LandingPage = () => {
   const navigate = useNavigate();
   const { showAlert } = useAlert();
+  const { logoUrl, companyName } = useCompanySettings();
 
   // Navigation & Interactive States
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -356,12 +358,17 @@ export const LandingPage = () => {
           {/* Logo & Brand Identity */}
           <Link to="/" className="flex items-center space-x-3 group flex-shrink-0">
             <div className="w-11 h-11 rounded-xl bg-white border border-slate-200/80 p-1 flex items-center justify-center shadow-sm group-hover:scale-105 group-hover:border-blue-300 transition-all flex-shrink-0">
-              <img src="/aaa-logo.png" alt="AAA Technologies Logo" className="w-full h-full object-contain" />
+              <img
+                src={logoUrl}
+                alt={`${companyName} Logo`}
+                className="w-full h-full object-contain"
+                onError={(e) => { e.currentTarget.src = '/kiaan-logo.svg'; }}
+              />
             </div>
             <div className="flex flex-col flex-shrink-0">
               <span className="font-outfit font-black text-lg text-slate-900 tracking-tight flex items-center space-x-1.5 leading-none">
-                <span>AAA</span>
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-500">TECHNOLOGIES</span>
+                <span>KIAAN</span>
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-500">TECHNOLOGY CRM</span>
               </span>
               <span className="text-[10px] text-slate-500 uppercase tracking-[0.2em] font-semibold mt-1">
                 Cloud • Software • AI Systems
@@ -474,7 +481,7 @@ export const LandingPage = () => {
               <div className="inline-flex self-center lg:self-start items-center space-x-2.5 bg-blue-50/80 border border-blue-200/80 px-4 py-1.5 rounded-full shadow-sm backdrop-blur-sm">
                 <span className="w-2 h-2 bg-blue-600 rounded-full animate-ping" />
                 <span className="text-[11px] font-outfit text-blue-700 uppercase tracking-widest font-bold">
-                  AAA Technologies • Cloud-Native &amp; AI Systems
+                  Kiaan Technologies • Cloud-Native &amp; AI Systems
                 </span>
               </div>
               
@@ -1067,7 +1074,7 @@ export const LandingPage = () => {
                   </div>
                   <div>
                     <div className="text-[10px] text-slate-500 uppercase tracking-wider font-mono font-semibold">Technical Inquiries</div>
-                    <div className="text-sm font-bold text-slate-900">contact@aaatechnologies.ae</div>
+                    <div className="text-sm font-bold text-slate-900">contact@kiaantechnology.com</div>
                   </div>
                 </div>
 
@@ -1262,10 +1269,15 @@ export const LandingPage = () => {
             <div className="space-y-4">
               <div className="flex items-center space-x-2.5">
                 <div className="w-9 h-9 bg-white rounded-lg p-1 flex items-center justify-center shadow-sm">
-                  <img src="/aaa-logo.png" alt="AAA Technologies Logo" className="w-full h-full object-contain" />
+                  <img
+                    src={logoUrl}
+                    alt={`${companyName} Logo`}
+                    className="w-full h-full object-contain"
+                    onError={(e) => { e.currentTarget.src = '/kiaan-logo.svg'; }}
+                  />
                 </div>
                 <span className="font-outfit font-black text-base text-white tracking-tight">
-                  AAA TECHNOLOGIES
+                  {companyName ? companyName.toUpperCase() : 'KIAAN TECHNOLOGY CRM'}
                 </span>
               </div>
               <p className="text-xs font-normal leading-relaxed text-slate-400">
@@ -1314,7 +1326,7 @@ export const LandingPage = () => {
 
           <div className="pt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 space-y-4 sm:space-y-0">
             <div>
-              &copy; {new Date().getFullYear()} AAA Technologies Global Inc. All Rights Reserved.
+              &copy; {new Date().getFullYear()} {companyName || 'Kiaan Technology CRM'}. All Rights Reserved.
             </div>
             <div className="space-x-4">
               <span>Privacy Policy</span>

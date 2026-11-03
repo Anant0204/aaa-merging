@@ -1,6 +1,6 @@
 /**
  * Centralized mapping of available IT company services and development offerings.
- * AAA Technologies & IT Solutions.
+ * Kiaan Technologies & IT Solutions.
  */
 
 export const ALL_IT_SERVICES = [

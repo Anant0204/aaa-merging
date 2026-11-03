@@ -63,6 +63,9 @@ import SmartToyIcon from '@mui/icons-material/SmartToy';
 import LanguageIcon from '@mui/icons-material/Language';
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
 import ChatIcon from '@mui/icons-material/Chat';
+import EmailIcon from '@mui/icons-material/Email';
+import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
+import FolderSpecialIcon from '@mui/icons-material/FolderSpecial';
 import { io } from 'socket.io-client';
 
 // Contexts & Hooks
@@ -80,15 +83,22 @@ const collapsedDrawerWidth = 72;
 const MENU_TRANSLATIONS = {
   English: {
     Dashboard: "Dashboard",
-    Agents: "Agents",
-    "Active Cases": "Active Cases",
-    "Closed Cases": "Closed Cases",
+    "AI Employees (24/7)": "AI Employees (24/7)",
+    Projects: "Projects",
+    "Archived Projects": "Archived Projects",
+    Team: "Team",
+    "User Management": "User Management",
+    "General Settings": "General Settings",
+    Settings: "Settings",
+    Agents: "Team",
+    "Active Cases": "Projects",
+    "Closed Cases": "Archived Projects",
     Clients: "Clients",
     Leads: "Leads",
     "Social Inbox": "Social Inbox",
     Marketing: "Marketing",
     Calendar: "Calendar",
-    "All Agents Performance": "Agents Performance",
+    "All Agents Performance": "Team Performance",
     Integrations: "Integrations",
     Reviews: "Reviews",
     Logout: "Logout",
@@ -97,15 +107,22 @@ const MENU_TRANSLATIONS = {
   },
   Arabic: {
     Dashboard: "لوحة القيادة",
-    Agents: "الوكلاء",
-    "Active Cases": "الحالات النشطة",
-    "Closed Cases": "الحالات المغلقة",
+    "AI Employees (24/7)": "الموظفون الذكاء الاصطناعي (24/7)",
+    Projects: "المشاريع",
+    "Archived Projects": "المشاريع المؤرشفة",
+    Team: "الفريق",
+    "User Management": "إدارة المستخدمين",
+    "General Settings": "الإعدادات العامة",
+    Settings: "الإعدادات",
+    Agents: "الفريق",
+    "Active Cases": "المشاريع النشطة",
+    "Closed Cases": "المشاريع المغلقة",
     Clients: "العملاء",
     Leads: "العملاء المحتملون",
     "Social Inbox": "البريد الاجتماعي",
     Marketing: "التسويق",
     Calendar: "التقويم",
-    "All Agents Performance": "أداء الوكلاء",
+    "All Agents Performance": "أداء الفريق",
     Integrations: "التكاملات",
     Reviews: "التقييمات",
     Logout: "تسجيل الخروج",
@@ -114,15 +131,22 @@ const MENU_TRANSLATIONS = {
   },
   Spanish: {
     Dashboard: "Tablero",
-    Agents: "Agentes",
-    "Active Cases": "Casos Activos",
-    "Closed Cases": "Casos Cerrados",
+    "AI Employees (24/7)": "Empleados IA (24/7)",
+    Projects: "Proyectos",
+    "Archived Projects": "Proyectos Archivados",
+    Team: "Equipo",
+    "User Management": "Gestión de Usuarios",
+    "General Settings": "Configuración General",
+    Settings: "Configuración",
+    Agents: "Equipo",
+    "Active Cases": "Proyectos Activos",
+    "Closed Cases": "Proyectos Cerrados",
     Clients: "Clientes",
     Leads: "Prospectos",
     "Social Inbox": "Bandeja Social",
     Marketing: "Marketing",
     Calendar: "Calendario",
-    "All Agents Performance": "Rendimiento de Agentes",
+    "All Agents Performance": "Rendimiento del Equipo",
     Integrations: "Integraciones",
     Reviews: "Reseñas",
     Logout: "Cerrar Sesión",
@@ -131,15 +155,22 @@ const MENU_TRANSLATIONS = {
   },
   French: {
     Dashboard: "Tableau de Bord",
-    Agents: "Agents",
-    "Active Cases": "Dossiers Actifs",
-    "Closed Cases": "Dossiers Clôturés",
+    "AI Employees (24/7)": "Employés IA (24/7)",
+    Projects: "Projets",
+    "Archived Projects": "Projets Archivés",
+    Team: "Équipe",
+    "User Management": "Gestion des Utilisateurs",
+    "General Settings": "Paramètres Généraux",
+    Settings: "Paramètres",
+    Agents: "Équipe",
+    "Active Cases": "Projets Actifs",
+    "Closed Cases": "Projets Clôturés",
     Clients: "Clients",
     Leads: "Pistes",
     "Social Inbox": "Boîte Réception Sociale",
     Marketing: "Marketing",
     Calendar: "Calendrier",
-    "All Agents Performance": "Performance des Agents",
+    "All Agents Performance": "Performance de l'Équipe",
     Integrations: "Intégrations",
     Reviews: "Avis",
     Logout: "Se Déconnecter",
@@ -148,15 +179,22 @@ const MENU_TRANSLATIONS = {
   },
   German: {
     Dashboard: "Dashboard",
-    Agents: "Agenten",
-    "Active Cases": "Aktive Fälle",
-    "Closed Cases": "Geschlossene Fälle",
+    "AI Employees (24/7)": "KI-Mitarbeiter (24/7)",
+    Projects: "Projekte",
+    "Archived Projects": "Archivierte Projekte",
+    Team: "Team",
+    "User Management": "Benutzerverwaltung",
+    "General Settings": "Allgemeine Einstellungen",
+    Settings: "Einstellungen",
+    Agents: "Team",
+    "Active Cases": "Aktive Projekte",
+    "Closed Cases": "Geschlossene Projekte",
     Clients: "Kunden",
     Leads: "Interessenten",
     "Social Inbox": "Sozialer Posteingang",
     Marketing: "Marketing",
     Calendar: "Kalender",
-    "All Agents Performance": "Agentenleistung",
+    "All Agents Performance": "Teamleistung",
     Integrations: "Integrationen",
     Reviews: "Bewertungen",
     Logout: "Abmelden",
@@ -165,16 +203,24 @@ const MENU_TRANSLATIONS = {
   },
   Urdu: {
     Dashboard: "ڈیش بورڈ",
-    Agents: "ایجنٹ",
-    "Active Cases": "سرگرم کیسز",
-    "Closed Cases": "بند کیسز",
+    "AI Employees (24/7)": "اے آئی ملازمین (24/7)",
+    Projects: "پروجیکٹس",
+    "Archived Projects": "محفوظ شدہ پروجیکٹس",
+    Team: "ٹیم",
+    "User Management": "صارفین کا انتظام",
+    "General Settings": "عام ترتیبات",
+    Settings: "ترتیبات",
+    Agents: "ٹیم",
+    "Active Cases": "فعال پروجیکٹس",
+    "Closed Cases": "بند پروجیکٹس",
     Clients: "کلائنٹس",
     Leads: "ممکنہ گاہک",
     "Social Inbox": "سوشل ان باکس",
     Marketing: "مارکیٹنگ",
     Calendar: "کیلنڈر",
-    "All Agents Performance": "ایجنٹوں کی کارکردگی",
+    "All Agents Performance": "ٹیم کی کارکردگی",
     Integrations: "انٹیگریشنز",
+    Reviews: "جائزے",
     Logout: "لاگ آؤٹ",
     "Search...": "تلاش کریں...",
     "Global CRM search...": "عام تلاش..."
@@ -236,6 +282,12 @@ export const DashboardLayout = () => {
   const { data: customizationSettings } = useQuery({
     queryKey: ['customization-settings'],
     queryFn: dbService.getCustomizationSettings
+  });
+
+  const { data: companySettings } = useQuery({
+    queryKey: ['settings-general'],
+    queryFn: dbService.getSettings,
+    staleTime: 1000 * 60 * 5
   });
 
   
@@ -444,6 +496,9 @@ export const DashboardLayout = () => {
     if (item.path === '/settings') return '/settings';
     if (item.path === '/reviews') return '/reviews';
     if (item.path === '/ai-employees') return '/ai-employees';
+    if (item.path === '/projects') return '/projects';
+    if (item.path === '/users') return '/users';
+    if (item.path === '/team') return '/team';
 
     if (item.path.startsWith(`/${prefix}`)) return item.path;
 
@@ -457,6 +512,14 @@ export const DashboardLayout = () => {
   const isActive = (item) => {
     const currentPath = location.pathname;
     const itemPath = getDynamicPath(item);
+
+    // Specific match for User Management vs Team
+    if (item.label === 'User Management') {
+      return currentPath.includes('/users');
+    }
+    if (item.label === 'Team') {
+      return (currentPath.includes('/team') || currentPath.includes('/agents')) && !currentPath.includes('/users');
+    }
 
     // Social inbox matching
     if (itemPath.includes('/social-inbox')) {
@@ -486,40 +549,57 @@ export const DashboardLayout = () => {
       roles: ['admin', 'consultant', 'operations', 'finance', 'super_admin', 'marketing'],
     },
     {
-      label: 'Team',
-      icon: <GroupsIcon />,
-      path: '/agents',
-      roles: ['admin', 'operations', 'super_admin'],
+      label: 'Leads',
+      icon: <PeopleIcon />,
+      path: '/leads',
+      roles: ['admin', 'consultant', 'super_admin', 'marketing'],
     },
     {
       label: 'Projects',
-      icon: <GroupsIcon />,
-      path: '/active-cases',
-      roles: ['admin', 'operations', 'super_admin'],
+      icon: <FolderSpecialIcon sx={{ color: '#2563EB' }} />,
+      path: '/projects',
+      roles: ['admin', 'operations', 'super_admin', 'consultant', 'finance'],
     },
-
     {
       label: 'Archived Projects',
       icon: <AssignmentTurnedInIcon />,
       path: '/closed-cases',
-      roles: ['admin', 'operations', 'super_admin'],
-    },
-    {
-      label: 'Leads',
-      icon: <PeopleIcon />,
-      path: '/leads',
-      roles: ['admin', 'consultant', 'operations', 'super_admin', 'marketing'],
+      roles: ['admin', 'operations', 'super_admin', 'finance'],
     },
     {
       label: 'Social Inbox',
       icon: <ForumIcon />,
       path: '/social-inbox',
-      roles: ['admin', 'consultant', 'operations', 'super_admin'],
+      roles: ['admin', 'consultant', 'super_admin', 'marketing'],
+    },
+    {
+      label: 'Calendar',
+      icon: <CalendarMonthIcon />,
+      path: '/consultations/calendar',
+      roles: ['admin', 'consultant', 'operations', 'super_admin', 'marketing'],
+    },
+    {
+      label: 'Team',
+      icon: <GroupsIcon />,
+      path: '/team',
+      roles: ['admin', 'operations', 'super_admin', 'consultant'],
+    },
+    {
+      label: 'User Management',
+      icon: <ManageAccountsIcon sx={{ color: '#2563EB' }} />,
+      path: '/users',
+      roles: ['admin', 'super_admin'],
     },
     {
       label: 'Marketing',
       icon: <AssessmentIcon />,
       path: '/marketing',
+      roles: ['admin', 'super_admin', 'marketing'],
+    },
+    {
+      label: 'Reviews',
+      icon: <RateReviewIcon />,
+      path: '/reviews',
       roles: ['admin', 'operations', 'super_admin', 'marketing'],
     },
     {
@@ -529,34 +609,10 @@ export const DashboardLayout = () => {
       roles: ['admin', 'super_admin'],
     },
     {
-      label: 'Reviews',
-      icon: <RateReviewIcon />,
-      path: '/reviews',
-      roles: ['admin', 'operations', 'super_admin', 'marketing'],
-    },
-    {
-      label: 'Calendar',
-      icon: <CalendarMonthIcon />,
-      path: '/consultations/calendar',
-      roles: ['admin', 'consultant', 'operations', 'super_admin'],
-    },
-    {
-      label: 'Team Performance',
-      icon: <AssessmentIcon />,
-      path: '/agents/performance',
-      roles: ['admin', 'operations', 'super_admin'],
-    },
-    {
-      label: 'Customization',
-      icon: <SettingsIcon />,
-      path: '/super_admin/customization',
-      roles: ['super_admin'],
-    },
-    {
       label: 'General Settings',
       icon: <AdminPanelSettingsIcon />,
       path: '/settings',
-      roles: ['admin', 'operations', 'finance', 'super_admin', 'marketing'],
+      roles: ['admin', 'operations', 'finance', 'super_admin'],
     },
   ];
 
@@ -580,70 +636,22 @@ export const DashboardLayout = () => {
       path: '/social-inbox?channel=instagram'
     },
     {
-      label: 'Telegram',
-      channel: 'telegram',
-      icon: <TelegramIcon />,
-      path: '/social-inbox?channel=telegram'
-    },
-    {
       label: 'LinkedIn',
       channel: 'linkedin',
       icon: <LinkedInIcon sx={{ color: '#0A66C2' }} />,
       path: '/social-inbox?channel=linkedin'
     },
     {
-      label: 'Twitter / X',
-      channel: 'twitter',
-      icon: <TwitterIcon sx={{ color: '#1DA1F2' }} />,
-      path: '/social-inbox?channel=twitter'
-    },
-    {
-      label: 'Pinterest',
-      channel: 'pinterest',
-      icon: <PinterestIcon sx={{ color: '#BD081C' }} />,
-      path: '/social-inbox?channel=pinterest'
-    },
-    {
-      label: 'WeChat',
-      channel: 'wechat',
-      icon: <ChatIcon sx={{ color: '#07C160' }} />,
-      path: '/social-inbox?channel=wechat'
-    },
-    {
-      label: 'LINE',
-      channel: 'line',
-      icon: <ChatIcon sx={{ color: '#06C755' }} />,
-      path: '/social-inbox?channel=line'
-    },
-    {
-      label: 'Viber',
-      channel: 'viber',
-      icon: <ChatIcon sx={{ color: '#7360F2' }} />,
-      path: '/social-inbox?channel=viber'
-    },
-    {
-      label: 'Discord',
-      channel: 'discord',
-      icon: <ChatIcon sx={{ color: '#5865F2' }} />,
-      path: '/social-inbox?channel=discord'
-    },
-    {
-      label: 'Snapchat',
-      channel: 'snapchat',
-      icon: <ChatIcon sx={{ color: '#E8C200' }} />,
-      path: '/social-inbox?channel=snapchat'
-    },
-    {
-      label: 'TikTok',
-      channel: 'tiktok',
-      icon: <ChatIcon sx={{ color: '#010101' }} />,
-      path: '/social-inbox?channel=tiktok'
-    },
-    {
       label: 'YouTube',
       channel: 'youtube',
       icon: <ChatIcon sx={{ color: '#FF0000' }} />,
       path: '/social-inbox?channel=youtube'
+    },
+    {
+      label: 'Email (Brevo)',
+      channel: 'brevo',
+      icon: <EmailIcon sx={{ color: '#0B996F' }} />,
+      path: '/social-inbox?channel=brevo'
     }
   ];
 
@@ -824,23 +832,52 @@ export const DashboardLayout = () => {
   };
 
   // Render navigation item
-  const renderNavItem = (item) => {
+  const isMenuAllowed = (allowedMenus, currentMenuLabel) => {
+  if (!allowedMenus || !Array.isArray(allowedMenus)) return true;
+  if (!currentMenuLabel) return true;
+
+  if (allowedMenus.includes(currentMenuLabel)) return true;
+
+  const synonyms = {
+    'Projects': ['Active Projects', 'Active Cases', 'Projects'],
+    'Active Projects': ['Active Projects', 'Active Cases', 'Projects'],
+    'Active Cases': ['Active Projects', 'Active Cases', 'Projects'],
+    'Archived Projects': ['Archived Projects', 'Closed Cases'],
+    'Closed Cases': ['Archived Projects', 'Closed Cases'],
+    'User Management': ['User Management'],
+    'Team': ['Team', 'Agents'],
+    'Agents': ['Team', 'Agents'],
+    'General Settings': ['General Settings', 'Settings'],
+    'Settings': ['General Settings', 'Settings'],
+    'Calendar': ['Calendar', 'Consultations'],
+    'AI Employees (24/7)': ['AI Employees (24/7)', 'AI Employees'],
+    'AI Employees': ['AI Employees (24/7)', 'AI Employees'],
+  };
+
+  const equivalents = synonyms[currentMenuLabel] || [currentMenuLabel];
+  return equivalents.some(item => allowedMenus.includes(item));
+};
+
+const renderNavItem = (item) => {
+    // Basic role check must always be respected
+    if (item.roles && !item.roles.includes(currentUser?.role)) return null;
+
     // 1. Check individual user customization override in customizationSettings (highest priority)
     if (customizationSettings && currentUser?.id && customizationSettings[currentUser.id]?.menus) {
       const allowedMenus = customizationSettings[currentUser.id].menus || [];
-      if (!allowedMenus.includes(item.label)) return null;
+      if (!isMenuAllowed(allowedMenus, item.label)) return null;
     }
     // 2. Legacy custom permissions override check
     else if (currentUser?.customPermissions?.enabled) {
       const allowedMenus = currentUser.customPermissions.menus || [];
-      if (!allowedMenus.includes(item.label)) return null;
+      if (!isMenuAllowed(allowedMenus, item.label)) return null;
     }
     // 3. Fall back to role-based settings (or static fallback)
     else {
       if (currentUser?.role !== 'super_admin') {
         if (customizationSettings && customizationSettings[currentUser?.role]) {
           const allowedMenus = customizationSettings[currentUser.role].menus || [];
-          if (!allowedMenus.includes(item.label)) return null;
+          if (!isMenuAllowed(allowedMenus, item.label)) return null;
         } else {
           // Fallback to static check if settings are not loaded yet
           if (!item.roles.includes(currentUser?.role)) return null;
@@ -975,18 +1012,16 @@ export const DashboardLayout = () => {
             }}
           >
             <img
-              src="/aaa-logo.png"
-              alt="AAA Logo"
+              src={companySettings?.logoUrl || "/kiaan-logo.svg"}
+              alt={companySettings?.companyName || "Kiaan Technologies Logo"}
               style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+              onError={(e) => { e.currentTarget.src = '/kiaan-logo.svg'; }}
             />
           </Box>
           {sidebarOpen && (
             <Box>
               <Typography variant="h6" sx={{ fontWeight: 800, lineHeight: 1.1, letterSpacing: '-0.02em' }}>
-                AAA TECHNOLOGIES
-              </Typography>
-              <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.65rem', fontWeight: 600, letterSpacing: '0.04em' }}>
-                IT SERVICES & SOFTWARE
+                {companySettings?.companyName ? companySettings.companyName.toUpperCase() : 'KIAAN TECHNOLOGY CRM'}
               </Typography>
             </Box>
           )}

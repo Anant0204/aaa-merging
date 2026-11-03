@@ -154,8 +154,8 @@ export const TeamList = () => {
   return (
     <Box>
       <PageHeader
-        title="Staff & Roles Management"
-        subtitle="Manage team members, performance metrics, and assign access roles."
+        title="Team Directory"
+        subtitle="Overview of tech leads, developers, consultants, and IT team members."
         action={
           !isViewOnly && isAdmin && (
             <Button
@@ -165,7 +165,7 @@ export const TeamList = () => {
               onClick={handleOpenAddModal}
               sx={{ borderRadius: 2.5, fontWeight: 700 }}
             >
-              Add New Staff
+              Add Team Member
             </Button>
           )
         }
@@ -262,7 +262,7 @@ export const TeamList = () => {
                   flexWrap: 'wrap',
                   width: '100%' }}
               >
-                {c.languages.map((l) => (
+                {(Array.isArray(c.languages) ? c.languages : (typeof c.languages === 'string' ? c.languages.split(',').filter(Boolean) : [])).map((l) => (
                   <Chip
                     key={l}
                     label={l}
@@ -323,7 +323,7 @@ export const TeamList = () => {
                       Revenue
                     </Typography>
                     <Typography variant="subtitle2" sx={{ fontWeight: 700, fontSize: '0.85rem' }}>
-                      €{c.revenueGenerated.toLocaleString()}
+                      ₹{(c.revenueGenerated || 0).toLocaleString()}
                     </Typography>
                   </Box>
                 </Box>

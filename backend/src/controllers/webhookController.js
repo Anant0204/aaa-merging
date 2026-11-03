@@ -958,7 +958,7 @@ exports.handleTwitterWebhook = async (req, res) => {
       // Save to database
       await prisma.communicationLog.create({
         data: {
-          phone: cleanSender,
+          phone: cleanSender, 
           name: senderDisplayName,
           channel: 'TWITTER',
           direction: 'INBOUND',

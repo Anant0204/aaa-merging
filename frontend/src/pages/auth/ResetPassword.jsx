@@ -11,10 +11,12 @@ import IconButton from '@mui/material/IconButton';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { useAlert } from '../../contexts/AlertContext';
+import { useCompanySettings } from '../../hooks/useCompanySettings';
 
 export const ResetPassword = () => {
   const navigate = useNavigate();
   const { showAlert } = useAlert();
+  const { logoUrl, companyName } = useCompanySettings();
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -57,9 +59,10 @@ export const ResetPassword = () => {
           }}
         >
           <img
-            src="/aaa-logo.png"
-            alt="AAA Technologies Logo"
+            src={logoUrl}
+            alt={`${companyName} Logo`}
             style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+            onError={(e) => { e.currentTarget.src = '/kiaan-logo.svg'; }}
           />
         </Box>
         <Typography variant="h4" sx={{ fontWeight: 800, mb: 1, letterSpacing: '-0.02em' }}>

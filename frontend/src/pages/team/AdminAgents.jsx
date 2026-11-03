@@ -451,8 +451,8 @@ export const AdminAgents = () => {
   return (
     <Box sx={{ height: 'calc(100vh - 120px)', display: 'flex', flexDirection: 'column' }}>
       <PageHeader
-        title="Agents Management"
-        subtitle="Manage agent accounts, review key performance metrics, commissions, and access privileges."
+        title="User Management"
+        subtitle="Create and manage system user accounts, login credentials, and access roles."
         action={
           !isViewOnly && isAdmin && (
             <Button
@@ -462,7 +462,7 @@ export const AdminAgents = () => {
               onClick={handleOpenAddModal}
               sx={{ borderRadius: 2.5, fontWeight: 700 }}
             >
-              Add New Team/Agent
+              Add New User
             </Button>
           )
         }
@@ -486,7 +486,7 @@ export const AdminAgents = () => {
             >
               <Box sx={{ p: 2, borderBottom: '1px solid', borderColor: 'divider', bgcolor: 'background.neutral' }}>
                 <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'text.secondary', textTransform: 'uppercase' }}>
-                  Agents Directory
+                  Users Directory
                 </Typography>
               </Box>
 

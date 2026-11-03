@@ -269,7 +269,7 @@ export const dbService = {
     return res.data?.integrations || {};
   },
   saveIntegrations: async (integrationsData) => {
-    const res = await apiClient.post('/settings/customization', {
+    const res = await apiClient.put('/settings/customization', {
       settings: {
         integrations: integrationsData
       }
@@ -361,6 +361,16 @@ export const dbService = {
   },
   updateCompanySettings: async (data) => {
     const res = await apiClient.put('/settings/company', data);
+    return res.data;
+  },
+  uploadCompanyLogo: async (file) => {
+    const formData = new FormData();
+    formData.append('logo', file);
+    const res = await apiClient.post('/settings/logo', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
     return res.data;
   },
   getLeadStages: async () => {
@@ -956,6 +966,82 @@ export const dbService = {
 
   submitPublicFeedback: async (data) => {
     const res = await axios.post(`${API_URL}/reviews/qr-hub/public/feedback`, data);
+    return res.data;
+  },
+
+  // IT PROJECTS MANAGEMENT
+  getProjects: async (params = {}) => {
+    const res = await apiClient.get('/projects', { params });
+    return res.data;
+  },
+
+  getProjectById: async (id) => {
+    const res = await apiClient.get(`/projects/${id}`);
+    return res.data;
+  },
+
+  createProject: async (projectData) => {
+    const res = await apiClient.post('/projects', projectData);
+    return res.data;
+  },
+
+  updateProject: async (id, projectData) => {
+    const res = await apiClient.put(`/projects/${id}`, projectData);
+    return res.data;
+  },
+
+  deleteProject: async (id) => {
+    const res = await apiClient.delete(`/projects/${id}`);
+    return res.data;
+  },
+
+  createMilestone: async (projectId, milestoneData) => {
+    const res = await apiClient.post(`/projects/${projectId}/milestones`, milestoneData);
+    return res.data;
+  },
+
+  updateMilestone: async (projectId, milestoneId, milestoneData) => {
+    const res = await apiClient.put(`/projects/${projectId}/milestones/${milestoneId}`, milestoneData);
+    return res.data;
+  },
+
+  deleteMilestone: async (projectId, milestoneId) => {
+    const res = await apiClient.delete(`/projects/${projectId}/milestones/${milestoneId}`);
+    return res.data;
+  },
+
+  createTask: async (projectId, taskData) => {
+    const res = await apiClient.post(`/projects/${projectId}/tasks`, taskData);
+    return res.data;
+  },
+
+  updateTask: async (projectId, taskId, taskData) => {
+    const res = await apiClient.put(`/projects/${projectId}/tasks/${taskId}`, taskData);
+    return res.data;
+  },
+
+  deleteTask: async (projectId, taskId) => {
+    const res = await apiClient.delete(`/projects/${projectId}/tasks/${taskId}`);
+    return res.data;
+  },
+
+  logTime: async (projectId, logData) => {
+    const res = await apiClient.post(`/projects/${projectId}/time-logs`, logData);
+    return res.data;
+  },
+
+  deleteTimeLog: async (projectId, logId) => {
+    const res = await apiClient.delete(`/projects/${projectId}/time-logs/${logId}`);
+    return res.data;
+  },
+
+  createHandover: async (projectId, handoverData) => {
+    const res = await apiClient.post(`/projects/${projectId}/handovers`, handoverData);
+    return res.data;
+  },
+
+  signOffHandover: async (projectId, handoverId, signoffData) => {
+    const res = await apiClient.put(`/projects/${projectId}/handovers/${handoverId}/signoff`, signoffData);
     return res.data;
   },
 };

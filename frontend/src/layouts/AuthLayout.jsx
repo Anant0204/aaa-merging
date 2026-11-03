@@ -4,9 +4,11 @@ import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import { useTheme } from '@mui/material/styles';
+import { useCompanySettings } from '../hooks/useCompanySettings';
 
 export const AuthLayout = () => {
   const theme = useTheme();
+  const { logoUrl, companyName } = useCompanySettings();
 
   return (
     <Box
@@ -62,14 +64,15 @@ export const AuthLayout = () => {
               }}
             >
               <img
-                src="/aaa-logo.png"
-                alt="AAA Technologies Logo"
+                src={logoUrl}
+                alt={`${companyName} Logo`}
                 style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                onError={(e) => { e.currentTarget.src = '/kiaan-logo.svg'; }}
               />
             </Box>
             <Box>
               <Typography variant="h5" sx={{ fontWeight: 800, letterSpacing: '-0.02em', color: 'white', lineHeight: 1.1 }}>
-                AAA TECHNOLOGIES
+                {companyName ? companyName.toUpperCase() : 'KIAAN TECHNOLOGY CRM'}
               </Typography>
               <Typography variant="caption" sx={{ color: '#94A3B8', fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', fontSize: '0.7rem' }}>
                 Cloud • Software • AI Enterprise Portal
@@ -108,7 +111,7 @@ export const AuthLayout = () => {
         </Box>
 
         <Typography variant="caption" sx={{ zIndex: 2, color: 'rgba(255,255,255,0.5)', textAlign: 'left' }}>
-          © {new Date().getFullYear()} AAA Technologies LLC. Innovate • Build • Scale.
+          © {new Date().getFullYear()} {companyName || 'Kiaan Technology CRM'}. Innovate • Build • Scale.
         </Typography>
       </Box>
 
@@ -171,17 +174,15 @@ export const AuthLayout = () => {
               }}
             >
               <img
-                src="/aaa-logo.png"
-                alt="AAA Technologies Logo"
+                src={logoUrl}
+                alt={`${companyName} Logo`}
                 style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                onError={(e) => { e.currentTarget.src = '/kiaan-logo.svg'; }}
               />
             </Box>
             <Box sx={{ textAlign: 'left' }}>
               <Typography variant="h6" sx={{ fontWeight: 800, lineHeight: 1.1, letterSpacing: '-0.02em', color: theme.palette.mode === 'light' ? 'primary.main' : 'white' }}>
-                AAA TECHNOLOGIES
-              </Typography>
-              <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>
-                IT Services & Enterprise Software Portal
+                {companyName ? companyName.toUpperCase() : 'KIAAN TECHNOLOGY CRM'}
               </Typography>
             </Box>
           </Box>

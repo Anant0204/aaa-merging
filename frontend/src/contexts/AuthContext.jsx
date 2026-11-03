@@ -133,7 +133,7 @@ export const useAuthContext = () => {
   const context = useContext(AuthContext);
   if (!context) {
     return {
-      currentUser: { id: 'admin_1', role: 'super_admin', fullName: 'SUPER ADMIN MODE', email: 'admin@aaabusinessconsultancy.com' },
+      currentUser: { id: 'admin_1', role: 'super_admin', fullName: 'SUPER ADMIN MODE', email: 'admin@kiaantechnology.com' },
       isAuthenticated: true,
       login: async () => {},
       logout: () => {},

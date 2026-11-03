@@ -29,8 +29,9 @@ import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
 import CreditCardIcon from '@mui/icons-material/CreditCard';
 
 // Assets & Components
-import aaaLogo from '../../assets/aaa-logo.png';
+import aaaLogo from '../../assets/kiaan-logo.svg';
 import { dbService } from '../../services/dbService';
+import { useCompanySettings } from '../../hooks/useCompanySettings';
 import PageHeader from '../../components/PageHeader';
 import StatusBadge from '../../components/StatusBadge';
 import AppModal from '../../components/AppModal';
@@ -39,20 +40,24 @@ import useAuth from '../../hooks/useAuth';
 import { SERVICES } from '../../constants/mockData';
 import { getPackageDisplayName } from '../../utils/packageHelper';
 
-// Official AAA Logo Image Component (Exact replica of Image 2)
-const AaaLogoComponent = ({ width = 76, height = 76, style = {} }) => (
-  <img
-    src={aaaLogo}
-    alt="AAA Business Consultancy Logo"
-    style={{
-      width,
-      height,
-      objectFit: 'contain',
-      display: 'block',
-      ...style
-    }}
-  />
-);
+// Official Corporate Logo Image Component
+const AaaLogoComponent = ({ width = 76, height = 76, style = {} }) => {
+  const { logoUrl, companyName } = useCompanySettings();
+  return (
+    <img
+      src={logoUrl || aaaLogo}
+      alt={`${companyName} Logo`}
+      onError={(e) => { e.currentTarget.src = aaaLogo; }}
+      style={{
+        width,
+        height,
+        objectFit: 'contain',
+        display: 'block',
+        ...style
+      }}
+    />
+  );
+};
 
 export const InvoiceDetails = () => {
   const { id } = useParams();
@@ -213,7 +218,7 @@ export const InvoiceDetails = () => {
       doc.setFont("helvetica", "bold");
       doc.setFontSize(20);
       doc.setTextColor(12, 35, 64);
-      doc.text("AAA BUSINESS CONSULTANCY L.L.C", 14, 20);
+      doc.text("KIAAN TECHNOLOGIES LLC", 14, 20);
 
       doc.setFontSize(9);
       doc.setFont("helvetica", "bold");
@@ -223,7 +228,7 @@ export const InvoiceDetails = () => {
       doc.setFontSize(9);
       doc.setFont("helvetica", "normal");
       doc.setTextColor(100, 116, 139);
-      doc.text("Email: client@aaabusinessconsultancy.com | Tel: +971509554142", 14, 32);
+      doc.text("Email: client@kiaantechnology.com | Tel: +919876543210", 14, 32);
       doc.text("Business Village B, Office F-09, Port Saeed, Deira, Dubai, UAE", 14, 37);
 
       doc.setDrawColor(197, 155, 39);
@@ -301,7 +306,7 @@ export const InvoiceDetails = () => {
       doc.setFontSize(9);
       doc.setFont("helvetica", "normal");
       doc.setTextColor(148, 163, 184);
-      doc.text("Thank you for choosing AAA Business Consultancy for your Spain Relocation journey.", 14, currentY + 35);
+      doc.text("Thank you for choosing KIAAN TECHNOLOGIES for your Spain Relocation journey.", 14, currentY + 35);
 
       doc.save(`Invoice-${invoiceNumber}.pdf`);
     } catch (err) {
@@ -423,7 +428,7 @@ export const InvoiceDetails = () => {
         />
       </Box>
 
-      {/* ── OFFICIAL AAA BUSINESS CONSULTANCY FZC LLC LETTERHEAD INVOICE CONTAINER ── */}
+      {/* ── OFFICIAL KIAAN TECHNOLOGIES FZC LLC LETTERHEAD INVOICE CONTAINER ── */}
       <Paper
         className="printable-invoice-letterhead"
         sx={{
@@ -466,7 +471,7 @@ export const InvoiceDetails = () => {
               <AaaLogoComponent width={64} height={64} />
               <Box sx={{ borderLeft: '1.5px solid #C59B27', pl: 1.2, py: 0.2 }}>
                 <Typography sx={{ fontWeight: 900, fontSize: '1.05rem', color: '#0C2340', lineHeight: 1.1, letterSpacing: '0.3px', whiteSpace: 'nowrap' }}>
-                  AAA BUSINESS CONSULTANCY L.L.C
+                  KIAAN TECHNOLOGIES LLC
                 </Typography>
 
                 {/* Divider Line & Tagline */}
@@ -487,7 +492,7 @@ export const InvoiceDetails = () => {
                     ✉️
                   </Box>
                   <Typography sx={{ fontSize: '0.68rem', color: '#0C2340', fontWeight: 700, whiteSpace: 'nowrap' }}>
-                    client@aaabusinessconsultancy.com
+                    client@kiaantechnology.com
                   </Typography>
                 </Box>
 
@@ -496,7 +501,7 @@ export const InvoiceDetails = () => {
                     📞
                   </Box>
                   <Typography sx={{ fontSize: '0.68rem', color: '#0C2340', fontWeight: 700, whiteSpace: 'nowrap' }}>
-                    +971509554142
+                    +919876543210
                   </Typography>
                 </Box>
 
@@ -505,7 +510,7 @@ export const InvoiceDetails = () => {
                     🌐
                   </Box>
                   <Typography sx={{ fontSize: '0.68rem', color: '#0C2340', fontWeight: 700, whiteSpace: 'nowrap' }}>
-                    www.aaabusinessconsultancy.com
+                    www.kiaantechnology.com
                   </Typography>
                 </Box>
 
@@ -688,7 +693,7 @@ export const InvoiceDetails = () => {
           </Box>
 
           <Typography sx={{ fontSize: '0.78rem', color: '#94A3B8', textAlign: 'center', mb: 2 }}>
-            Thank you for choosing AAA Business Consultancy for your Spain Relocation journey.
+            Thank you for choosing KIAAN TECHNOLOGIES for your Spain Relocation journey.
           </Typography>
         </Box>
 
